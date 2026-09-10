@@ -100,6 +100,25 @@ body {
   border-radius: var(--radius-xs);
 }
 
+/* Skip link — visible only on focus (spec §44) */
+.skip-link {
+  position: fixed;
+  top: 0.5rem;
+  left: 0.5rem;
+  z-index: var(--z-toast);
+  transform: translateY(-160%);
+  background: var(--color-ink);
+  color: #fff;
+  padding: 0.6rem 1rem;
+  border-radius: var(--radius-sm);
+  font-size: 0.85rem;
+  font-weight: 700;
+  transition: transform var(--duration-fast) var(--ease-out);
+}
+.skip-link:focus {
+  transform: translateY(0);
+}
+
 /* Respect reduced-motion (spec §44, §67) */
 @media (prefers-reduced-motion: reduce) {
   *,
@@ -135,5 +154,91 @@ body {
     .site-container {
       padding-inline: 2rem; /* 32px desktop */
     }
+  }
+
+  /* Basic readable prose for static/legal pages. Article-grade prose (TOC,
+     pull quotes, embeds) is built in Phase 3. */
+  .page-prose {
+    max-width: var(--measure-article);
+    font-size: 1.05rem;
+    line-height: 1.75;
+    color: var(--color-ink);
+  }
+  .page-prose > * + * {
+    margin-top: 1.1rem;
+  }
+  .page-prose h2 {
+    margin-top: 2rem;
+    font-size: 1.5rem;
+    font-weight: 700;
+    line-height: 1.3;
+  }
+  .page-prose h3 {
+    margin-top: 1.6rem;
+    font-size: 1.2rem;
+    font-weight: 700;
+  }
+  .page-prose a {
+    color: var(--color-accent-blue);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+  .page-prose ul,
+  .page-prose ol {
+    padding-left: 1.4rem;
+  }
+  .page-prose li + li {
+    margin-top: 0.4rem;
+  }
+  .page-prose ul {
+    list-style: disc;
+  }
+  .page-prose ol {
+    list-style: decimal;
+  }
+}
+
+/* ==========================================================================
+   Motion utilities (subtle; disabled by the reduced-motion block above)
+   ========================================================================== */
+
+@keyframes vt-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes vt-slide-in-right {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+@keyframes vt-slide-down {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@layer utilities {
+  .animate-fade-in {
+    animation: vt-fade-in var(--duration-base) var(--ease-out);
+  }
+  .animate-slide-in-right {
+    animation: vt-slide-in-right var(--duration-base) var(--ease-out);
+  }
+  .animate-slide-down {
+    animation: vt-slide-down var(--duration-fast) var(--ease-out);
   }
 }

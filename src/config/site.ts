@@ -26,6 +26,17 @@ export const SOCIAL_LINKS = {
   tiktok: "",
 } as const;
 
+export type SocialPlatform = keyof typeof SOCIAL_LINKS;
+
+/** Order + accessible labels for rendering the social icon row. */
+export const SOCIAL_PLATFORMS: { key: SocialPlatform; label: string }[] = [
+  { key: "facebook", label: "Facebook" },
+  { key: "x", label: "X" },
+  { key: "instagram", label: "Instagram" },
+  { key: "youtube", label: "YouTube" },
+  { key: "tiktok", label: "TikTok" },
+];
+
 export type CategoryKey =
   | "viral"
   | "people"
