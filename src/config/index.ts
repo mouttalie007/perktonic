@@ -1,4 +1,5 @@
-export { clientEnv, serverEnv } from "./env";
+// Client-safe barrel. Server-only env lives in "@/config/env.server".
+export { clientEnv } from "./env";
 export {
   SITE,
   SOCIAL_LINKS,

@@ -1,5 +1,5 @@
 import { prisma } from "@/lib/prisma";
-import { serverEnv } from "@/config/env";
+import { serverEnv } from "@/config/env.server";
 
 /**
  * Newsletter subscription abstraction (spec §18, §88, §89).

@@ -1,5 +1,5 @@
 import { prisma } from "@/lib/prisma";
-import { serverEnv } from "@/config/env";
+import { serverEnv } from "@/config/env.server";
 
 /**
  * Media resolution + upload abstraction (spec §15, §42, §68).
