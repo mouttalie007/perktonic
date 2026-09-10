@@ -1,38 +1,28 @@
 import { Fragment } from "react";
-import { processArticleHtml } from "@/lib/article-html";
-import { adService } from "@/services/ad.service";
+import type { TocItem } from "@/lib/article-html";
 import { AdSlot } from "@/components/ads/AdSlot";
 import { TableOfContents } from "./TableOfContents";
 
-type BodyArticle = {
-  content: string | null;
-  adsDisabled: boolean;
-  adOverrides: unknown;
-};
-
 /**
- * Renders the article body (spec §25, §27): styled prose, an auto table of
- * contents (3+ headings) and in-content ads injected every Nth paragraph
- * when the placement rule is active.
+ * Renders the prepared article body (spec §25, §27): the inline table of
+ * contents (3+ headings, mobile/tablet only), styled prose, and in-content
+ * ads between the pre-split segments.
  */
-export async function ArticleBody({ article }: { article: BodyArticle }) {
-  const rule = await adService.getInContentRule("STANDARD");
-  const { toc, segments } = processArticleHtml(article.content ?? "", {
-    adEveryNParagraphs: rule?.everyNParagraphs,
-    maxAds: rule?.maxInjections,
-  });
-
-  const adCtx = {
-    adsDisabled: article.adsDisabled,
-    adOverrides: (article.adOverrides ?? null) as Record<
-      string,
-      string | null
-    > | null,
+export function ArticleBody({
+  segments,
+  toc,
+  adCtx,
+}: {
+  segments: string[];
+  toc: TocItem[];
+  adCtx: {
+    adsDisabled: boolean;
+    adOverrides: Record<string, string | null> | null;
   };
-
+}) {
   return (
     <>
-      {toc.length >= 3 && <TableOfContents items={toc} />}
+      {toc.length >= 3 && <TableOfContents items={toc} variant="inline" />}
       <div className="article-prose">
         {segments.map((seg, i) => (
           <Fragment key={i}>

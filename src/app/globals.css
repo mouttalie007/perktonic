@@ -43,7 +43,8 @@
 
   /* --- Layout --- */
   --width-page: 1320px; /* centered container max (spec §5) */
-  --width-article: 812px; /* article body column */
+  --width-article: 744px; /* article reading column (720–780 target) */
+  --article-rhythm: 1.3rem; /* controlled paragraph spacing */
 
   /* --- Radius (spec §14: 4–8px max) --- */
   --radius-xs: 2px;
@@ -216,10 +217,11 @@ body {
   /* Article body (spec §25, §27). Reading measure ~700px, 18px base.   */
   /* ------------------------------------------------------------------ */
   .article-prose {
-    font-size: 1.125rem;
+    font-size: 1.125rem; /* 18px */
     line-height: 1.8;
     color: var(--color-ink);
   }
+  /* Controlled, consistent vertical rhythm — no stray first/last margins. */
   .article-prose p,
   .article-prose ul,
   .article-prose ol,
@@ -227,21 +229,42 @@ body {
   .article-prose figure,
   .article-prose .article-table-wrap,
   .article-prose pre {
-    margin-block: 1.35rem;
+    margin-block: var(--article-rhythm);
   }
+  .article-prose > *:first-child {
+    margin-top: 0;
+  }
+  .article-prose > *:last-child {
+    margin-bottom: 0;
+  }
+  /* Stronger H2 hierarchy: clear separation above, bound tight to its text,
+     larger and tighter-tracked than the body (spec §25). */
   .article-prose h2 {
-    margin-block: 2.4rem 0.9rem;
-    font-size: 1.6rem;
+    margin-block: 3rem 0.7rem;
+    padding-top: 1.4rem;
+    border-top: 1px solid var(--color-line);
+    font-size: 1.75rem;
     font-weight: 800;
-    line-height: 1.25;
-    letter-spacing: -0.01em;
+    line-height: 1.2;
+    letter-spacing: -0.02em;
     scroll-margin-top: 5rem;
+  }
+  .article-prose h2:first-child {
+    margin-top: 0;
+    padding-top: 0;
+    border-top: 0;
   }
   .article-prose h3 {
-    margin-block: 1.9rem 0.75rem;
-    font-size: 1.25rem;
+    margin-block: 2rem 0.55rem;
+    font-size: 1.2rem;
     font-weight: 700;
+    line-height: 1.35;
     scroll-margin-top: 5rem;
+  }
+  /* Tighten the heading -> first paragraph gap so headings own their content. */
+  .article-prose h2 + p,
+  .article-prose h3 + p {
+    margin-top: 0;
   }
   .article-prose a {
     color: var(--color-accent-blue);

@@ -77,7 +77,7 @@ export function ArticleHeader({ article }: { article: HeaderArticle }) {
               alt={article.featuredImage.alt || article.title}
               fill
               priority
-              sizes="(max-width: 860px) 100vw, 820px"
+              sizes="(max-width: 800px) 100vw, 744px"
               className="object-cover"
             />
           </div>
