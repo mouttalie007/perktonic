@@ -180,7 +180,7 @@ async function main() {
       name: "Daniel Brooks",
       role: "Entertainment · People · Trending · Weird Stories",
       bio: "Daniel Brooks follows the entertainment headlines, viral moments and genuinely strange stories the internet will not stop sharing — and enjoys explaining why each one blew up.",
-      avatarUrl: "/authors/daniel-brooks.jpg",
+      avatarUrl: "/authors/daniel-brooks.png",
     },
   ];
 
