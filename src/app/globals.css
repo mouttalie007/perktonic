@@ -211,6 +211,149 @@ body {
       min-height: var(--ad-h-d, 0px);
     }
   }
+
+  /* ------------------------------------------------------------------ */
+  /* Article body (spec §25, §27). Reading measure ~700px, 18px base.   */
+  /* ------------------------------------------------------------------ */
+  .article-prose {
+    font-size: 1.125rem;
+    line-height: 1.8;
+    color: var(--color-ink);
+  }
+  .article-prose p,
+  .article-prose ul,
+  .article-prose ol,
+  .article-prose blockquote,
+  .article-prose figure,
+  .article-prose .article-table-wrap,
+  .article-prose pre {
+    margin-block: 1.35rem;
+  }
+  .article-prose h2 {
+    margin-block: 2.4rem 0.9rem;
+    font-size: 1.6rem;
+    font-weight: 800;
+    line-height: 1.25;
+    letter-spacing: -0.01em;
+    scroll-margin-top: 5rem;
+  }
+  .article-prose h3 {
+    margin-block: 1.9rem 0.75rem;
+    font-size: 1.25rem;
+    font-weight: 700;
+    scroll-margin-top: 5rem;
+  }
+  .article-prose a {
+    color: var(--color-accent-blue);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+  .article-prose a:hover {
+    text-decoration-thickness: 2px;
+  }
+  .article-prose strong {
+    font-weight: 700;
+  }
+  .article-prose ul,
+  .article-prose ol {
+    padding-left: 1.5rem;
+  }
+  .article-prose ul {
+    list-style: disc;
+  }
+  .article-prose ol {
+    list-style: decimal;
+  }
+  .article-prose li + li {
+    margin-top: 0.5rem;
+  }
+  .article-prose blockquote {
+    border-left: 3px solid var(--color-brand);
+    padding: 0.2rem 0 0.2rem 1.25rem;
+    font-size: 1.2rem;
+    font-style: italic;
+    color: var(--color-ink);
+  }
+  .article-prose blockquote p {
+    margin-block: 0.5rem;
+  }
+  .article-prose figure {
+    margin-inline: 0;
+  }
+  .article-prose img {
+    border-radius: var(--radius-sm);
+  }
+  .article-prose figcaption {
+    margin-top: 0.5rem;
+    font-size: 0.85rem;
+    color: var(--color-muted);
+  }
+  .article-prose hr {
+    margin-block: 2.5rem;
+    border: 0;
+    border-top: 1px solid var(--color-line);
+  }
+  .article-prose .article-table-wrap {
+    overflow-x: auto;
+  }
+  .article-prose table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.95rem;
+  }
+  .article-prose th,
+  .article-prose td {
+    border: 1px solid var(--color-line);
+    padding: 0.6rem 0.8rem;
+    text-align: left;
+  }
+  .article-prose th {
+    background: var(--color-surface);
+    font-weight: 700;
+  }
+  .article-prose pre {
+    overflow-x: auto;
+    background: var(--color-ink-deep);
+    color: #f5f5f5;
+    padding: 1rem 1.1rem;
+    border-radius: var(--radius-sm);
+    font-size: 0.9rem;
+    line-height: 1.6;
+  }
+  .article-prose :not(pre) > code {
+    background: var(--color-surface);
+    border: 1px solid var(--color-line);
+    border-radius: var(--radius-xs);
+    padding: 0.1rem 0.35rem;
+    font-size: 0.9em;
+  }
+  .article-prose iframe {
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    height: auto;
+    border: 0;
+    border-radius: var(--radius-sm);
+  }
+  /* Editor-produced helpers (spec §27) */
+  .article-prose .pullquote {
+    margin-block: 2rem;
+    font-size: 1.5rem;
+    font-weight: 700;
+    line-height: 1.3;
+    color: var(--color-ink);
+    border-top: 2px solid var(--color-ink);
+    border-bottom: 2px solid var(--color-ink);
+    padding-block: 1rem;
+  }
+  .article-prose .callout {
+    margin-block: 1.75rem;
+    background: var(--color-surface);
+    border: 1px solid var(--color-line);
+    border-left: 3px solid var(--color-accent-blue);
+    border-radius: var(--radius-sm);
+    padding: 1rem 1.15rem;
+    font-size: 1rem;
+  }
 }
 
 /* ==========================================================================

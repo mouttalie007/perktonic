@@ -4,11 +4,33 @@ const dateFmt = new Intl.DateTimeFormat("en-US", {
   year: "numeric",
 });
 
+const dateFmtLong = new Intl.DateTimeFormat("en-US", {
+  month: "long",
+  day: "numeric",
+  year: "numeric",
+});
+
 /** "Sep 10, 2026" */
 export function formatDate(date: Date | string | null | undefined): string {
   if (!date) return "";
   const d = typeof date === "string" ? new Date(date) : date;
   return dateFmt.format(d);
+}
+
+/** "September 10, 2026" */
+export function formatDateLong(date: Date | string | null | undefined): string {
+  if (!date) return "";
+  const d = typeof date === "string" ? new Date(date) : date;
+  return dateFmtLong.format(d);
+}
+
+/** True when two dates fall on different calendar days. */
+export function isDifferentDay(
+  a: Date | string | null | undefined,
+  b: Date | string | null | undefined,
+): boolean {
+  if (!a || !b) return false;
+  return formatDate(a) !== formatDate(b);
 }
 
 /** ISO date for <time dateTime> / structured data. */

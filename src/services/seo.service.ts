@@ -99,6 +99,45 @@ export const seoService = {
     };
   },
 
+  /** JSON-LD: Article / NewsArticle (spec §36). Only marks up what the page shows. */
+  async articleJsonLd(input: {
+    headline: string;
+    description: string;
+    path: string;
+    imageUrl?: string;
+    datePublished?: string;
+    dateModified?: string;
+    authorName: string;
+    section?: string;
+  }) {
+    const seo = await siteSettingsService.getSeoSettings();
+    const url = absoluteUrl(input.path);
+    return {
+      "@context": "https://schema.org",
+      "@type": "Article",
+      headline: input.headline.slice(0, 110),
+      description: input.description,
+      ...(input.imageUrl ? { image: [absoluteUrl(input.imageUrl)] } : {}),
+      ...(input.datePublished ? { datePublished: input.datePublished } : {}),
+      dateModified: input.dateModified ?? input.datePublished,
+      ...(input.section ? { articleSection: input.section } : {}),
+      author: { "@type": "Person", name: input.authorName },
+      publisher: {
+        "@type": "Organization",
+        name: seo.organizationName,
+        ...(seo.organizationLogoUrl
+          ? {
+              logo: {
+                "@type": "ImageObject",
+                url: absoluteUrl(seo.organizationLogoUrl),
+              },
+            }
+          : {}),
+      },
+      mainEntityOfPage: { "@type": "WebPage", "@id": url },
+    };
+  },
+
   /** JSON-LD: BreadcrumbList (spec §71). */
   breadcrumbJsonLd(crumbs: { name: string; path: string }[]) {
     return {

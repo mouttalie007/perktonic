@@ -126,22 +126,36 @@ export const articleService = {
     });
   },
 
-  /** Related stories — same category, most recent, excluding the current one (spec §28). */
+  /**
+   * Related stories (spec §28): same category first, then backfilled with
+   * recent stories from elsewhere so the block is never empty.
+   */
   async listRelated(
     articleId: string,
     categoryId: string | null,
     limit = 4,
   ): Promise<ArticleCard[]> {
-    return prisma.article.findMany({
+    const sameCategory = categoryId
+      ? await prisma.article.findMany({
+          where: { ...PUBLISHED, id: { not: articleId }, categoryId },
+          orderBy: { publishedAt: "desc" },
+          take: limit,
+          select: cardSelect,
+        })
+      : [];
+
+    if (sameCategory.length >= limit) return sameCategory;
+
+    const backfill = await prisma.article.findMany({
       where: {
         ...PUBLISHED,
-        id: { not: articleId },
-        ...(categoryId ? { categoryId } : {}),
+        id: { notIn: [articleId, ...sameCategory.map((a) => a.id)] },
       },
       orderBy: { publishedAt: "desc" },
-      take: limit,
+      take: limit - sameCategory.length,
       select: cardSelect,
     });
+    return [...sameCategory, ...backfill];
   },
 
   /** All published slugs (with type) for sitemap / static params (spec §38). */

@@ -112,3 +112,44 @@ export function TiktokIcon(props: IconProps) {
     </svg>
   );
 }
+
+export function WhatsappIcon(props: IconProps) {
+  return (
+    <svg {...base(props)} fill="currentColor">
+      <path d="M17.5 14.4c-.3-.15-1.77-.87-2.04-.97-.27-.1-.47-.15-.67.15-.2.3-.77.96-.94 1.16-.17.2-.35.22-.65.07-.3-.15-1.26-.46-2.4-1.48-.89-.79-1.49-1.77-1.66-2.07-.17-.3-.02-.46.13-.61.13-.13.3-.35.45-.52.15-.17.2-.3.3-.5.1-.2.05-.37-.02-.52-.08-.15-.67-1.62-.92-2.22-.24-.58-.49-.5-.67-.51h-.57c-.2 0-.52.07-.8.37-.27.3-1.04 1.02-1.04 2.48s1.07 2.88 1.22 3.08c.15.2 2.1 3.2 5.08 4.49.71.3 1.26.49 1.7.63.71.23 1.36.2 1.87.12.57-.08 1.77-.72 2.02-1.42.25-.7.25-1.29.17-1.42-.07-.13-.27-.2-.57-.35ZM12.04 21.5h-.01a9.4 9.4 0 0 1-4.8-1.32l-.34-.2-3.57.94.95-3.48-.22-.36a9.42 9.42 0 0 1-1.44-5.02c0-5.2 4.24-9.44 9.46-9.44a9.4 9.4 0 0 1 6.69 2.77 9.38 9.38 0 0 1 2.77 6.68c-.01 5.2-4.25 9.45-9.45 9.45Zm8.05-17.5A11.32 11.32 0 0 0 12.04 0C5.79 0 .71 5.08.7 11.32c0 2 .52 3.94 1.51 5.66L.6 24l7.17-1.88a11.3 11.3 0 0 0 5.42 1.38h.01c6.24 0 11.32-5.08 11.33-11.33a11.26 11.26 0 0 0-3.33-8.02Z" />
+    </svg>
+  );
+}
+
+export function TelegramIcon(props: IconProps) {
+  return (
+    <svg {...base(props)} fill="currentColor">
+      <path d="M23.9 3.2 20.3 20.3c-.27 1.2-.98 1.5-1.98.93l-5.5-4.05-2.65 2.55c-.3.3-.54.54-1.1.54l.4-5.6L19.5 5.94c.44-.4-.1-.62-.68-.22L6.2 13.53l-5.42-1.7c-1.18-.37-1.2-1.18.25-1.75L22.38 1.5c.98-.36 1.84.22 1.52 1.7Z" />
+    </svg>
+  );
+}
+
+export function MailIcon(props: IconProps) {
+  return (
+    <svg {...base(props)} fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+      <rect x="2.5" y="4.5" width="19" height="15" rx="2" />
+      <path d="m3 6 9 7 9-7" />
+    </svg>
+  );
+}
+
+export function LinkIcon(props: IconProps) {
+  return (
+    <svg {...base(props)} fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+      <path d="M9 15 15 9M11 6.5l.9-.9a4 4 0 0 1 5.66 5.66l-.9.9M13 17.5l-.9.9a4 4 0 0 1-5.66-5.66l.9-.9" />
+    </svg>
+  );
+}
+
+export function CheckIcon(props: IconProps) {
+  return (
+    <svg {...base(props)} fill="none" stroke="currentColor" strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round">
+      <path d="m5 13 4 4L19 7" />
+    </svg>
+  );
+}
