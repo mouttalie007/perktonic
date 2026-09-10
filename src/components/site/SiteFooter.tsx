@@ -75,7 +75,7 @@ export function SiteFooter({
       <div className="site-container py-14">
         <div className="grid gap-10 md:grid-cols-2 lg:grid-cols-[1.4fr_1fr_1fr_1fr]">
           <div>
-            <Logo />
+            <Logo onDark />
             <p className="text-meta mt-2 font-semibold tracking-[0.2em] text-white/50 uppercase">
               Trend Today. Talk Tomorrow.
             </p>

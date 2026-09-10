@@ -91,6 +91,10 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
+  /* Safety net against horizontal overflow (spec §45). `clip` — unlike
+     `hidden`/`auto` — does not create a scroll container, so descendant
+     `position: sticky` keeps working. */
+  overflow-x: clip;
 }
 
 /* Accessible focus (spec §44) */

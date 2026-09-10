@@ -25,13 +25,13 @@ export function UtilityBar({
 
         {/* Trending ticker */}
         {ticker ? (
-          <p className="flex min-w-0 flex-1 items-center justify-center gap-2 md:justify-center">
+          <p className="flex min-w-0 flex-1 items-center justify-center gap-2 overflow-hidden">
             <span className="text-brand shrink-0 font-bold tracking-wide uppercase">
               Trending
             </span>
             <Link
               href={ticker.href}
-              className="truncate text-white transition-colors hover:text-white/70"
+              className="min-w-0 truncate text-white transition-colors hover:text-white/70"
             >
               {ticker.title}
             </Link>

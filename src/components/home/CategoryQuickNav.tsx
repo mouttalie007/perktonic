@@ -20,7 +20,7 @@ export function CategoryQuickNav({
   return (
     <nav
       aria-label="Browse by category"
-      className="border-line bg-canvas overflow-x-auto rounded-sm border [scrollbar-width:thin]"
+      className="border-line bg-canvas w-full max-w-full overflow-x-auto rounded-sm border [scrollbar-width:thin]"
     >
       <ul className="flex min-w-max divide-x divide-[var(--color-line)]">
         {categories.map((c) => (

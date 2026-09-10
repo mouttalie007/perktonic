@@ -61,20 +61,20 @@ export function HeaderBar({
 
   return (
     <header className="bg-canvas border-line border-b">
-      <div className="site-container flex items-center justify-between gap-6 py-4">
+      <div className="site-container flex items-center justify-between gap-3 py-4 xl:gap-6">
         <Logo withTagline />
 
         {/* Desktop navigation */}
         <nav
           aria-label="Primary"
-          className="hidden items-center gap-1 lg:flex"
+          className="hidden min-w-0 items-center lg:flex"
         >
           {NAV_PRIMARY.map((item) => (
             <Link
               key={item.href}
               href={item.href as Route}
               aria-current={isActive(item.href) ? "page" : undefined}
-              className={`relative px-3 py-2 text-[0.82rem] font-bold tracking-wide uppercase transition-colors after:absolute after:inset-x-3 after:-bottom-[1.05rem] after:h-[3px] after:transition-colors ${
+              className={`relative px-2 py-2 text-[0.75rem] font-bold uppercase transition-colors after:absolute after:inset-x-2 after:-bottom-[1.05rem] after:h-[3px] after:transition-colors xl:px-3 xl:text-[0.82rem] xl:tracking-wide xl:after:inset-x-3 ${
                 isActive(item.href)
                   ? "text-ink after:bg-brand"
                   : "text-ink/70 hover:text-ink after:bg-transparent"
@@ -91,7 +91,7 @@ export function HeaderBar({
               onClick={() => setMoreOpen((v) => !v)}
               aria-expanded={moreOpen}
               aria-haspopup="menu"
-              className={`relative flex items-center gap-1 px-3 py-2 text-[0.82rem] font-bold tracking-wide uppercase transition-colors after:absolute after:inset-x-3 after:-bottom-[1.05rem] after:h-[3px] ${
+              className={`relative flex items-center gap-1 px-2 py-2 text-[0.75rem] font-bold uppercase transition-colors after:absolute after:inset-x-2 after:-bottom-[1.05rem] after:h-[3px] xl:px-3 xl:text-[0.82rem] xl:tracking-wide xl:after:inset-x-3 ${
                 moreActive || moreOpen
                   ? "text-ink after:bg-brand"
                   : "text-ink/70 hover:text-ink after:bg-transparent"

@@ -58,8 +58,8 @@ export default async function HomePage() {
 
         <HeroSection stories={featured} />
 
-        <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_320px]">
-          <div className="space-y-12">
+        <div className="flex flex-col gap-8 lg:grid lg:grid-cols-[minmax(0,1fr)_320px]">
+          <div className="min-w-0 space-y-12">
             <CategoryQuickNav categories={quickNav} />
 
             <section>
@@ -76,7 +76,7 @@ export default async function HomePage() {
             <TrendingList stories={trending} className="lg:hidden" />
           </div>
 
-          <aside className="hidden space-y-6 lg:block">
+          <aside className="hidden min-w-0 space-y-6 lg:block">
             <AdSlot placement="sidebar" />
             <TrendingList stories={trending} className="lg:sticky lg:top-6" />
           </aside>

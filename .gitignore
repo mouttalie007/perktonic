@@ -54,3 +54,6 @@ next-env.d.ts
 
 # local dev server log
 .dev.log
+
+# responsive audit screenshots
+/scripts/.audit/
