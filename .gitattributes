@@ -1,0 +1,13 @@
+# Normalise line endings — the repo stores LF, deploys to Linux.
+* text=auto eol=lf
+
+# Binary assets — never munge.
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.webp binary
+*.avif binary
+*.ico binary
+*.woff binary
+*.woff2 binary

@@ -1,0 +1,35 @@
+# Local development database for ViralTrendly.
+# Host port 5433 avoids clashing with a native PostgreSQL on 5432.
+services:
+  postgres:
+    image: postgres:18-alpine
+    container_name: viraltrendly-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: viraltrendly
+      POSTGRES_PASSWORD: viraltrendly_dev
+      POSTGRES_DB: viraltrendly
+    ports:
+      - "5433:5432"
+    volumes:
+      # Postgres 18 images expect the mount at /var/lib/postgresql and store
+      # data in a version subdirectory (…/18/docker).
+      - viraltrendly-pgdata:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U viraltrendly -d viraltrendly"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  # Optional lightweight DB UI at http://localhost:8090
+  adminer:
+    image: adminer:5
+    container_name: viraltrendly-adminer
+    restart: unless-stopped
+    ports:
+      - "8090:8080"
+    depends_on:
+      - postgres
+
+volumes:
+  viraltrendly-pgdata:

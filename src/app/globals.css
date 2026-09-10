@@ -1,0 +1,139 @@
+@import "tailwindcss";
+
+/* ==========================================================================
+   ViralTrendly — Design tokens (spec §3, §4, §5, §66)
+   Identity: WHITE + BLACK + YELLOW. Light editorial UI. No public dark mode.
+   Keep this file the single source of truth; the TS mirror lives in
+   src/lib/design-tokens.ts for use in JS/structured-data contexts.
+   ========================================================================== */
+
+@theme {
+  /* --- Color: surfaces --- */
+  --color-canvas: #ffffff; /* main background */
+  --color-surface: #f7f7f7; /* secondary background */
+  --color-ink: #111111; /* primary black / primary text */
+  --color-ink-deep: #0a0a0a; /* deep black (footer, utility bar) */
+
+  /* --- Color: brand --- */
+  --color-brand: #ffd400; /* primary yellow */
+  --color-brand-strong: #ffc400; /* secondary yellow */
+
+  /* --- Color: accents --- */
+  --color-accent-red: #ff304f;
+  --color-accent-blue: #1683ff;
+
+  /* --- Color: lines & muted --- */
+  --color-line: #e5e5e5; /* borders */
+  --color-muted: #707070; /* muted / metadata text */
+
+  /* Semantic aliases consumed by Tailwind color utilities */
+  --color-background: var(--color-canvas);
+  --color-foreground: var(--color-ink);
+
+  /* --- Typography --- */
+  --font-sans:
+    var(--font-inter), "Inter", ui-sans-serif, system-ui, -apple-system,
+    "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+
+  --text-meta: 0.8125rem; /* 13px — nav / metadata */
+  --text-meta--line-height: 1.4;
+
+  /* Article body reading measure (spec §25) */
+  --measure-article: 78ch;
+
+  /* --- Layout --- */
+  --width-page: 1320px; /* centered container max (spec §5) */
+  --width-article: 812px; /* article body column */
+
+  /* --- Radius (spec §14: 4–8px max) --- */
+  --radius-xs: 2px;
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 8px;
+
+  /* --- Shadow (minimal, spec §97) --- */
+  --shadow-card: 0 1px 2px rgba(17, 17, 17, 0.04), 0 1px 3px rgba(17, 17, 17, 0.06);
+  --shadow-raised: 0 4px 12px rgba(17, 17, 17, 0.08);
+  --shadow-overlay: 0 12px 40px rgba(10, 10, 10, 0.18);
+
+  /* --- z-index scale --- */
+  --z-header: 100;
+  --z-dropdown: 200;
+  --z-overlay: 300;
+  --z-modal: 400;
+  --z-toast: 500;
+
+  /* --- Motion (subtle only; spec §67) --- */
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --duration-fast: 120ms;
+  --duration-base: 200ms;
+}
+
+/* ==========================================================================
+   Base
+   ========================================================================== */
+
+:root {
+  color-scheme: light;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+body {
+  background: var(--color-canvas);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  font-size: 1rem;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+/* Accessible focus (spec §44) */
+:focus-visible {
+  outline: 2px solid var(--color-accent-blue);
+  outline-offset: 2px;
+  border-radius: var(--radius-xs);
+}
+
+/* Respect reduced-motion (spec §44, §67) */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ==========================================================================
+   Layout helpers
+   ========================================================================== */
+
+@layer components {
+  /* Centered responsive container (spec §5). Side gutter never below 16px. */
+  .site-container {
+    width: 100%;
+    max-width: var(--width-page);
+    margin-inline: auto;
+    padding-inline: 1rem; /* 16px mobile */
+  }
+
+  @media (min-width: 768px) {
+    .site-container {
+      padding-inline: 1.25rem; /* 20px tablet */
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .site-container {
+      padding-inline: 2rem; /* 32px desktop */
+    }
+  }
+}

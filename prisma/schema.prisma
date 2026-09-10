@@ -1,0 +1,431 @@
+// ViralTrendly.com — Prisma schema v1 (Phase 0)
+// Public content model + settings + ads. Auth/session tables land in Phase 7.
+// Every configurable frontend element has a data source here so the future
+// Admin Dashboard can control it without schema churn.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ----------------------------------------------------------------------------
+// Enums
+// ----------------------------------------------------------------------------
+
+enum Role {
+  ADMIN
+  EDITOR
+  AUTHOR
+}
+
+enum ArticleType {
+  STANDARD // long-form article, HTML body, full SEO
+  LISTICLE // Top N — each item renders as its own server-rendered subpage
+}
+
+enum ContentStatus {
+  DRAFT
+  SCHEDULED
+  PUBLISHED
+  ARCHIVED
+  DELETED
+}
+
+// ----------------------------------------------------------------------------
+// Users & Authors
+// ----------------------------------------------------------------------------
+
+model User {
+  id           String  @id @default(cuid())
+  email        String  @unique
+  name         String
+  passwordHash String
+  role         Role    @default(AUTHOR)
+  isActive     Boolean @default(true)
+
+  authorProfile Author?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("users")
+}
+
+/// Public-facing byline. May or may not be linked to a login account.
+model Author {
+  id          String  @id @default(cuid())
+  slug        String  @unique
+  name        String
+  avatarUrl   String?
+  bio         String?
+  role        String? // e.g. "Staff Writer", "Editorial Team"
+  email       String?
+  socialLinks Json? // { x?, instagram?, facebook?, website? }
+
+  userId String? @unique
+  user   User?   @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  articles Article[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("authors")
+}
+
+// ----------------------------------------------------------------------------
+// Taxonomy
+// ----------------------------------------------------------------------------
+
+model Category {
+  id               String  @id @default(cuid())
+  slug             String  @unique
+  name             String
+  description      String?
+  shortDescription String? // used on "Popular Categories" tiles
+  imageUrl         String? // tile background
+  iconKey          String? // icon identifier for quick-nav / tiles
+  accentColor      String? // optional per-category accent
+  order            Int     @default(0)
+
+  // SEO
+  seoTitle        String?
+  metaDescription String?
+  robotsIndex     Boolean @default(true)
+
+  articles Article[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([order])
+  @@map("categories")
+}
+
+model Tag {
+  id          String  @id @default(cuid())
+  slug        String  @unique
+  name        String
+  robotsIndex Boolean @default(false) // tag pages default to noindex (spec §31)
+
+  articles ArticleTag[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("tags")
+}
+
+model ArticleTag {
+  articleId String
+  tagId     String
+
+  article Article @relation(fields: [articleId], references: [id], onDelete: Cascade)
+  tag     Tag     @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@id([articleId, tagId])
+  @@index([tagId])
+  @@map("article_tags")
+}
+
+// ----------------------------------------------------------------------------
+// Articles
+// ----------------------------------------------------------------------------
+
+model Article {
+  id      String      @id @default(cuid())
+  type    ArticleType @default(STANDARD)
+  title   String
+  slug    String      @unique
+  excerpt String?
+
+  // STANDARD: sanitized HTML body. LISTICLE: `intro` + `items`.
+  content String?
+  intro   String?
+
+  featuredImageId String?
+  featuredImage   Media?  @relation("ArticleFeaturedImage", fields: [featuredImageId], references: [id], onDelete: SetNull)
+
+  authorId String?
+  author   Author? @relation(fields: [authorId], references: [id], onDelete: SetNull)
+
+  categoryId String?
+  category   Category? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+
+  tags          ArticleTag[]
+  listicleItems ListicleItem[]
+
+  status       ContentStatus @default(DRAFT)
+  publishedAt  DateTime?
+  scheduledFor DateTime?
+
+  readingTime Int @default(0) // minutes
+  viewCount   Int @default(0)
+
+  isFeatured    Boolean @default(false)
+  isTrending    Boolean @default(false)
+  isBreaking    Boolean @default(false)
+  trendingRank  Int?
+  trendingScore Float?
+  manualPriority Int?   // admin override for trending ordering (spec §61)
+
+  // SEO (configurable separately from the visible title/excerpt)
+  seoTitle        String?
+  metaDescription String?
+  canonicalUrl    String?
+  ogImageId       String?
+  ogImage         Media?  @relation("ArticleOgImage", fields: [ogImageId], references: [id], onDelete: SetNull)
+  robotsIndex     Boolean @default(true)
+  robotsFollow    Boolean @default(true)
+
+  // LISTICLE behaviour
+  listicleIndexSubpages Boolean @default(true) // per-article subpage indexing toggle (spec discussion)
+
+  // Ad control (spec §46). adOverrides: { [placementKey]: adUnitId | null }
+  adsDisabled Boolean @default(false)
+  adOverrides Json?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([status, publishedAt])
+  @@index([type])
+  @@index([categoryId])
+  @@index([isTrending, trendingRank])
+  @@index([isFeatured])
+  @@map("articles")
+}
+
+/// One entry of a LISTICLE article. Rendered at /story/{slug}/{position}.
+model ListicleItem {
+  id        String  @id @default(cuid())
+  articleId String
+  article   Article @relation(fields: [articleId], references: [id], onDelete: Cascade)
+
+  position Int // 1-based
+  heading  String? // optional per-item title (strongly recommended for SEO)
+
+  mediaId  String?
+  media    Media?  @relation(fields: [mediaId], references: [id], onDelete: SetNull)
+  imageUrl String? // fallback when no Media row is attached
+  imageAlt String?
+
+  description String // item body — min length enforced in the app layer
+  credit     String?
+  sourceUrl  String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([articleId, position])
+  @@index([articleId])
+  @@map("listicle_items")
+}
+
+// ----------------------------------------------------------------------------
+// Media
+// ----------------------------------------------------------------------------
+
+model Media {
+  id         String  @id @default(cuid())
+  url        String // canonical delivery URL (CDN)
+  storageKey String? // provider object key / path
+  provider   String  @default("local") // local | r2 | cloudinary
+  filename   String
+  mimeType   String?
+  width      Int?
+  height     Int?
+  fileSize   Int?
+
+  // SEO / attribution (spec §42, §68)
+  alt       String?
+  title     String?
+  caption   String?
+  credit    String?
+  sourceUrl String?
+  focalX    Float? // 0..1 — smart-crop focal point (future CMS)
+  focalY    Float?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  articlesFeatured Article[]      @relation("ArticleFeaturedImage")
+  articlesOg       Article[]      @relation("ArticleOgImage")
+  listicleItems    ListicleItem[]
+
+  @@map("media")
+}
+
+// ----------------------------------------------------------------------------
+// Static / legal pages
+// ----------------------------------------------------------------------------
+
+model Page {
+  id      String        @id @default(cuid())
+  slug    String        @unique // "about", "privacy-policy", ...
+  title   String
+  content String? // sanitized HTML
+  status  ContentStatus @default(PUBLISHED)
+
+  seoTitle        String?
+  metaDescription String?
+  robotsIndex     Boolean @default(true)
+
+  showInFooter Boolean @default(true)
+  footerColumn String? // "quick-links" | "resources" | "company"
+  order        Int     @default(0)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("pages")
+}
+
+// ----------------------------------------------------------------------------
+// Settings (singletons, id = "singleton")
+// ----------------------------------------------------------------------------
+
+model SiteSettings {
+  id       String @id @default("singleton")
+  siteName String @default("ViralTrendly.com")
+  siteUrl  String @default("https://viraltrendly.com")
+  tagline  String @default("TREND TODAY. TALK TOMORROW.")
+
+  logoUrl           String?
+  defaultOgImageUrl String?
+  contactEmail      String?
+
+  facebookUrl  String?
+  xUrl         String?
+  instagramUrl String?
+  youtubeUrl   String?
+  tiktokUrl    String?
+
+  newsletterProvider String?
+  newsletterFromName String?
+
+  tickerEnabled Boolean @default(true)
+
+  // Admin-managed structured config
+  homepageConfig   Json?
+  navigationConfig Json?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("site_settings")
+}
+
+model SeoSettings {
+  id                     String  @id @default("singleton")
+  defaultTitle           String  @default("ViralTrendly — Trending Stories, Viral News & Stories Worth Sharing")
+  titleTemplate          String  @default("%s — ViralTrendly")
+  defaultMetaDescription String  @default("Trending stories, viral news and fascinating reads worth sharing — across tech, people, lifestyle, entertainment, travel, health and more.")
+  defaultRobotsIndex     Boolean @default(true)
+
+  googleSiteVerification String?
+  bingSiteVerification   String?
+
+  organizationName    String  @default("ViralTrendly")
+  organizationLogoUrl String?
+  twitterHandle       String? // "@viraltrendly"
+
+  tagPagesIndexable    Boolean @default(false)
+  searchPagesIndexable Boolean @default(false)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("seo_settings")
+}
+
+// ----------------------------------------------------------------------------
+// Advertising (spec §46 — publisher IDs live in env, never here)
+// ----------------------------------------------------------------------------
+
+/// A named block of ad markup the admin creates and reuses.
+model AdUnit {
+  id     String  @id @default(cuid())
+  name   String // "Top Banner", "Under Title"
+  key    String  @unique // machine key
+  code   String // full AdSense <ins> snippet (or other network markup)
+  format String? // auto | horizontal | rectangle | vertical
+
+  enabled     Boolean @default(true)
+  showDesktop Boolean @default(true)
+  showTablet  Boolean @default(true)
+  showMobile  Boolean @default(true)
+
+  // CLS reservation
+  reservedHeightDesktop Int?
+  reservedHeightMobile  Int?
+
+  placements AdPlacement[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("ad_units")
+}
+
+/// A slot in the page templates, mapped to an AdUnit globally by default.
+/// Per-article overrides live on Article.adOverrides.
+model AdPlacement {
+  id           String  @id @default(cuid())
+  placementKey String  @unique // top-leaderboard | under-title | in-content | between-slides | sidebar | below-article | mobile-anchor
+  label        String
+  description  String?
+
+  adUnitId String?
+  adUnit   AdUnit? @relation(fields: [adUnitId], references: [id], onDelete: SetNull)
+
+  enabled Boolean @default(true)
+  order   Int     @default(0)
+
+  // in-content auto injection
+  autoInject       Boolean      @default(false)
+  everyNParagraphs Int?
+  maxInjections    Int?
+  appliesTo        ArticleType? // null = both types
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("ad_placements")
+}
+
+// ----------------------------------------------------------------------------
+// Redirects & Newsletter
+// ----------------------------------------------------------------------------
+
+model Redirect {
+  id         String  @id @default(cuid())
+  fromPath   String  @unique
+  toPath     String
+  statusCode Int     @default(301)
+  enabled    Boolean @default(true)
+  hits       Int     @default(0)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("redirects")
+}
+
+model NewsletterSubscriber {
+  id             String    @id @default(cuid())
+  email          String    @unique
+  status         String    @default("pending") // pending | subscribed | unsubscribed
+  source         String? // "homepage" | "article" | "footer"
+  confirmedAt    DateTime?
+  unsubscribedAt DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("newsletter_subscribers")
+}
