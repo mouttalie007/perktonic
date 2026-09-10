@@ -1,0 +1,154 @@
+import Link from "next/link";
+import type { Route } from "next";
+import type { ArticleCard } from "@/services/article.service";
+import { Breadcrumbs, type Crumb } from "@/components/ui/Breadcrumbs";
+import { ShareButtons } from "@/components/article/ShareButtons";
+import { AuthorBox } from "@/components/article/AuthorBox";
+import { RelatedStories } from "@/components/article/RelatedStories";
+import { NewsletterCTA } from "@/components/home/NewsletterCTA";
+import { AdSlot } from "@/components/ads/AdSlot";
+import { formatDateLong, formatReadingTime } from "@/lib/format";
+import { DEFAULT_AUTHOR_NAME } from "@/config/site";
+import { subpagePath, type ListicleItemLike } from "@/lib/listicle";
+import { ListicleItemBlock } from "./ListicleItemBlock";
+
+type AllArticle = {
+  slug: string;
+  title: string;
+  intro: string | null;
+  publishedAt: Date | null;
+  readingTime: number;
+  adsDisabled: boolean;
+  adOverrides: unknown;
+  category: { slug: string; name: string } | null;
+  author: {
+    name: string;
+    role: string | null;
+    bio: string | null;
+    avatarUrl: string | null;
+  } | null;
+};
+
+/**
+ * Single-page view of a whole listicle (spec §4 — the secondary "/all" route).
+ * Its canonical points back to page 1 so it doesn't compete for indexing.
+ */
+export function ListicleAllView({
+  article,
+  items,
+  canonical,
+  related,
+}: {
+  article: AllArticle;
+  items: ListicleItemLike[];
+  canonical: string;
+  related: ArticleCard[];
+}) {
+  const authorName = article.author?.name ?? DEFAULT_AUTHOR_NAME;
+  const adCtx = {
+    adsDisabled: article.adsDisabled,
+    adOverrides: (article.adOverrides ?? null) as Record<
+      string,
+      string | null
+    > | null,
+  };
+
+  const crumbs: Crumb[] = [
+    { name: "Home", href: "/" as Route },
+    ...(article.category
+      ? [
+          {
+            name: article.category.name,
+            href: `/category/${article.category.slug}` as Route,
+          },
+        ]
+      : []),
+    { name: article.title },
+  ];
+
+  return (
+    <>
+      <article className="site-container py-8 sm:py-10">
+        <div className="mx-auto max-w-[var(--width-article)]">
+          <Breadcrumbs items={crumbs} />
+
+          <header className="mt-4">
+            {article.category && (
+              <Link
+                href={`/category/${article.category.slug}` as Route}
+                className="bg-brand text-ink inline-block rounded-sm px-2.5 py-1 text-[0.7rem] font-extrabold tracking-wider uppercase"
+              >
+                {article.category.name}
+              </Link>
+            )}
+            <h1 className="mt-4 text-[2rem] leading-[1.15] font-extrabold tracking-tight sm:text-[2.6rem]">
+              {article.title}
+            </h1>
+            <div className="text-muted mt-5 flex flex-wrap items-center gap-x-2 gap-y-1 text-[0.82rem]">
+              <span className="text-ink font-semibold">{authorName}</span>
+              <span aria-hidden>·</span>
+              {article.publishedAt && (
+                <time dateTime={article.publishedAt.toISOString()}>
+                  {formatDateLong(article.publishedAt)}
+                </time>
+              )}
+              <span aria-hidden>·</span>
+              <span>{formatReadingTime(article.readingTime)}</span>
+            </div>
+            <p className="mt-3 text-[0.8rem]">
+              <Link
+                href={subpagePath(article.slug, 1)}
+                className="text-accent-blue font-semibold hover:underline"
+              >
+                ← Read one item at a time
+              </Link>
+            </p>
+            {article.intro && (
+              <div className="article-prose mt-6">
+                {article.intro
+                  .split(/\n{2,}/)
+                  .map((p, i) => <p key={i}>{p.trim()}</p>)}
+              </div>
+            )}
+          </header>
+
+          <AdSlot placement="under-title" article={adCtx} className="my-8" />
+
+          <div className="mt-8 space-y-14">
+            {items.map((item, i) => (
+              <ListicleItemBlock
+                key={item.position}
+                item={item}
+                total={items.length}
+                headingLevel="h2"
+                priority={i === 0}
+              />
+            ))}
+          </div>
+
+          <ShareButtons
+            url={canonical}
+            title={article.title}
+            className="border-line mt-12 border-t pt-6"
+          />
+          <div className="mt-8">
+            <AuthorBox author={article.author} />
+          </div>
+          <AdSlot
+            placement="below-article"
+            article={adCtx}
+            className="mt-10"
+          />
+        </div>
+
+        {related.length > 0 && (
+          <div className="mx-auto mt-16 max-w-5xl">
+            <RelatedStories stories={related} />
+          </div>
+        )}
+      </article>
+
+      <NewsletterCTA />
+    </>
+  );
+}

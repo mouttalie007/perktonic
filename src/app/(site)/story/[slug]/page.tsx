@@ -1,18 +1,12 @@
 import type { Metadata } from "next";
-import type { Route } from "next";
 import { notFound } from "next/navigation";
 import { articleService } from "@/services/article.service";
 import { adService } from "@/services/ad.service";
 import { seoService } from "@/services/seo.service";
 import { processArticleHtml } from "@/lib/article-html";
-import { Breadcrumbs } from "@/components/ui/Breadcrumbs";
-import { ArticleHeader } from "@/components/article/ArticleHeader";
-import { ArticleBody } from "@/components/article/ArticleBody";
-import { ShareButtons } from "@/components/article/ShareButtons";
-import { AuthorBox } from "@/components/article/AuthorBox";
-import { RelatedStories } from "@/components/article/RelatedStories";
-import { NewsletterCTA } from "@/components/home/NewsletterCTA";
-import { AdSlot } from "@/components/ads/AdSlot";
+import { buildSubpageMeta } from "@/lib/listicle";
+import { StandardArticleView } from "@/components/article/StandardArticleView";
+import { ListicleView } from "@/components/listicle/ListicleView";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { DEFAULT_AUTHOR_NAME } from "@/config/site";
 
@@ -20,15 +14,27 @@ type Params = { params: Promise<{ slug: string }> };
 
 export async function generateStaticParams() {
   const refs = await articleService.listAllPublishedRefs();
-  return refs
-    .filter((r) => r.type === "STANDARD")
-    .map((r) => ({ slug: r.slug }));
+  return refs.map((r) => ({ slug: r.slug }));
 }
 
 export async function generateMetadata({ params }: Params): Promise<Metadata> {
   const { slug } = await params;
-  const article = await articleService.getStandardBySlug(slug);
+  const article = await articleService.getForRender(slug);
   if (!article) return { title: "Story not found" };
+
+  if (article.type === "LISTICLE") {
+    const meta = buildSubpageMeta(article, article.listicleItems, 1);
+    return seoService.buildMetadata({
+      title: meta.title,
+      description: meta.description,
+      path: meta.canonicalPath,
+      type: "article",
+      ogImage: meta.ogImageUrl ?? undefined,
+      robotsIndex: meta.robotsIndex,
+      publishedTime: article.publishedAt?.toISOString(),
+      modifiedTime: article.updatedAt.toISOString(),
+    });
+  }
 
   return seoService.buildMetadata({
     title: article.seoTitle ?? article.title,
@@ -44,18 +50,8 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
 
 export default async function StoryPage({ params }: Params) {
   const { slug } = await params;
-  const article = await articleService.getStandardBySlug(slug);
+  const article = await articleService.getForRender(slug);
   if (!article) notFound();
-
-  const [related, adRule] = await Promise.all([
-    articleService.listRelated(article.id, article.categoryId, 4),
-    adService.getInContentRule("STANDARD"),
-  ]);
-
-  const { toc, segments } = processArticleHtml(article.content ?? "", {
-    adEveryNParagraphs: adRule?.everyNParagraphs,
-    maxAds: adRule?.maxInjections,
-  });
 
   const path = `/story/${article.slug}`;
   const canonical = seoService.absoluteUrl(path);
@@ -74,13 +70,48 @@ export default async function StoryPage({ params }: Params) {
     { name: article.title, path },
   ];
 
-  const adCtx = {
-    adsDisabled: article.adsDisabled,
-    adOverrides: (article.adOverrides ?? null) as Record<
-      string,
-      string | null
-    > | null,
-  };
+  const [related, adRule] = await Promise.all([
+    articleService.listRelated(article.id, article.categoryId, 4),
+    adService.getInContentRule(article.type),
+  ]);
+
+  // ---- Listicle: page 1 (intro + first item) ----
+  if (article.type === "LISTICLE") {
+    const meta = buildSubpageMeta(article, article.listicleItems, 1);
+    return (
+      <>
+        {meta.nextPath && (
+          <link rel="next" href={seoService.absoluteUrl(meta.nextPath)} />
+        )}
+        <JsonLd
+          data={await seoService.articleJsonLd({
+            headline: article.title,
+            description: meta.description,
+            path,
+            imageUrl: meta.ogImageUrl ?? undefined,
+            datePublished: article.publishedAt?.toISOString(),
+            dateModified: article.updatedAt.toISOString(),
+            authorName,
+            section: article.category?.name,
+          })}
+        />
+        <JsonLd data={seoService.breadcrumbJsonLd(crumbs)} />
+        <ListicleView
+          article={article}
+          items={article.listicleItems}
+          position={1}
+          canonical={canonical}
+          related={related}
+        />
+      </>
+    );
+  }
+
+  // ---- Standard article ----
+  const { toc, segments } = processArticleHtml(article.content ?? "", {
+    adEveryNParagraphs: adRule?.everyNParagraphs,
+    maxAds: adRule?.maxInjections,
+  });
 
   return (
     <>
@@ -97,43 +128,13 @@ export default async function StoryPage({ params }: Params) {
         })}
       />
       <JsonLd data={seoService.breadcrumbJsonLd(crumbs)} />
-
-      <article className="site-container py-8 sm:py-10">
-        <div className="mx-auto max-w-[var(--width-article)]">
-          <Breadcrumbs
-            items={crumbs.map((c, i) => ({
-              name: c.name,
-              href: i < crumbs.length - 1 ? (c.path as Route) : undefined,
-            }))}
-          />
-
-          <ArticleHeader article={article} />
-
-          <div className="mt-8">
-            <ArticleBody segments={segments} toc={toc} adCtx={adCtx} />
-          </div>
-
-          <ShareButtons
-            url={canonical}
-            title={article.title}
-            className="border-line mt-10 border-t pt-6"
-          />
-
-          <div className="mt-8">
-            <AuthorBox author={article.author} />
-          </div>
-
-          <AdSlot placement="below-article" article={adCtx} className="mt-10" />
-        </div>
-
-        {related.length > 0 && (
-          <div className="mx-auto mt-16 max-w-5xl">
-            <RelatedStories stories={related} />
-          </div>
-        )}
-      </article>
-
-      <NewsletterCTA />
+      <StandardArticleView
+        article={article}
+        segments={segments}
+        toc={toc}
+        canonical={canonical}
+        related={related}
+      />
     </>
   );
 }

@@ -108,6 +108,24 @@ export const articleService = {
     });
   },
 
+  /** Any published article (either type) by slug, with everything a page needs. */
+  async getForRender(slug: string) {
+    return prisma.article.findFirst({
+      where: { ...PUBLISHED, slug },
+      include: {
+        featuredImage: true,
+        ogImage: true,
+        category: true,
+        author: true,
+        tags: { include: { tag: true } },
+        listicleItems: {
+          orderBy: { position: "asc" },
+          include: { media: true },
+        },
+      },
+    });
+  },
+
   /** Full listicle (with ordered items) by slug, or null (spec §4, Phase 4). */
   async getListicleBySlug(slug: string) {
     return prisma.article.findFirst({
@@ -164,6 +182,18 @@ export const articleService = {
       where: PUBLISHED,
       select: { slug: true, type: true, updatedAt: true },
       orderBy: { publishedAt: "desc" },
+    });
+  },
+
+  /** Published listicles with their item counts, for subpage static params. */
+  async listListicleRefs() {
+    return prisma.article.findMany({
+      where: { ...PUBLISHED, type: "LISTICLE" },
+      select: {
+        slug: true,
+        updatedAt: true,
+        _count: { select: { listicleItems: true } },
+      },
     });
   },
 
