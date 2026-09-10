@@ -196,6 +196,17 @@ body {
   .page-prose ol {
     list-style: decimal;
   }
+
+  /* Ad container — reserves height to prevent CLS (spec §16, §43, §82).
+     Set --ad-h-m / --ad-h-d (mobile / desktop, px) on the element. */
+  .ad-reserve {
+    min-height: var(--ad-h-m, 0px);
+  }
+  @media (min-width: 1024px) {
+    .ad-reserve {
+      min-height: var(--ad-h-d, 0px);
+    }
+  }
 }
 
 /* ==========================================================================

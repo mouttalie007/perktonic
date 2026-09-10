@@ -41,9 +41,15 @@ export interface Paginated<T> {
 
 export const articleService = {
   /** Latest published articles (spec §14). */
-  async listLatest(limit = 8): Promise<ArticleCard[]> {
+  async listLatest({
+    limit = 8,
+    excludeIds = [],
+  }: { limit?: number; excludeIds?: string[] } = {}): Promise<ArticleCard[]> {
     return prisma.article.findMany({
-      where: PUBLISHED,
+      where:
+        excludeIds.length > 0
+          ? { ...PUBLISHED, id: { notIn: excludeIds } }
+          : PUBLISHED,
       orderBy: { publishedAt: "desc" },
       take: limit,
       select: cardSelect,
