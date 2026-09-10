@@ -4,9 +4,9 @@ import { AdSlot } from "@/components/ads/AdSlot";
 import { TableOfContents } from "./TableOfContents";
 
 /**
- * Renders the prepared article body (spec §25, §27): the inline table of
- * contents (3+ headings, mobile/tablet only), styled prose, and in-content
- * ads between the pre-split segments.
+ * Renders the prepared article body (spec §25, §27): the collapsible table of
+ * contents (3+ headings), styled prose, and in-content ads between the
+ * pre-split segments.
  */
 export function ArticleBody({
   segments,
@@ -22,7 +22,7 @@ export function ArticleBody({
 }) {
   return (
     <>
-      {toc.length >= 3 && <TableOfContents items={toc} variant="inline" />}
+      {toc.length >= 3 && <TableOfContents items={toc} />}
       <div className="article-prose">
         {segments.map((seg, i) => (
           <Fragment key={i}>

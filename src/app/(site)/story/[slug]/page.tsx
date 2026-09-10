@@ -8,7 +8,6 @@ import { processArticleHtml } from "@/lib/article-html";
 import { Breadcrumbs } from "@/components/ui/Breadcrumbs";
 import { ArticleHeader } from "@/components/article/ArticleHeader";
 import { ArticleBody } from "@/components/article/ArticleBody";
-import { TableOfContents } from "@/components/article/TableOfContents";
 import { ShareButtons } from "@/components/article/ShareButtons";
 import { AuthorBox } from "@/components/article/AuthorBox";
 import { RelatedStories } from "@/components/article/RelatedStories";
@@ -100,49 +99,35 @@ export default async function StoryPage({ params }: Params) {
       <JsonLd data={seoService.breadcrumbJsonLd(crumbs)} />
 
       <article className="site-container py-8 sm:py-10">
-        <div className="mx-auto max-w-[var(--width-article)] xl:max-w-[1140px]">
-          <div className="xl:grid xl:grid-cols-[minmax(0,var(--width-article))_minmax(0,1fr)] xl:gap-14">
-            <div className="min-w-0">
-              <Breadcrumbs
-                items={crumbs.map((c, i) => ({
-                  name: c.name,
-                  href: i < crumbs.length - 1 ? (c.path as Route) : undefined,
-                }))}
-              />
+        <div className="mx-auto max-w-[var(--width-article)]">
+          <Breadcrumbs
+            items={crumbs.map((c, i) => ({
+              name: c.name,
+              href: i < crumbs.length - 1 ? (c.path as Route) : undefined,
+            }))}
+          />
 
-              <ArticleHeader article={article} />
+          <ArticleHeader article={article} />
 
-              <div className="mt-8">
-                <ArticleBody segments={segments} toc={toc} adCtx={adCtx} />
-              </div>
-
-              <ShareButtons
-                url={canonical}
-                title={article.title}
-                className="border-line mt-10 border-t pt-6"
-              />
-
-              <div className="mt-8">
-                <AuthorBox author={article.author} />
-              </div>
-
-              <AdSlot
-                placement="below-article"
-                article={adCtx}
-                className="mt-10"
-              />
-            </div>
-
-            <aside className="hidden xl:block">
-              {toc.length >= 3 && (
-                <TableOfContents items={toc} variant="sidebar" />
-              )}
-            </aside>
+          <div className="mt-8">
+            <ArticleBody segments={segments} toc={toc} adCtx={adCtx} />
           </div>
+
+          <ShareButtons
+            url={canonical}
+            title={article.title}
+            className="border-line mt-10 border-t pt-6"
+          />
+
+          <div className="mt-8">
+            <AuthorBox author={article.author} />
+          </div>
+
+          <AdSlot placement="below-article" article={adCtx} className="mt-10" />
         </div>
 
         {related.length > 0 && (
-          <div className="mx-auto mt-16 max-w-5xl xl:mt-20">
+          <div className="mx-auto mt-16 max-w-5xl">
             <RelatedStories stories={related} />
           </div>
         )}

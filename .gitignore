@@ -57,3 +57,8 @@ next-env.d.ts
 
 # responsive audit screenshots
 /scripts/.audit/
+
+# author source images (originals kept out of repo; copies live in public/authors)
+/Alex.png
+/Mia.png
+/Daniel.jpeg

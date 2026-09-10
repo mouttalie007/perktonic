@@ -152,17 +152,67 @@ async function main() {
     });
   }
 
-  console.log("→ default author");
-  const author = await prisma.author.upsert({
-    where: { slug: "viraltrendly-editorial-team" },
-    update: {},
-    create: {
+  console.log("→ authors");
+  const AUTHORS = [
+    {
       slug: "viraltrendly-editorial-team",
       name: "ViralTrendly Editorial Team",
       role: "Editorial Team",
       bio: "Stories researched, written and edited by the ViralTrendly newsroom.",
+      avatarUrl: null as string | null,
     },
-  });
+    {
+      slug: "alex-carter",
+      name: "Alex Carter",
+      role: "Tech · Internet · Money · Facts",
+      bio: "Alex Carter writes about technology, internet culture and personal finance — the shifts in how we work, spend and get online. He is at his best turning a complicated trend into something you can actually use.",
+      avatarUrl: "/authors/alex-carter.png",
+    },
+    {
+      slug: "mia-reynolds",
+      name: "Mia Reynolds",
+      role: "Lifestyle · Relationships · People · Travel",
+      bio: "Mia Reynolds covers lifestyle, relationships and travel, with an eye for the small habits and the far-flung trips that change how a life feels. She likes advice that is specific, honest and easy to start today.",
+      avatarUrl: "/authors/mia-reynolds.png",
+    },
+    {
+      slug: "daniel-brooks",
+      name: "Daniel Brooks",
+      role: "Entertainment · People · Trending · Weird Stories",
+      bio: "Daniel Brooks follows the entertainment headlines, viral moments and genuinely strange stories the internet will not stop sharing — and enjoys explaining why each one blew up.",
+      avatarUrl: "/authors/daniel-brooks.jpg",
+    },
+  ];
+
+  const authorBySlug = new Map<string, string>();
+  for (const a of AUTHORS) {
+    const row = await prisma.author.upsert({
+      where: { slug: a.slug },
+      update: { name: a.name, role: a.role, bio: a.bio, avatarUrl: a.avatarUrl },
+      create: a,
+    });
+    authorBySlug.set(a.slug, row.id);
+  }
+  const author = { id: authorBySlug.get("viraltrendly-editorial-team")! };
+
+  // Which byline covers which category (spec §73 — publisher's own roster).
+  const AUTHOR_FOR_CATEGORY: Record<string, string> = {
+    tech: "alex-carter",
+    money: "alex-carter",
+    science: "alex-carter",
+    lifestyle: "mia-reynolds",
+    travel: "mia-reynolds",
+    health: "mia-reynolds",
+    people: "mia-reynolds",
+    entertainment: "daniel-brooks",
+    viral: "daniel-brooks",
+    sports: "daniel-brooks",
+    amazing: "daniel-brooks",
+    culture: "daniel-brooks",
+  };
+  const authorIdForCategory = (slug: string) =>
+    authorBySlug.get(AUTHOR_FOR_CATEGORY[slug] ?? "viraltrendly-editorial-team") ??
+    author.id;
 
   console.log("→ legal pages");
   for (const [i, p] of LEGAL_PAGES.entries()) {
@@ -219,9 +269,10 @@ async function main() {
         credit: "Demo image — Lorem Picsum",
       },
     });
+    const articleAuthorId = authorIdForCategory(a.category);
     await prisma.article.upsert({
       where: { slug: a.slug },
-      update: {},
+      update: { authorId: articleAuthorId, categoryId: category?.id ?? null },
       create: {
         type: "STANDARD",
         title: a.title,
@@ -229,7 +280,7 @@ async function main() {
         excerpt: a.excerpt,
         content: bodyHtml(a.excerpt),
         featuredImageId: media.id,
-        authorId: author.id,
+        authorId: articleAuthorId,
         categoryId: category?.id ?? null,
         status: "PUBLISHED",
         publishedAt: daysAgo(a.days),
@@ -249,7 +300,7 @@ async function main() {
   const travel = await prisma.category.findUnique({ where: { slug: "lifestyle" } });
   const listicle = await prisma.article.upsert({
     where: { slug: listicleSlug },
-    update: {},
+    update: { authorId: authorIdForCategory("lifestyle") },
     create: {
       type: "LISTICLE",
       title: "8 Everyday Habits That Quietly Improve Your Life",
@@ -257,7 +308,7 @@ async function main() {
       excerpt: "Small, low-effort habits with a compounding payoff over months and years.",
       intro:
         "None of these will change your life overnight. Stacked together and kept up for a few months, they add up to something that feels a lot like a different life. Here are eight worth trying.",
-      authorId: author.id,
+      authorId: authorIdForCategory("lifestyle"),
       categoryId: travel?.id ?? null,
       status: "PUBLISHED",
       publishedAt: daysAgo(1),
