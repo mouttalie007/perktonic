@@ -12,6 +12,7 @@
  */
 
 import { PrismaClient, type Prisma } from "@prisma/client";
+import bcrypt from "bcryptjs";
 
 const prisma = new PrismaClient();
 
@@ -175,6 +176,20 @@ async function main() {
       },
     });
   }
+
+  console.log("→ admin user");
+  const ADMIN_EMAIL = "mouttaliof@gmail.com";
+  const ADMIN_DEFAULT_PASSWORD = "ViralTrendly#2026";
+  await prisma.user.upsert({
+    where: { email: ADMIN_EMAIL },
+    update: {},
+    create: {
+      email: ADMIN_EMAIL,
+      name: "Iyad Ziyad",
+      role: "ADMIN",
+      passwordHash: await bcrypt.hash(ADMIN_DEFAULT_PASSWORD, 12),
+    },
+  });
 
   console.log("→ authors");
   const AUTHORS = [

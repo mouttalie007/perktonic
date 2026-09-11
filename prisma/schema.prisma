@@ -48,11 +48,27 @@ model User {
   isActive     Boolean @default(true)
 
   authorProfile Author?
+  sessions      Session[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   @@map("users")
+}
+
+/// Server-side, revocable admin sessions (Phase 7). The cookie holds only a
+/// random token; we store its SHA-256 hash so a DB leak doesn't yield usable
+/// sessions.
+model Session {
+  id        String   @id @default(cuid())
+  tokenHash String   @unique
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@map("sessions")
 }
 
 /// Public-facing byline. May or may not be linked to a login account.
