@@ -19,4 +19,12 @@ export const pageService = {
     });
     return rows.map((r) => r.slug);
   },
+
+  /** Published + indexable pages, for the sitemap (spec §38). */
+  async listIndexable() {
+    return prisma.page.findMany({
+      where: { status: "PUBLISHED", robotsIndex: true },
+      select: { slug: true, updatedAt: true },
+    });
+  },
 };

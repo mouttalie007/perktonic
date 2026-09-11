@@ -421,6 +421,13 @@ async function main() {
     }
   }
 
+  console.log("→ demo redirect");
+  await prisma.redirect.upsert({
+    where: { fromPath: "/old-homepage" },
+    update: {},
+    create: { fromPath: "/old-homepage", toPath: "/", statusCode: 301 },
+  });
+
   console.log("✓ seed complete");
 }
 

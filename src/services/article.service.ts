@@ -226,6 +226,22 @@ export const articleService = {
     });
   },
 
+  /** Indexable articles for the sitemap (spec §38) — includes indexable
+   *  listicle subpages when the article opts in via listicleIndexSubpages. */
+  async listSitemapRefs() {
+    return prisma.article.findMany({
+      where: { ...PUBLISHED, robotsIndex: true },
+      select: {
+        slug: true,
+        type: true,
+        updatedAt: true,
+        listicleIndexSubpages: true,
+        _count: { select: { listicleItems: true } },
+      },
+      orderBy: { publishedAt: "desc" },
+    });
+  },
+
   /** Published listicles with their item counts, for subpage static params. */
   async listListicleRefs() {
     return prisma.article.findMany({

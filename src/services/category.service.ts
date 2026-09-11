@@ -32,6 +32,15 @@ export const categoryService = {
     return prisma.category.findUnique({ where: { slug } });
   },
 
+  /** Indexable categories, for the sitemap (spec §38). */
+  async listIndexable() {
+    return prisma.category.findMany({
+      where: { robotsIndex: true },
+      select: { slug: true, updatedAt: true },
+      orderBy: { order: "asc" },
+    });
+  },
+
   async listSlugs(): Promise<string[]> {
     const rows = await prisma.category.findMany({ select: { slug: true } });
     return rows.length > 0

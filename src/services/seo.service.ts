@@ -32,7 +32,7 @@ export const seoService = {
     const canonical = absoluteUrl(input.path);
     const description = input.description ?? seo.defaultMetaDescription;
     const ogImage = absoluteUrl(
-      input.ogImage ?? seo.organizationLogoUrl ?? "/og-default.png",
+      input.ogImage ?? seo.organizationLogoUrl ?? "/opengraph-image",
     );
     const index = input.robotsIndex ?? seo.defaultRobotsIndex;
 
