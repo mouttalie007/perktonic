@@ -25,7 +25,7 @@ export function ListicleItemBlock({
 
   return (
     <section aria-label={item.heading ?? `Item ${item.position}`}>
-      <p className="text-brand-strong text-sm font-extrabold tracking-wider">
+      <p className="text-brand-ink text-sm font-extrabold tracking-wider">
         {item.position} <span className="text-muted">/ {total}</span>
       </p>
       {item.heading && (
@@ -47,7 +47,10 @@ export function ListicleItemBlock({
               src={img.url}
               alt={img.alt}
               fill
-              priority={priority}
+              // `priority` alone no longer sets fetchPriority on Next 16 —
+              // see StoryCard.tsx's Picture() for the full note.
+              fetchPriority={priority ? "high" : undefined}
+              loading={priority ? "eager" : "lazy"}
               sizes="(max-width: 800px) 100vw, 744px"
               className="object-cover"
             />

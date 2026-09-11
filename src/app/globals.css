@@ -15,12 +15,20 @@
   --color-ink-deep: #0a0a0a; /* deep black (footer, utility bar) */
 
   /* --- Color: brand --- */
-  --color-brand: #ffd400; /* primary yellow */
-  --color-brand-strong: #ffc400; /* secondary yellow */
+  --color-brand: #ffd400; /* primary yellow — backgrounds/fills only */
+  --color-brand-strong: #ffc400; /* secondary yellow — backgrounds/fills only */
+  /* Brand yellow fails WCAG contrast as literal text on light backgrounds
+     (~1.4:1 against white). This darker gold is for that exact case — the
+     wordmark, headings, counters set directly on canvas/surface — and
+     passes AA (~5:1). Never use it as a background; use --color-brand(-strong)
+     for that, paired with dark text. */
+  --color-brand-ink: #b45309;
 
   /* --- Color: accents --- */
-  --color-accent-red: #ff304f;
-  --color-accent-blue: #1683ff;
+  /* Both tuned to clear WCAG AA (4.5:1) against white at normal text sizes —
+     the original values (#ff304f / #1683ff) only cleared ~3.6:1. */
+  --color-accent-red: #dc2626;
+  --color-accent-blue: #2563eb;
 
   /* --- Color: lines & muted --- */
   --color-line: #e5e5e5; /* borders */

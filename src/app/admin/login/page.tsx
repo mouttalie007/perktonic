@@ -14,7 +14,7 @@ export default async function LoginPage() {
       <div className="w-full max-w-sm">
         <div className="mb-8 text-center">
           <span className="text-2xl font-extrabold tracking-tight">
-            Viral<span className="text-brand">Trendly</span>
+            Viral<span className="text-brand-ink">Trendly</span>
             <span>.com</span>
           </span>
           <p className="text-muted mt-1 text-xs font-semibold tracking-[0.2em] uppercase">

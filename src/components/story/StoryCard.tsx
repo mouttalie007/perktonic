@@ -109,8 +109,13 @@ function Picture({
       alt={img.alt || story.title}
       fill
       sizes={sizes}
-      priority={priority}
-      loading={priority ? undefined : "lazy"}
+      // Next 16 deprecated `priority` in favour of explicit `fetchPriority`
+      // + `loading` (see node_modules/next/dist/docs .../components/image.md
+      // #preload) — `priority` alone stopped setting fetchPriority="high" on
+      // the <img>, only inserting the <link rel=preload>, which left the LCP
+      // image's actual fetch un-prioritised (found via scripts/perf-audit.mjs).
+      fetchPriority={priority ? "high" : undefined}
+      loading={priority ? "eager" : "lazy"}
       className={`object-cover transition-transform duration-500 ease-[var(--ease-out)] group-hover:scale-[1.03] ${className}`}
     />
   );
@@ -135,8 +140,11 @@ export function StoryCard({
         href={href}
         className={`group flex items-start gap-3 ${className}`}
       >
+        {/* text-muted, not text-line (#e5e5e5 ~1.25:1 on white) — that was a
+            real WCAG failure axe flagged as needing review (short-text
+            numerals get "incomplete" rather than a hard violation). */}
         {rank != null && (
-          <span className="text-line w-6 shrink-0 text-2xl leading-none font-extrabold tabular-nums">
+          <span className="text-muted w-6 shrink-0 text-2xl leading-none font-extrabold tabular-nums">
             {rank}
           </span>
         )}

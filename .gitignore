@@ -63,3 +63,6 @@ next-env.d.ts
 /Mia.png
 /Daniel.jpeg
 /Daniel .png
+
+# Claude Code runtime state (session locks etc.), not project content
+/.claude/

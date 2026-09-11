@@ -8,7 +8,7 @@ import type { Route } from "next";
 export default function NotFound() {
   return (
     <div className="site-container flex flex-col items-center py-24 text-center sm:py-32">
-      <p className="text-brand-strong text-6xl font-extrabold sm:text-7xl">
+      <p className="text-brand-ink text-6xl font-extrabold sm:text-7xl">
         404
       </p>
       <h1 className="mt-4 text-2xl font-extrabold tracking-tight sm:text-3xl">

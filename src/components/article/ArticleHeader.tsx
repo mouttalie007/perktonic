@@ -76,7 +76,10 @@ export function ArticleHeader({ article }: { article: HeaderArticle }) {
               src={article.featuredImage.url}
               alt={article.featuredImage.alt || article.title}
               fill
-              priority
+              // `priority` alone no longer sets fetchPriority on Next 16 —
+              // see StoryCard.tsx's Picture() for the full note.
+              fetchPriority="high"
+              loading="eager"
               sizes="(max-width: 800px) 100vw, 744px"
               className="object-cover"
             />

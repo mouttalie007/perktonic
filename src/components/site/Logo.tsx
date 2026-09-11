@@ -16,6 +16,9 @@ export function Logo({
 }) {
   const fg = onDark ? "text-white" : "text-ink";
   const tag = onDark ? "text-white/55" : "text-muted";
+  // Brand yellow only clears AA contrast on a dark surface; on light
+  // surfaces (the default) use the darker "ink" gold instead (see globals.css).
+  const brand = onDark ? "text-brand" : "text-brand-ink";
 
   return (
     <Link
@@ -26,7 +29,7 @@ export function Logo({
       <span
         className={`text-xl font-extrabold tracking-tight sm:text-2xl xl:text-[1.7rem] ${fg}`}
       >
-        Viral<span className="text-brand">Trendly</span>
+        Viral<span className={brand}>Trendly</span>
         <span className={fg}>.com</span>
       </span>
       {withTagline && (

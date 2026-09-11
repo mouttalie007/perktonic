@@ -4,7 +4,7 @@ import Link from "next/link";
 export default function RootNotFound() {
   return (
     <div className="site-container flex min-h-[70vh] flex-col items-center justify-center py-24 text-center">
-      <p className="text-brand-strong text-6xl font-extrabold">404</p>
+      <p className="text-brand-ink text-6xl font-extrabold">404</p>
       <h1 className="mt-4 text-2xl font-extrabold tracking-tight">
         Page not found
       </h1>
