@@ -445,3 +445,20 @@ model NewsletterSubscriber {
 
   @@map("newsletter_subscribers")
 }
+
+/// Contact form submissions (spec §22). No outbound email provider is wired
+/// yet, so submissions land here for an editor to read in the admin.
+model ContactMessage {
+  id      String @id @default(cuid())
+  name    String
+  email   String
+  subject String
+  message String
+
+  status String @default("new") // new | read | archived
+
+  createdAt DateTime @default(now())
+
+  @@index([status, createdAt])
+  @@map("contact_messages")
+}

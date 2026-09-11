@@ -46,6 +46,7 @@ export const ADMIN_NAV: AdminNavGroup[] = [
     title: "Audience",
     items: [
       { label: "Newsletter", href: "/admin/subscribers" as Route, minRole: "EDITOR" },
+      { label: "Contact Messages", href: "/admin/contact-messages" as Route, minRole: "EDITOR" },
     ],
   },
   {

@@ -4,6 +4,7 @@ import { randomBytes, createHash } from "node:crypto";
 import bcrypt from "bcryptjs";
 import { prisma } from "./prisma";
 import type { Role } from "@prisma/client";
+import { createRateLimiter } from "./rate-limit";
 export { hasRole } from "./role-rank";
 
 /**
@@ -81,27 +82,8 @@ export async function getSessionUser(): Promise<SessionUser | null> {
   return { id: user.id, email: user.email, name: user.name, role: user.role };
 }
 
-/** Very small in-memory brute-force guard for the login form (spec §57, §88).
- *  Fine for a single-instance deploy; move to a shared store if scaled out. */
-const loginAttempts = new Map<string, { count: number; resetAt: number }>();
-const MAX_ATTEMPTS = 8;
-const WINDOW_MS = 15 * 60_000;
-
-export function isLoginRateLimited(key: string): boolean {
-  const entry = loginAttempts.get(key);
-  if (!entry || Date.now() > entry.resetAt) return false;
-  return entry.count >= MAX_ATTEMPTS;
-}
-
-export function recordLoginAttempt(key: string): void {
-  const entry = loginAttempts.get(key);
-  if (!entry || Date.now() > entry.resetAt) {
-    loginAttempts.set(key, { count: 1, resetAt: Date.now() + WINDOW_MS });
-    return;
-  }
-  entry.count += 1;
-}
-
-export function clearLoginAttempts(key: string): void {
-  loginAttempts.delete(key);
-}
+/** Brute-force guard for the login form (spec §57, §88). */
+const loginLimiter = createRateLimiter(8, 15 * 60_000);
+export const isLoginRateLimited = loginLimiter.isLimited;
+export const recordLoginAttempt = loginLimiter.record;
+export const clearLoginAttempts = loginLimiter.clear;
