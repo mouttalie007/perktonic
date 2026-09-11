@@ -10,10 +10,12 @@ import { FlameIcon, ArrowRightIcon } from "@/components/icons";
  */
 export function TrendingList({
   stories,
+  title = "Trending Now",
   seeAllHref,
   className = "",
 }: {
   stories: ArticleCard[];
+  title?: string;
   seeAllHref?: Route;
   className?: string;
 }) {
@@ -21,13 +23,13 @@ export function TrendingList({
 
   return (
     <section
-      aria-label="Trending now"
+      aria-label={title}
       className={`border-line bg-canvas rounded-sm border p-4 ${className}`}
     >
       <div className="mb-4 flex items-center justify-between">
         <h2 className="flex items-center gap-2 text-sm font-extrabold tracking-[0.12em] uppercase">
           <FlameIcon width={18} height={18} className="text-accent-red" />
-          Trending Now
+          {title}
         </h2>
         {seeAllHref && (
           <Link

@@ -57,6 +57,30 @@ const AD_PLACEMENTS: {
   { key: "mobile-anchor", label: "Mobile Anchor", description: "Sticky anchor unit at the bottom of the viewport on mobile.", appliesTo: null },
 ];
 
+// Kept sparing on purpose (spec §31) — a handful of real, reusable tags
+// rather than one per article.
+const TAGS: { slug: string; name: string }[] = [
+  { slug: "ai", name: "AI" },
+  { slug: "tiktok", name: "TikTok" },
+  { slug: "viral-videos", name: "Viral Videos" },
+  { slug: "travel-tips", name: "Travel Tips" },
+  { slug: "space", name: "Space" },
+  { slug: "wellness", name: "Wellness" },
+];
+
+// slug (demoStandard/listicle) -> tag slugs
+const ARTICLE_TAGS: Record<string, string[]> = {
+  "how-ai-is-changing-our-lives-in-2026": ["ai"],
+  "this-dogs-reaction-will-melt-your-heart": ["viral-videos", "tiktok"],
+  "a-stunning-discovery-just-changed-what-we-know-about-the-universe": ["space"],
+  "scientists-discover-a-new-planet-that-could-support-life": ["space"],
+  "7-foods-that-boost-your-energy-naturally": ["wellness"],
+  "10-breathtaking-places-to-visit-before-they-change-forever": ["travel-tips"],
+  "the-most-beautiful-road-in-the-world": ["travel-tips"],
+  "this-moment-had-fans-going-crazy-around-the-world": ["viral-videos"],
+  "8-everyday-habits-that-quietly-improve-your-life": ["wellness"],
+};
+
 const LEGAL_PAGES: { slug: string; title: string; footerColumn: string }[] = [
   { slug: "about", title: "About Us", footerColumn: "quick-links" },
   { slug: "contact", title: "Contact", footerColumn: "quick-links" },
@@ -214,6 +238,17 @@ async function main() {
     authorBySlug.get(AUTHOR_FOR_CATEGORY[slug] ?? "viraltrendly-editorial-team") ??
     author.id;
 
+  console.log("→ tags");
+  const tagBySlug = new Map<string, string>();
+  for (const t of TAGS) {
+    const row = await prisma.tag.upsert({
+      where: { slug: t.slug },
+      update: { name: t.name },
+      create: { slug: t.slug, name: t.name },
+    });
+    tagBySlug.set(t.slug, row.id);
+  }
+
   console.log("→ legal pages");
   for (const [i, p] of LEGAL_PAGES.entries()) {
     await prisma.page.upsert({
@@ -370,6 +405,21 @@ async function main() {
   }).catch(() => {
     /* featuredImage already set on a re-run */
   });
+
+  console.log("→ article tags");
+  for (const [slug, tagSlugs] of Object.entries(ARTICLE_TAGS)) {
+    const article = await prisma.article.findUnique({ where: { slug } });
+    if (!article) continue;
+    for (const tagSlug of tagSlugs) {
+      const tagId = tagBySlug.get(tagSlug);
+      if (!tagId) continue;
+      await prisma.articleTag.upsert({
+        where: { articleId_tagId: { articleId: article.id, tagId } },
+        update: {},
+        create: { articleId: article.id, tagId },
+      });
+    }
+  }
 
   console.log("✓ seed complete");
 }

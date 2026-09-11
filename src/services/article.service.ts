@@ -94,6 +94,47 @@ export const articleService = {
     };
   },
 
+  /** Paginated list for a tag page (spec §31, §70). */
+  async listByTag(
+    tagSlug: string,
+    { page = 1, pageSize = 12 }: { page?: number; pageSize?: number } = {},
+  ): Promise<Paginated<ArticleCard>> {
+    const where: Prisma.ArticleWhereInput = {
+      ...PUBLISHED,
+      tags: { some: { tag: { slug: tagSlug } } },
+    };
+    const [items, total] = await Promise.all([
+      prisma.article.findMany({
+        where,
+        orderBy: { publishedAt: "desc" },
+        skip: (page - 1) * pageSize,
+        take: pageSize,
+        select: cardSelect,
+      }),
+      prisma.article.count({ where }),
+    ]);
+    return {
+      items,
+      total,
+      page,
+      pageSize,
+      totalPages: Math.max(1, Math.ceil(total / pageSize)),
+    };
+  },
+
+  /** Top-viewed stories within a category, for a category page's aside. */
+  async listTopViewedInCategory(
+    categoryId: string,
+    limit = 4,
+  ): Promise<ArticleCard[]> {
+    return prisma.article.findMany({
+      where: { ...PUBLISHED, categoryId },
+      orderBy: { viewCount: "desc" },
+      take: limit,
+      select: cardSelect,
+    });
+  },
+
   /** Full standard article by slug, or null. */
   async getStandardBySlug(slug: string) {
     return prisma.article.findFirst({

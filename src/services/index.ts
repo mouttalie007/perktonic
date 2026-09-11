@@ -10,6 +10,7 @@ export { seoService } from "./seo.service";
 export type { PageMetaInput } from "./seo.service";
 export { mediaService } from "./media.service";
 export { pageService } from "./page.service";
+export { tagService } from "./tag.service";
 export { newsletterService } from "./newsletter.service";
 export type { SubscribeResult } from "./newsletter.service";
 export { siteSettingsService } from "./site-settings.service";
