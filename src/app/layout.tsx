@@ -3,6 +3,8 @@ import type { ReactNode } from "react";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { SITE } from "@/config/site";
+import { ConsentBanner } from "@/components/consent/ConsentBanner";
+import { AnalyticsScripts } from "@/components/consent/AnalyticsScripts";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -36,6 +38,8 @@ export default function RootLayout({
     <html lang="en" className={`${inter.variable} h-full`}>
       <body className="bg-canvas text-ink flex min-h-full flex-col antialiased">
         {children}
+        <ConsentBanner />
+        <AnalyticsScripts />
       </body>
     </html>
   );

@@ -3,6 +3,7 @@ import type { Route } from "next";
 import { CATEGORIES, type SocialPlatform } from "@/config/site";
 import { Logo } from "./Logo";
 import { SocialLinks } from "./SocialLinks";
+import { CookiePreferencesButton } from "@/components/consent/CookiePreferencesButton";
 
 /**
  * Site footer (spec §19, §74). Dark. Every link resolves — no dead links.
@@ -117,6 +118,9 @@ export function SiteFooter({
                 </Link>
               </li>
             ))}
+            <li>
+              <CookiePreferencesButton className="transition-colors hover:text-white" />
+            </li>
           </ul>
         </div>
       </div>

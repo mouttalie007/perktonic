@@ -1,0 +1,69 @@
+"use client";
+
+import { useEffect, useState } from "react";
+import Script from "next/script";
+import { ANALYTICS } from "@/config/analytics";
+import { ADSENSE } from "@/config/ads";
+import { DEFAULT_CONSENT, readConsentCookieClient, type ConsentState } from "@/lib/consent";
+
+/**
+ * Consent-gated script loading (Phase 9). Deliberately a client component,
+ * reading the same consent cookie the banner writes: reading it via
+ * `cookies()` on the server would mark every page dynamic (any use of that
+ * API in the render tree opts the whole route out of static generation),
+ * which would undo Phase 6's static pages for no real benefit — the
+ * scripts below only ever matter once the page is interactive anyway. This
+ * is also how real-world CMPs (OneTrust, Cookiebot, etc.) inject
+ * analytics/ad scripts: client-side, gated on a stored decision.
+ *
+ * Nothing here renders until the visitor has explicitly granted the
+ * matching category, and until the corresponding config (measurement /
+ * container / publisher id) is actually set.
+ */
+export function AnalyticsScripts() {
+  const [consent, setConsent] = useState<ConsentState>(DEFAULT_CONSENT);
+
+  useEffect(() => {
+    // document.cookie (browser-only) can't be read during SSR, so this can
+    // only run after mount.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setConsent(readConsentCookieClient() ?? DEFAULT_CONSENT);
+  }, []);
+
+  return (
+    <>
+      {consent.analytics && ANALYTICS.ga4Enabled && (
+        <>
+          <Script
+            src={`https://www.googletagmanager.com/gtag/js?id=${ANALYTICS.ga4MeasurementId}`}
+            strategy="afterInteractive"
+          />
+          <Script id="ga4-init" strategy="afterInteractive">
+            {`window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', '${ANALYTICS.ga4MeasurementId}', { anonymize_ip: true });`}
+          </Script>
+        </>
+      )}
+
+      {consent.analytics && ANALYTICS.gtmEnabled && (
+        <Script id="gtm-init" strategy="afterInteractive">
+          {`(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});
+var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';
+j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','${ANALYTICS.gtmContainerId}');`}
+        </Script>
+      )}
+
+      {consent.advertising && ADSENSE.enabled && ADSENSE.publisherId && (
+        <Script
+          async
+          src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${ADSENSE.publisherId}`}
+          crossOrigin="anonymous"
+          strategy="afterInteractive"
+        />
+      )}
+    </>
+  );
+}
