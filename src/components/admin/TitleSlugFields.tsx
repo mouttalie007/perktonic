@@ -12,12 +12,16 @@ export function TitleSlugFields({
   slugName = "slug",
   defaultTitle = "",
   defaultSlug = "",
+  onTitleChange,
 }: {
   titleLabel?: string;
   titleName?: string;
   slugName?: string;
   defaultTitle?: string;
   defaultSlug?: string;
+  /** Fires on every keystroke — lets a parent form track the live title
+   *  (e.g. to seed pasted-image alt text) without controlling this field. */
+  onTitleChange?: (title: string) => void;
 }) {
   const [title, setTitle] = useState(defaultTitle);
   const [slug, setSlug] = useState(defaultSlug);
@@ -33,6 +37,7 @@ export function TitleSlugFields({
           value={title}
           onChange={(e) => {
             setTitle(e.target.value);
+            onTitleChange?.(e.target.value);
             if (!slugEdited) setSlug(slugify(e.target.value));
           }}
         />

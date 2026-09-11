@@ -162,8 +162,8 @@ export async function saveListicleArticle(
 
   const headings = formData.getAll("item_heading").map(String);
   const descriptions = formData.getAll("item_description").map(String);
+  const mediaIds = formData.getAll("item_mediaId").map(String);
   const imageUrls = formData.getAll("item_imageUrl").map(String);
-  const imageAlts = formData.getAll("item_imageAlt").map(String);
   const credits = formData.getAll("item_credit").map(String);
   const sourceUrls = formData.getAll("item_sourceUrl").map(String);
 
@@ -172,12 +172,14 @@ export async function saveListicleArticle(
       position: i + 1,
       heading: headings[i]?.trim() || null,
       description: description.trim(),
-      imageUrl: imageUrls[i]?.trim() || null,
-      imageAlt: imageAlts[i]?.trim() || null,
+      // Prefer the uploaded Media row; fall back to a plain URL (legacy /
+      // externally-hosted images) only when no media was pasted.
+      mediaId: mediaIds[i]?.trim() || null,
+      imageUrl: mediaIds[i]?.trim() ? null : imageUrls[i]?.trim() || null,
       credit: credits[i]?.trim() || null,
       sourceUrl: sourceUrls[i]?.trim() || null,
     }))
-    .filter((it) => it.description.length > 0 || it.imageUrl);
+    .filter((it) => it.description.length > 0 || it.imageUrl || it.mediaId);
 
   if (items.length < 2) {
     return { status: "error", message: "Add at least 2 items to a Top N list." };

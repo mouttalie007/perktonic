@@ -3,11 +3,11 @@ import { ListicleArticleForm } from "@/components/admin/article/ListicleArticleF
 import { articleFormData } from "@/lib/admin-article-data";
 
 export default async function NewListicleArticlePage() {
-  const { categories, authors, tags, media } = await articleFormData();
+  const { categories, authors, tags } = await articleFormData();
   return (
     <div>
       <PageHeader title="New Top N List" />
-      <ListicleArticleForm categories={categories} authors={authors} tags={tags} media={media} />
+      <ListicleArticleForm categories={categories} authors={authors} tags={tags} />
     </div>
   );
 }

@@ -19,8 +19,9 @@ export default async function EditArticlePage({
     prisma.article.findUnique({
       where: { id },
       include: {
+        featuredImage: true,
         tags: { select: { tagId: true } },
-        listicleItems: { orderBy: { position: "asc" } },
+        listicleItems: { orderBy: { position: "asc" }, include: { media: true } },
       },
     }),
     articleFormData(),
@@ -36,9 +37,14 @@ export default async function EditArticlePage({
         description={saved ? "Saved." : undefined}
       />
       {article.type === "LISTICLE" ? (
-        <ListicleArticleForm article={withTagIds} items={article.listicleItems} {...formData} />
+        <ListicleArticleForm
+          article={withTagIds}
+          items={article.listicleItems}
+          featuredImageMedia={article.featuredImage}
+          {...formData}
+        />
       ) : (
-        <StandardArticleForm article={withTagIds} {...formData} />
+        <StandardArticleForm article={withTagIds} featuredImageMedia={article.featuredImage} {...formData} />
       )}
     </div>
   );

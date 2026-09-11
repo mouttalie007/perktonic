@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useState } from "react";
 import type { Article, Author, Category, ListicleItem, Media, Tag } from "@prisma/client";
 import { saveListicleArticle, type SaveState } from "@/app/actions/admin-articles";
 import { TitleSlugFields } from "../TitleSlugFields";
@@ -10,28 +10,32 @@ import { PublishingCard, TaxonomyCard, FeaturedImageField, SeoCard } from "./Sha
 
 const initial: SaveState = { status: "idle" };
 
+type ListicleItemWithMedia = ListicleItem & { media?: Media | null };
+
 export function ListicleArticleForm({
   article,
   items,
+  featuredImageMedia,
   categories,
   authors,
   tags,
-  media,
 }: {
   article?: Article & { tagIds?: string[] };
-  items?: ListicleItem[];
+  items?: ListicleItemWithMedia[];
+  featuredImageMedia?: Media | null;
   categories: Category[];
   authors: Author[];
   tags: Tag[];
-  media: Media[];
 }) {
   const [state, formAction, pending] = useActionState(saveListicleArticle, initial);
+  const [liveTitle, setLiveTitle] = useState(article?.title ?? "");
 
   const defaultItems: ItemDraft[] = (items ?? []).map((it) => ({
     heading: it.heading ?? "",
     description: it.description,
-    imageUrl: it.imageUrl ?? "",
-    imageAlt: it.imageAlt ?? "",
+    mediaId: it.mediaId ?? "",
+    imageUrl: it.media?.url ?? it.imageUrl ?? "",
+    imageAlt: it.media?.alt ?? it.imageAlt ?? "",
     credit: it.credit ?? "",
     sourceUrl: it.sourceUrl ?? "",
   }));
@@ -42,14 +46,14 @@ export function ListicleArticleForm({
 
       <div className="min-w-0 space-y-6">
         <Card className="space-y-4">
-          <TitleSlugFields defaultTitle={article?.title} defaultSlug={article?.slug} />
+          <TitleSlugFields defaultTitle={article?.title} defaultSlug={article?.slug} onTitleChange={setLiveTitle} />
           <Field label="Excerpt" htmlFor="excerpt" hint="Shown in cards and search results.">
             <Textarea id="excerpt" name="excerpt" rows={2} defaultValue={article?.excerpt ?? ""} />
           </Field>
           <Field label="Introduction" htmlFor="intro" hint="Shown above item 1, on the first page. Separate paragraphs with a blank line.">
             <Textarea id="intro" name="intro" rows={4} defaultValue={article?.intro ?? ""} />
           </Field>
-          <FeaturedImageField article={article} media={media} />
+          <FeaturedImageField article={article} featuredImageMedia={featuredImageMedia} titleForAlt={liveTitle} />
         </Card>
 
         <Card>
@@ -61,7 +65,7 @@ export function ListicleArticleForm({
               defaultChecked={article?.listicleIndexSubpages ?? true}
             />
           </div>
-          <ItemsEditor defaultItems={defaultItems} />
+          <ItemsEditor defaultItems={defaultItems} titleForAlt={liveTitle} />
         </Card>
 
         <SeoCard article={article} />

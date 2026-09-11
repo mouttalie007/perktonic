@@ -1,5 +1,6 @@
 import type { Author, Category, Media, Tag, Article } from "@prisma/client";
 import { Field, Input, Textarea, Select, Checkbox, Card } from "../ui";
+import { PasteImageField } from "./PasteImageField";
 
 type ArticleDefaults = Partial<Article> & { tagIds?: string[] };
 
@@ -94,21 +95,27 @@ export function TaxonomyCard({
 
 export function FeaturedImageField({
   article,
-  media,
+  featuredImageMedia,
+  titleForAlt,
 }: {
   article?: ArticleDefaults;
-  media: Media[];
+  /** The currently-set featured Media row, if any (for the preview on edit). */
+  featuredImageMedia?: Media | null;
+  /** Live article title, used to seed a fresh paste's alt text. */
+  titleForAlt: string;
 }) {
   return (
-    <Field label="Featured image" htmlFor="featuredImageId" hint="From the Media Library.">
-      <Select id="featuredImageId" name="featuredImageId" defaultValue={article?.featuredImageId ?? ""}>
-        <option value="">No featured image</option>
-        {media.map((m) => (
-          <option key={m.id} value={m.id}>
-            {m.filename} {m.alt ? `— ${m.alt}` : ""}
-          </option>
-        ))}
-      </Select>
+    <Field label="Featured image" htmlFor="featuredImageId-paste" hint="Click, then Ctrl+V to paste an image. Compressed automatically.">
+      <PasteImageField
+        name="featuredImageId"
+        altBase={titleForAlt || article?.title || ""}
+        altNumber={1}
+        defaultValue={
+          featuredImageMedia
+            ? { mediaId: featuredImageMedia.id, url: featuredImageMedia.url, alt: featuredImageMedia.alt ?? "" }
+            : null
+        }
+      />
     </Field>
   );
 }

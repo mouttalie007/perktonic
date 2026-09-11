@@ -2,12 +2,14 @@
 
 import { useState } from "react";
 import { Field, Input, Textarea, Button } from "../ui";
+import { PasteImageField } from "./PasteImageField";
 import { LISTICLE_MIN_ITEM_DESCRIPTION } from "@/lib/listicle";
 
 export interface ItemDraft {
   heading: string;
   description: string;
-  imageUrl: string;
+  mediaId: string;
+  imageUrl: string; // preview / legacy fallback when no mediaId
   imageAlt: string;
   credit: string;
   sourceUrl: string;
@@ -16,6 +18,7 @@ export interface ItemDraft {
 const emptyItem = (): ItemDraft => ({
   heading: "",
   description: "",
+  mediaId: "",
   imageUrl: "",
   imageAlt: "",
   credit: "",
@@ -25,10 +28,17 @@ const emptyItem = (): ItemDraft => ({
 /**
  * Repeatable Top-N items — the LISTICLE editor's core (spec §4). Each item
  * renders as its own real subpage, so the heading and description here map
- * 1:1 to what the visitor sees on /story/{slug}/{n}. Reorder is up/down
- * buttons rather than drag-and-drop, to avoid an extra dependency.
+ * 1:1 to what the visitor sees on /story/{slug}/{n}. Images are paste-to-
+ * upload, per feedback. Reorder is up/down buttons rather than drag-and-drop,
+ * to avoid an extra dependency.
  */
-export function ItemsEditor({ defaultItems }: { defaultItems: ItemDraft[] }) {
+export function ItemsEditor({
+  defaultItems,
+  titleForAlt,
+}: {
+  defaultItems: ItemDraft[];
+  titleForAlt: string;
+}) {
   const [items, setItems] = useState<ItemDraft[]>(
     defaultItems.length >= 2 ? defaultItems : [emptyItem(), emptyItem()],
   );
@@ -75,19 +85,32 @@ export function ItemsEditor({ defaultItems }: { defaultItems: ItemDraft[] }) {
             </div>
           </div>
 
-          <div className="grid gap-3 sm:grid-cols-2">
-            <Field label="Item heading" htmlFor={`heading-${i}`} hint="Becomes the H1 on its subpage — keep it unique.">
-              <Input id={`heading-${i}`} name="item_heading" value={it.heading} onChange={(e) => update(i, { heading: e.target.value })} />
-            </Field>
-            <Field label="Image URL" htmlFor={`img-${i}`}>
-              <Input id={`img-${i}`} name="item_imageUrl" value={it.imageUrl} onChange={(e) => update(i, { imageUrl: e.target.value })} />
-            </Field>
-            <Field label="Image alt text" htmlFor={`alt-${i}`}>
-              <Input id={`alt-${i}`} name="item_imageAlt" value={it.imageAlt} onChange={(e) => update(i, { imageAlt: e.target.value })} />
-            </Field>
-            <Field label="Image credit" htmlFor={`credit-${i}`}>
-              <Input id={`credit-${i}`} name="item_credit" value={it.credit} onChange={(e) => update(i, { credit: e.target.value })} />
-            </Field>
+          <div className="grid gap-3 sm:grid-cols-[10rem_1fr]">
+            <PasteImageField
+              name="item_mediaId"
+              urlFieldName="item_imageUrl"
+              altBase={titleForAlt || "Image"}
+              altNumber={i + 1}
+              aspect="aspect-square"
+              defaultValue={
+                it.mediaId || it.imageUrl
+                  ? { mediaId: it.mediaId, url: it.imageUrl, alt: it.imageAlt }
+                  : null
+              }
+            />
+            <div className="space-y-3">
+              <Field label="Item heading" htmlFor={`heading-${i}`} hint="Becomes the H1 on its subpage — keep it unique.">
+                <Input id={`heading-${i}`} name="item_heading" value={it.heading} onChange={(e) => update(i, { heading: e.target.value })} />
+              </Field>
+              <div className="grid gap-3 sm:grid-cols-2">
+                <Field label="Image credit" htmlFor={`credit-${i}`}>
+                  <Input id={`credit-${i}`} name="item_credit" value={it.credit} onChange={(e) => update(i, { credit: e.target.value })} />
+                </Field>
+                <Field label="Source URL" htmlFor={`src-${i}`} hint="Optional.">
+                  <Input id={`src-${i}`} name="item_sourceUrl" value={it.sourceUrl} onChange={(e) => update(i, { sourceUrl: e.target.value })} />
+                </Field>
+              </div>
+            </div>
           </div>
 
           <div className="mt-3">
@@ -103,12 +126,6 @@ export function ItemsEditor({ defaultItems }: { defaultItems: ItemDraft[] }) {
                 value={it.description}
                 onChange={(e) => update(i, { description: e.target.value })}
               />
-            </Field>
-          </div>
-
-          <div className="mt-3">
-            <Field label="Source URL" htmlFor={`src-${i}`} hint="Optional — where a claim or figure comes from.">
-              <Input id={`src-${i}`} name="item_sourceUrl" value={it.sourceUrl} onChange={(e) => update(i, { sourceUrl: e.target.value })} />
             </Field>
           </div>
         </div>

@@ -3,11 +3,11 @@ import { StandardArticleForm } from "@/components/admin/article/StandardArticleF
 import { articleFormData } from "@/lib/admin-article-data";
 
 export default async function NewStandardArticlePage() {
-  const { categories, authors, tags, media } = await articleFormData();
+  const { categories, authors, tags } = await articleFormData();
   return (
     <div>
       <PageHeader title="New Article" />
-      <StandardArticleForm categories={categories} authors={authors} tags={tags} media={media} />
+      <StandardArticleForm categories={categories} authors={authors} tags={tags} />
     </div>
   );
 }

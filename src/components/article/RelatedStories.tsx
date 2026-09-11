@@ -3,7 +3,8 @@ import { StoryCard } from "@/components/story/StoryCard";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 
 /**
- * "You May Also Like" (spec §28). 3–4 related stories at the end of an article.
+ * "You May Also Like" (spec §28) — small, elegant rows at the end of an
+ * article, per feedback: image + title only, no metadata clutter.
  */
 export function RelatedStories({
   stories,
@@ -16,14 +17,9 @@ export function RelatedStories({
   return (
     <section aria-label={title}>
       <SectionHeading title={title} />
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        {stories.slice(0, 4).map((story) => (
-          <StoryCard
-            key={story.id}
-            story={story}
-            variant="grid"
-            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
-          />
+      <div className="grid grid-cols-2 gap-x-4 gap-y-3 sm:grid-cols-3 lg:grid-cols-4">
+        {stories.slice(0, 8).map((story) => (
+          <StoryCard key={story.id} story={story} variant="compact" />
         ))}
       </div>
     </section>

@@ -1,16 +1,45 @@
 import { parse, type HTMLElement } from "node-html-parser";
 import { slugify } from "./slug";
+import { SITE } from "@/config/site";
 
 /**
  * Prepares an article's stored HTML for rendering (spec §25, §27):
  *  - gives every h2/h3 a stable `id` and returns the table of contents
  *  - wraps bare <table> in a horizontally scrollable container
+ *  - marks every external link rel="nofollow noopener noreferrer"
+ *    target="_blank" (per feedback — implicit on all outbound links); internal
+ *    links are left untouched
  *  - splits the body into segments so an in-content ad can be placed after
  *    every Nth paragraph (spec §16, §46)
  *
  * Sanitisation of admin-authored HTML is added in Phase 9; today the input is
  * trusted (seed data / Phase 7 editor output).
  */
+
+const SITE_HOSTNAME = (() => {
+  try {
+    return new URL(SITE.url).hostname;
+  } catch {
+    return "";
+  }
+})();
+
+function markExternalLinks(root: HTMLElement) {
+  for (const a of root.querySelectorAll("a")) {
+    const href = a.getAttribute("href");
+    if (!href) continue;
+    let url: URL;
+    try {
+      url = new URL(href, SITE.url);
+    } catch {
+      continue;
+    }
+    if (url.protocol !== "http:" && url.protocol !== "https:") continue;
+    if (url.hostname === SITE_HOSTNAME) continue;
+    a.setAttribute("rel", "nofollow noopener noreferrer");
+    a.setAttribute("target", "_blank");
+  }
+}
 
 export interface TocItem {
   id: string;
@@ -58,6 +87,9 @@ export function processArticleHtml(
     table.replaceWith(wrapper);
     wrapper.appendChild(table);
   }
+
+  // --- external links: implicit nofollow/noopener/noreferrer + new tab ---
+  markExternalLinks(root);
 
   // --- split for in-content ads ---
   const n = opts.adEveryNParagraphs ?? 0;

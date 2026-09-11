@@ -5,16 +5,18 @@ import type { ArticleCard } from "@/services/article.service";
 import { formatDate, formatViews, isoDate } from "@/lib/format";
 
 /**
- * The reusable story card (spec §14, §15, §65). One component, three shapes:
+ * The reusable story card (spec §14, §15, §65). One component, four shapes:
  *  - `grid`    image-top card for grids (Latest Stories, category pages)
  *  - `overlay` full-bleed image with text over a bottom gradient (hero)
  *  - `list`    thumb + text row, optional rank number (Trending)
+ *  - `compact` small thumb + title only, no meta/badge — end-of-article
+ *              "You May Also Like" rows
  *
  * All images use a fixed aspect ratio + object-cover and reserve space to
  * avoid CLS. Only pass `priority` for the single above-the-fold hero image.
  */
 
-type Variant = "grid" | "overlay" | "list";
+type Variant = "grid" | "overlay" | "list" | "compact";
 
 interface Props {
   story: ArticleCard;
@@ -197,6 +199,22 @@ export function StoryCard({
             <Meta story={story} tone="light" />
           </div>
         </div>
+      </Link>
+    );
+  }
+
+  /* ---------- compact (small, elegant — end-of-article) ---------- */
+  if (variant === "compact") {
+    return (
+      <Link href={href} className={`group flex items-center gap-2.5 ${className}`}>
+        <span className="bg-surface relative aspect-square w-14 shrink-0 overflow-hidden rounded-sm">
+          <Picture story={story} sizes="56px" />
+        </span>
+        <span className="min-w-0">
+          <h3 className="text-ink group-hover:text-ink/70 line-clamp-2 text-[0.82rem] leading-snug font-semibold transition-colors">
+            {story.title}
+          </h3>
+        </span>
       </Link>
     );
   }

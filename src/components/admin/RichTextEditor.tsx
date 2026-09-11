@@ -1,35 +1,50 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useEditor, EditorContent, type Editor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import Underline from "@tiptap/extension-underline";
 import TiptapLink from "@tiptap/extension-link";
 import TiptapImage from "@tiptap/extension-image";
 import Placeholder from "@tiptap/extension-placeholder";
+import { uploadImageDirect } from "@/app/actions/admin-media";
 
 /**
  * The article/page rich text editor (per the original brief: "an advanced
  * editor that helps write the article and can be given the article as HTML
  * code, and it publishes it normally"). TipTap-based, with a source-HTML
- * view and an HTML import panel. Outputs into a hidden <input name=...> so
- * it submits with the surrounding <form> like any other field.
+ * view, an HTML import panel, and paste-to-upload images (click where you
+ * want the image, Ctrl+V — it uploads, compresses and inserts automatically,
+ * with alt defaulting to "{title} {n}"). Outputs into a hidden
+ * <input name=...> so it submits with the surrounding <form>.
  */
 export function RichTextEditor({
   name,
   defaultValue = "",
   placeholder = "Start writing…",
   minHeight = 320,
+  altBase = "",
+  onParagraphCountChange,
 }: {
   name: string;
   defaultValue?: string;
   placeholder?: string;
   minHeight?: number;
+  /** Used to auto-name pasted images: "{altBase} {n}". Usually the article title. */
+  altBase?: string;
+  /** Fires on every edit with the current top-level paragraph count. */
+  onParagraphCountChange?: (count: number) => void;
 }) {
   const [html, setHtml] = useState(defaultValue);
   const [sourceMode, setSourceMode] = useState(false);
   const [importOpen, setImportOpen] = useState(false);
   const [importText, setImportText] = useState("");
+  const [uploading, setUploading] = useState(false);
+  const imageCount = useRef(0);
+  const altBaseRef = useRef(altBase);
+  useEffect(() => {
+    altBaseRef.current = altBase;
+  }, [altBase]);
 
   const editor = useEditor({
     extensions: [
@@ -46,9 +61,49 @@ export function RichTextEditor({
         class: "article-prose max-w-none focus:outline-none",
         style: `min-height:${minHeight}px`,
       },
+      handlePaste: (view, event) => {
+        const items = Array.from(event.clipboardData?.items ?? []);
+        const imageItem = items.find((i) => i.type.startsWith("image/"));
+        if (!imageItem) return false;
+        const file = imageItem.getAsFile();
+        if (!file) return false;
+        event.preventDefault();
+
+        imageCount.current += 1;
+        const alt = `${altBaseRef.current || "Image"} ${imageCount.current}`.trim();
+        setUploading(true);
+        const fd = new FormData();
+        fd.append("file", file);
+        fd.append("alt", alt);
+        uploadImageDirect(fd)
+          .then((result) => {
+            if (result.status === "success" && result.media) {
+              const { schema } = view.state;
+              const node = schema.nodes.image.create({
+                src: result.media.url,
+                alt: result.media.alt ?? alt,
+              });
+              view.dispatch(view.state.tr.replaceSelectionWith(node));
+            }
+          })
+          .finally(() => setUploading(false));
+        return true;
+      },
     },
-    onUpdate: ({ editor }) => setHtml(editor.getHTML()),
+    onCreate: ({ editor }) => reportStats(editor),
+    onUpdate: ({ editor }) => {
+      setHtml(editor.getHTML());
+      reportStats(editor);
+    },
   });
+
+  function reportStats(ed: Editor) {
+    let paragraphs = 0;
+    ed.state.doc.forEach((node) => {
+      if (node.type.name === "paragraph" && node.textContent.trim()) paragraphs++;
+    });
+    onParagraphCountChange?.(paragraphs);
+  }
 
   if (!editor) {
     return (
@@ -119,8 +174,16 @@ export function RichTextEditor({
           className="w-full p-3 font-mono text-xs outline-none"
         />
       ) : (
-        <div className="p-4">
+        <div className="relative p-4">
           <EditorContent editor={editor} />
+          {uploading && (
+            <span className="bg-ink absolute top-2 right-2 rounded-sm px-2 py-1 text-[0.7rem] font-bold text-white">
+              Uploading pasted image…
+            </span>
+          )}
+          <p className="text-muted mt-2 text-[0.7rem]">
+            Tip: click where you want an image and press Ctrl+V to paste one in — it uploads and compresses automatically.
+          </p>
         </div>
       )}
 
