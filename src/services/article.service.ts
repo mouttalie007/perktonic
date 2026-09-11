@@ -26,10 +26,17 @@ const cardSelect = {
 
 export type ArticleCard = Prisma.ArticleGetPayload<{ select: typeof cardSelect }>;
 
-const PUBLISHED: Prisma.ArticleWhereInput = {
-  status: "PUBLISHED",
-  publishedAt: { lte: new Date() },
-};
+/**
+ * A function, not a module-level constant — `new Date()` must be evaluated
+ * fresh on every call. A frozen constant would bake in the timestamp from
+ * whenever this module first loaded (server boot / first HMR compile) and
+ * silently hide every article published after that moment for the rest of
+ * the process's life. (Found via an admin smoke test: a just-published
+ * listicle 404'd on the public site until the dev module reloaded.)
+ */
+function published(): Prisma.ArticleWhereInput {
+  return { status: "PUBLISHED", publishedAt: { lte: new Date() } };
+}
 
 export interface Paginated<T> {
   items: T[];
@@ -48,8 +55,8 @@ export const articleService = {
     return prisma.article.findMany({
       where:
         excludeIds.length > 0
-          ? { ...PUBLISHED, id: { notIn: excludeIds } }
-          : PUBLISHED,
+          ? { ...published(), id: { notIn: excludeIds } }
+          : published(),
       orderBy: { publishedAt: "desc" },
       take: limit,
       select: cardSelect,
@@ -59,7 +66,7 @@ export const articleService = {
   /** Featured articles for the hero (spec §9, §62). */
   async listFeatured(limit = 3): Promise<ArticleCard[]> {
     return prisma.article.findMany({
-      where: { ...PUBLISHED, isFeatured: true },
+      where: { ...published(), isFeatured: true },
       orderBy: [{ manualPriority: "asc" }, { publishedAt: "desc" }],
       take: limit,
       select: cardSelect,
@@ -72,7 +79,7 @@ export const articleService = {
     { page = 1, pageSize = 12 }: { page?: number; pageSize?: number } = {},
   ): Promise<Paginated<ArticleCard>> {
     const where: Prisma.ArticleWhereInput = {
-      ...PUBLISHED,
+      ...published(),
       category: { slug: categorySlug },
     };
     const [items, total] = await Promise.all([
@@ -100,7 +107,7 @@ export const articleService = {
     { page = 1, pageSize = 12 }: { page?: number; pageSize?: number } = {},
   ): Promise<Paginated<ArticleCard>> {
     const where: Prisma.ArticleWhereInput = {
-      ...PUBLISHED,
+      ...published(),
       tags: { some: { tag: { slug: tagSlug } } },
     };
     const [items, total] = await Promise.all([
@@ -128,7 +135,7 @@ export const articleService = {
     limit = 4,
   ): Promise<ArticleCard[]> {
     return prisma.article.findMany({
-      where: { ...PUBLISHED, categoryId },
+      where: { ...published(), categoryId },
       orderBy: { viewCount: "desc" },
       take: limit,
       select: cardSelect,
@@ -138,7 +145,7 @@ export const articleService = {
   /** Full standard article by slug, or null. */
   async getStandardBySlug(slug: string) {
     return prisma.article.findFirst({
-      where: { ...PUBLISHED, slug, type: "STANDARD" },
+      where: { ...published(), slug, type: "STANDARD" },
       include: {
         featuredImage: true,
         ogImage: true,
@@ -152,7 +159,7 @@ export const articleService = {
   /** Any published article (either type) by slug, with everything a page needs. */
   async getForRender(slug: string) {
     return prisma.article.findFirst({
-      where: { ...PUBLISHED, slug },
+      where: { ...published(), slug },
       include: {
         featuredImage: true,
         ogImage: true,
@@ -170,7 +177,7 @@ export const articleService = {
   /** Full listicle (with ordered items) by slug, or null (spec §4, Phase 4). */
   async getListicleBySlug(slug: string) {
     return prisma.article.findFirst({
-      where: { ...PUBLISHED, slug, type: "LISTICLE" },
+      where: { ...published(), slug, type: "LISTICLE" },
       include: {
         featuredImage: true,
         ogImage: true,
@@ -196,7 +203,7 @@ export const articleService = {
   ): Promise<ArticleCard[]> {
     const sameCategory = categoryId
       ? await prisma.article.findMany({
-          where: { ...PUBLISHED, id: { not: articleId }, categoryId },
+          where: { ...published(), id: { not: articleId }, categoryId },
           orderBy: { publishedAt: "desc" },
           take: limit,
           select: cardSelect,
@@ -207,7 +214,7 @@ export const articleService = {
 
     const backfill = await prisma.article.findMany({
       where: {
-        ...PUBLISHED,
+        ...published(),
         id: { notIn: [articleId, ...sameCategory.map((a) => a.id)] },
       },
       orderBy: { publishedAt: "desc" },
@@ -220,7 +227,7 @@ export const articleService = {
   /** All published slugs (with type) for sitemap / static params (spec §38). */
   async listAllPublishedRefs() {
     return prisma.article.findMany({
-      where: PUBLISHED,
+      where: published(),
       select: { slug: true, type: true, updatedAt: true },
       orderBy: { publishedAt: "desc" },
     });
@@ -230,7 +237,7 @@ export const articleService = {
    *  listicle subpages when the article opts in via listicleIndexSubpages. */
   async listSitemapRefs() {
     return prisma.article.findMany({
-      where: { ...PUBLISHED, robotsIndex: true },
+      where: { ...published(), robotsIndex: true },
       select: {
         slug: true,
         type: true,
@@ -245,7 +252,7 @@ export const articleService = {
   /** Published listicles with their item counts, for subpage static params. */
   async listListicleRefs() {
     return prisma.article.findMany({
-      where: { ...PUBLISHED, type: "LISTICLE" },
+      where: { ...published(), type: "LISTICLE" },
       select: {
         slug: true,
         updatedAt: true,

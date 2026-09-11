@@ -46,13 +46,13 @@ export default async function AdminHome() {
           <h2 className="mb-3 font-bold">Write something new</h2>
           <div className="flex flex-wrap gap-2">
             <Link
-              href="/admin/articles/new/standard"
+              href={"/admin/articles/new/standard" as Route}
               className="bg-ink hover:bg-ink-deep rounded-sm px-4 py-2 text-sm font-bold text-white transition-colors"
             >
               New Article
             </Link>
             <Link
-              href="/admin/articles/new/listicle"
+              href={"/admin/articles/new/listicle" as Route}
               className="border-line hover:bg-surface rounded-sm border px-4 py-2 text-sm font-bold transition-colors"
             >
               New Top N List
@@ -65,10 +65,10 @@ export default async function AdminHome() {
             <Link href="/admin/categories" className="border-line hover:bg-surface rounded-sm border px-4 py-2 text-sm font-bold transition-colors">
               Categories
             </Link>
-            <Link href="/admin/ads/units" className="border-line hover:bg-surface rounded-sm border px-4 py-2 text-sm font-bold transition-colors">
+            <Link href={"/admin/ads/units" as Route} className="border-line hover:bg-surface rounded-sm border px-4 py-2 text-sm font-bold transition-colors">
               Ad Units
             </Link>
-            <Link href="/admin/settings/site" className="border-line hover:bg-surface rounded-sm border px-4 py-2 text-sm font-bold transition-colors">
+            <Link href={"/admin/settings/site" as Route} className="border-line hover:bg-surface rounded-sm border px-4 py-2 text-sm font-bold transition-colors">
               Site Settings
             </Link>
           </div>
