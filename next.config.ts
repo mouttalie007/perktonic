@@ -15,9 +15,19 @@ const CSP_GOOGLE_SCRIPT_ORIGINS = [
 // the GA4/GTM bootstrap loaders above are also inline by design. A strict
 // nonce-based CSP would break both. This is a deliberate, documented
 // trade-off, not an oversight — everything else here is locked down.
+//
+// 'unsafe-eval' is added in development ONLY: Turbopack/React dev mode uses
+// eval() for HMR and reconstructing call stacks across environments — with
+// a strict CSP this hard-crashed every page in `next dev` (caught via a
+// screenshot of Next's own error overlay, not by any automated check, since
+// `next build`/`next start` — what the audits above run against — never
+// hit this). React's own error message is explicit that it "will never use
+// eval() in production mode", so omitting this in prod is a real
+// restriction, not a placebo.
+const isDev = process.env.NODE_ENV === "development";
 const CSP = [
   "default-src 'self'",
-  `script-src 'self' 'unsafe-inline' ${CSP_GOOGLE_SCRIPT_ORIGINS.join(" ")}`,
+  `script-src 'self' 'unsafe-inline' ${isDev ? "'unsafe-eval' " : ""}${CSP_GOOGLE_SCRIPT_ORIGINS.join(" ")}`,
   "style-src 'self' 'unsafe-inline'",
   "img-src 'self' data: https:",
   "font-src 'self' data:",
