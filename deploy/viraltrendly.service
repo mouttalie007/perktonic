@@ -1,0 +1,48 @@
+# systemd unit for ViralTrendly.com on the shared VPS (109.205.179.106).
+# Coexists with dimabac-live.service + livekit.service on the same box —
+# see memory: viraltrendly-vps for the full coexistence rules this follows
+# (own port, own resource caps, own file tree, never touches the other
+# project's units/vhost/DB).
+#
+# Install:
+#   sudo cp deploy/viraltrendly.service /etc/systemd/system/viraltrendly.service
+#   sudo systemctl daemon-reload
+#   sudo systemctl enable --now viraltrendly.service
+#
+# Deploys after this point are: build the new code, then
+#   sudo systemctl restart viraltrendly.service
+# (build is deliberately NOT part of this unit — a slow build blocking a
+# crash-restart would be worse than a short manual step).
+
+[Unit]
+Description=ViralTrendly.com - Next.js production server
+After=network.target postgresql.service
+Wants=postgresql.service
+
+[Service]
+Type=simple
+User=viraltrendly
+Group=viraltrendly
+WorkingDirectory=/srv/viraltrendly
+EnvironmentFile=/srv/viraltrendly/.env
+ExecStart=/usr/bin/npm run start
+Restart=on-failure
+RestartSec=5
+
+# Resource caps so this can never starve dimabac-live/livekit sharing the
+# box (4 vCPU / 8 GB total) — tune once real traffic exists, per the
+# roadmap's Phase 10 note.
+CPUQuota=150%
+MemoryMax=1536M
+TasksMax=512
+
+# Hardening: a Next.js web server needs no raw sockets, no device access,
+# and no writes outside its own tree (build output + local media uploads).
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/srv/viraltrendly
+
+[Install]
+WantedBy=multi-user.target

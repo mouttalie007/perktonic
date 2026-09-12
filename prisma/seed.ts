@@ -5,16 +5,27 @@
  *   1. STRUCTURAL (keep): singleton settings, categories, ad-placement slots,
  *      the default editorial author, and the legal/trust page shells.
  *   2. DEMO CONTENT (removable): a handful of published articles + one listicle
- *      so Phases 1–6 have something to render. Delete these from the Admin
- *      Dashboard once real content exists, or run `npm run db:reset`.
+ *      + randomized engagement, so Phases 1–9 have something to render.
+ *      Delete these from the Admin Dashboard once real content exists, run
+ *      `npm run db:reset`, or — for a real deploy — just never seed them:
+ *      `npm run db:seed:prod` (this same script with `--production`) skips
+ *      this whole section. Never run the plain `db:seed` against a
+ *      production database; it would publish 11 fake articles, fake
+ *      comments and randomized reaction counts onto the real site.
  *
  * Idempotent: everything is upserted by a natural key, so re-running is safe.
  */
 
 import { PrismaClient, type Prisma, type ReactionEmoji } from "@prisma/client";
+import { randomBytes } from "node:crypto";
 import bcrypt from "bcryptjs";
 
 const prisma = new PrismaClient();
+
+// CLI flag, not an env var — package.json scripts stay portable across
+// shells this way (no cross-env dependency, no cmd.exe vs bash inline-
+// VAR=value mismatch).
+const isProduction = process.argv.includes("--production");
 
 // ---------------------------------------------------------------------------
 // Reference data
@@ -344,18 +355,36 @@ async function main() {
   }
 
   console.log("→ admin user");
-  const ADMIN_EMAIL = "mouttaliof@gmail.com";
-  const ADMIN_DEFAULT_PASSWORD = "ViralTrendly#2026";
-  await prisma.user.upsert({
-    where: { email: ADMIN_EMAIL },
-    update: {},
-    create: {
-      email: ADMIN_EMAIL,
-      name: "Iyad Ziyad",
-      role: "ADMIN",
-      passwordHash: await bcrypt.hash(ADMIN_DEFAULT_PASSWORD, 12),
-    },
-  });
+  const ADMIN_EMAIL = process.env.ADMIN_EMAIL ?? "mouttaliof@gmail.com";
+  const existingAdmin = await prisma.user.findUnique({ where: { email: ADMIN_EMAIL } });
+  if (existingAdmin) {
+    console.log(`  already exists (${ADMIN_EMAIL}) — left untouched`);
+  } else {
+    // Dev keeps a fixed, documented password for convenience. Production
+    // gets a fresh random one, printed exactly once below — never written
+    // to a file, never reused across deploys.
+    const password = isProduction
+      ? randomBytes(15).toString("base64url")
+      : "ViralTrendly#2026";
+    await prisma.user.create({
+      data: {
+        email: ADMIN_EMAIL,
+        name: "Iyad Ziyad",
+        role: "ADMIN",
+        passwordHash: await bcrypt.hash(password, 12),
+      },
+    });
+    if (isProduction) {
+      console.log("\n" + "=".repeat(64));
+      console.log("  ADMIN LOGIN — shown once, save it now:");
+      console.log(`    Email:    ${ADMIN_EMAIL}`);
+      console.log(`    Password: ${password}`);
+      console.log("  Change it immediately: /admin -> My Account.");
+      console.log("=".repeat(64) + "\n");
+    } else {
+      console.log(`  created (${ADMIN_EMAIL} / ViralTrendly#2026 — change this)`);
+    }
+  }
 
   console.log("→ authors");
   const AUTHORS = [
@@ -461,6 +490,12 @@ ${LEGAL_PAGES.filter((p) => p.slug !== "sitemap")
         metaDescription,
       },
     });
+  }
+
+  if (isProduction) {
+    console.log("→ skipping demo articles/listicle/engagement/redirect (--production)");
+    console.log("✓ seed complete");
+    return;
   }
 
   console.log("→ demo standard articles");
