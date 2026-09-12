@@ -3,123 +3,177 @@
 Target: `109.205.179.106`, shared with the unrelated `live.dimabac.com`
 project. Full coexistence rules live in the `viraltrendly-vps` memory —
 the short version: new files only, new port (3100), new systemd unit with
-resource caps, own native Postgres, own nginx vhost, own Let's Encrypt
-cert. Never touch `dimabac-live.service`, `livekit.service`,
+resource caps, own native Postgres, own nginx vhost. Never touch
+`dimabac-live.service`, `livekit.service`,
 `/etc/nginx/sites-available/live.dimabac.com`, or `default`.
 
-This is a first-deploy runbook, not a CI pipeline — run it by hand,
-checking each step before the next.
+**Status (2026-09-13): live at http://109.205.179.106/**, IP-only — no
+domain/Cloudflare/TLS yet (deliberately deferred, see "Adding a domain
+later" below). Steps 0-6 below are done on the box; this file stays as the
+runbook for redeploys and for whoever adds the domain later.
 
-## 0. Prerequisites (once)
+## 0. Prerequisites (once) — done
 
-- DNS: point `viraltrendly.com` and `www.viraltrendly.com` A records at
-  `109.205.179.106` (Namecheap). Let this propagate before step 6.
-- On the VPS: Node.js (same major version as local — currently 24.x LTS),
-  npm, PostgreSQL server, nginx, certbot (`python3-certbot-nginx`) —
-  install whichever of these aren't already present (nginx is; Postgres
-  is not, dimabac has no DB).
-- Create the app's system user:
-  `sudo useradd --system --no-create-home --shell /usr/sbin/nologin viraltrendly`
+- On the VPS: Node.js v22 LTS, npm, PostgreSQL 14 (installed via apt — not
+  present before), nginx (already there), certbot (already there, unused
+  until a domain exists).
+- App system user: `viraltrendly` (`useradd --system --no-create-home
+  --shell /usr/sbin/nologin viraltrendly`).
 
-## 1. Database
+## 1. Database — done
 
 ```sh
-sudo -u postgres psql -c "CREATE ROLE viraltrendly WITH LOGIN PASSWORD 'CHANGE_ME_STRONG_PASSWORD';"
+sudo -u postgres psql -c "CREATE ROLE viraltrendly WITH LOGIN PASSWORD '...';"
 sudo -u postgres psql -c "CREATE DATABASE viraltrendly OWNER viraltrendly;"
 ```
 
-Use that same password in `/srv/viraltrendly/.env`'s `DATABASE_URL` (step 3).
+Real password is in `/srv/viraltrendly/.env` on the box only — not
+recorded anywhere else. Confirmed with a direct `psql -h 127.0.0.1`
+connection, not just assumed from the CREATE ROLE output — the first
+attempt's password silently didn't take (multiple layers of shell quoting
+across the SSH hop swallowed something), which only surfaced as a Prisma
+auth error during the first build attempt. `ALTER ROLE ... WITH PASSWORD`
++ a direct `psql` connection test fixed and confirmed it.
 
-## 2. Get the code onto the box
+## 2. Code onto the box — done (tarball, not git)
+
+No git remote exists for this repo yet, so the first deploy went via a
+tarball rather than `git clone`:
 
 ```sh
-sudo mkdir -p /srv/viraltrendly
-sudo chown viraltrendly:viraltrendly /srv/viraltrendly
-# copy the repo in (git clone, rsync, or scp — whatever this project uses for
-# source control remotes), then as the viraltrendly user:
-cd /srv/viraltrendly
-npm ci
+# locally — exclude dev-only stuff. IMPORTANT: also exclude anything
+# .gitignore excludes that isn't in this explicit list (the first attempt
+# missed this and shipped the raw multi-MB author source photos + a
+# .claude/ session-lock dir to the server — harmless, but sloppy; cleaned
+# up by hand after. `git archive` on a real remote avoids this entirely).
+tar --exclude=node_modules --exclude=.next --exclude=.git \
+    --exclude=scripts/.audit --exclude=public/uploads \
+    --exclude=.env --exclude=.env.local --exclude='VPS login' \
+    -czf /tmp/viraltrendly-deploy.tar.gz .
+pscp -batch -hostkey <fingerprint> -pw <pass> /tmp/viraltrendly-deploy.tar.gz root@109.205.179.106:/tmp/
+# on the VPS:
+mkdir -p /srv/viraltrendly
+tar -xzf /tmp/viraltrendly-deploy.tar.gz -C /srv/viraltrendly
+rm /tmp/viraltrendly-deploy.tar.gz
+cd /srv/viraltrendly && npm ci
 ```
 
-## 3. Environment
+Once a real git remote exists, switch this step to `git clone`/`git pull`
+(see "Redeploying later").
+
+## 3. Environment — done
+
+`.env` on the box (not `.env.production.example` — copied then edited):
+
+- `NEXT_PUBLIC_SITE_URL="http://109.205.179.106"` (IP-only for now — **must
+  change + rebuild** once a domain exists, see below)
+- `PORT="3100"`
+- real `DATABASE_URL` with the role's password
+- `MEDIA_PROVIDER="local"`
+- AdSense/analytics/newsletter vars left blank (none of those accounts
+  exist yet)
+
+`chmod 600 .env`, owned by `viraltrendly:viraltrendly`.
+
+## 4. Migrate, seed, build — done, **in this order**
+
+The original draft of this runbook had build before migrate — wrong for a
+first deploy: `next build` statically generates pages that query the DB
+(e.g. `/[pageSlug]`, `/category/[slug]`), so the schema must exist first.
+Redeploys where the schema is already current are more forgiving of the
+order, but do it this way every time regardless:
 
 ```sh
-cp .env.production.example .env
-# edit .env: DATABASE_URL password, ADMIN_EMAIL, and any AdSense/analytics
-# IDs you actually have. Leave the rest as-is to start.
-chmod 600 .env
-```
-
-## 4. Build, migrate, seed
-
-```sh
+npx prisma migrate deploy       # NOT `migrate dev` — only applies existing
+                                 # migrations, never prompts, never resets
+npm run db:seed:prod            # structural data only. NEVER plain
+                                 # `db:seed` here — it publishes 11 fake
+                                 # demo articles + fake comments +
+                                 # randomized reactions onto the real site
 npm run build
-npx prisma migrate deploy       # NOT `migrate dev` — this only applies
-                                 # existing migrations, never prompts,
-                                 # never resets anything
-npm run db:seed:prod            # structural data only — categories, ad
-                                 # placements, admin user, authors, tags,
-                                 # legal pages. NEVER run plain `db:seed`
-                                 # here: it publishes 11 fake demo
-                                 # articles + fake comments + randomized
-                                 # reaction counts onto the real site.
 ```
 
-`db:seed:prod` prints the generated admin password to the terminal
-**exactly once** — copy it immediately, then log in and change it via
-`/admin` → My Account.
+`db:seed:prod` printed the generated admin password to the terminal
+**exactly once** — already captured and relayed to the user directly
+(not written to any file on either machine). Change it via `/admin` → My
+Account as soon as convenient.
 
-## 5. systemd
+## 5. systemd — done
 
 ```sh
-sudo cp deploy/viraltrendly.service /etc/systemd/system/viraltrendly.service
-sudo systemctl daemon-reload
-sudo systemctl enable --now viraltrendly.service
-sudo systemctl status viraltrendly.service     # should be active (running)
+chown -R viraltrendly:viraltrendly /srv/viraltrendly
+cp deploy/viraltrendly.service /etc/systemd/system/viraltrendly.service
+systemctl daemon-reload
+systemctl enable --now viraltrendly.service
+systemctl status viraltrendly.service        # active (running)
 curl -s -o /dev/null -w "%{http_code}\n" http://127.0.0.1:3100/   # 200
 ```
 
-## 6. nginx + TLS
+## 6. nginx — done (HTTP only, IP-matched, no TLS yet)
 
 ```sh
-sudo cp deploy/nginx-viraltrendly.conf /etc/nginx/sites-available/viraltrendly.com
-sudo ln -s /etc/nginx/sites-available/viraltrendly.com /etc/nginx/sites-enabled/
-sudo nginx -t && sudo systemctl reload nginx
-sudo certbot --nginx -d viraltrendly.com -d www.viraltrendly.com
+cp deploy/nginx-viraltrendly.conf /etc/nginx/sites-available/viraltrendly
+ln -s /etc/nginx/sites-available/viraltrendly /etc/nginx/sites-enabled/
+nginx -t && systemctl reload nginx
 ```
 
-certbot rewrites the 443 server block in place to point at the issued
-cert — that edit is expected and permanent, don't revert it from the repo
-copy on a later redeploy (copy everything except the
-`ssl_certificate*`/certbot-managed lines, or just don't re-copy the file
-at all once TLS is live).
+The vhost matches `server_name 109.205.179.106` specifically (not a
+catch-all `_`), so it can't intercept traffic meant for
+`live.dimabac.com` or nginx's `default` site. Confirmed both dimabac and
+the new site respond correctly after the reload.
 
-## 7. Cloudflare (manual, your account)
+## 7. Verified (2026-09-13)
 
-Add the domain to Cloudflare, switch nameservers at Namecheap to
-Cloudflare's, proxy the A record (orange cloud). SSL mode: "Full (strict)"
-once step 6's cert is live.
+- `http://109.205.179.106/` → 200, real production CSP header present (no
+  `unsafe-eval` — that's `next dev`-only)
+- `/admin/login` → logged in successfully with the generated credentials
+- `dimabac-live`, `livekit`, `nginx`, `postgresql`, `viraltrendly` — all
+  `active`; `https://live.dimabac.com/` still 200 throughout
+- axe a11y audit CLEAN, responsive audit ALL CLEAN 320-1440, against the
+  live IP
 
-## 8. Post-deploy smoke test
+## Adding a domain + Cloudflare + TLS later
 
-- `https://viraltrendly.com/` loads, no mixed-content warnings
-- `/admin/login` reachable, log in with the changed password
+Skipped for now by choice, not by blocker — do this whenever ready:
+
+1. Namecheap: point `viraltrendly.com` + `www` A records at
+   `109.205.179.106`. Let it propagate.
+2. Update `/srv/viraltrendly/.env`: `NEXT_PUBLIC_SITE_URL="https://viraltrendly.com"`.
+3. `npm run build && sudo systemctl restart viraltrendly.service` — the
+   site bakes its canonical/OG/sitemap URLs into statically generated
+   pages at build time, so this rebuild is required, not optional, for
+   the domain to actually take effect everywhere.
+4. Replace `/etc/nginx/sites-available/viraltrendly`'s `server_name` line
+   with a real domain-based vhost (apex + www redirect + TLS) — a fuller
+   template for this shape existed in an earlier version of this file in
+   git history if useful as a starting point.
+5. `certbot --nginx -d viraltrendly.com -d www.viraltrendly.com`
+6. Cloudflare: add the domain, switch nameservers at Namecheap, proxy the
+   A record (orange cloud), SSL mode "Full (strict)" once step 5's cert
+   is live.
+7. Re-run the post-deploy smoke test (below) against the real domain over
+   HTTPS, and re-run `npm run audit:perf` — the Phase 9 Lighthouse numbers
+   were measured on a local dev machine against picsum.photos placeholder
+   images, not representative of the real deploy.
+
+## Post-deploy smoke test (repeat after any real content/config change)
+
+- Homepage loads, no console errors, no mixed-content warnings once on TLS
+- `/admin/login` reachable, log in works
 - Submit the contact form, react to an article, submit a comment — confirm
-  each in the admin (`/admin/contact-messages`, `/admin/comments`)
-- `curl -sI https://viraltrendly.com/ | grep -i content-security-policy`
-  — confirm the header is present and has no `unsafe-eval` (that's a
-  `next dev`-only allowance, see the CSP fix commit)
-- Re-run `npm run audit` / `audit:a11y` / `audit:perf` against the real
-  domain instead of localhost, per the Phase 9 note that lab numbers on a
-  dev machine with placeholder images aren't the real signal
+  each lands correctly in the admin (`/admin/contact-messages`,
+  `/admin/comments`)
+- `curl -sI <url> | grep -i content-security-policy` — header present, no
+  `unsafe-eval`
+- `npm run audit` / `audit:a11y` / `audit:perf` against the real URL
 
 ## Redeploying later
 
 ```sh
 cd /srv/viraltrendly
-git pull   # or however new code arrives
+git pull   # once a remote exists — otherwise repeat the tarball step above
 npm ci
-npm run build
 npx prisma migrate deploy   # no-op if there are no new migrations
+npm run build
 sudo systemctl restart viraltrendly.service
 ```
