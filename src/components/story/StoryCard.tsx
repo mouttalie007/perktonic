@@ -2,7 +2,7 @@ import Link from "next/link";
 import Image from "next/image";
 import type { Route } from "next";
 import type { ArticleCard } from "@/services/article.service";
-import { formatDate, formatRelativeTime, formatViews, isoDate } from "@/lib/format";
+import { formatDate, formatViews, isoDate } from "@/lib/format";
 import { EngagementMeta } from "@/components/article/EngagementMeta";
 import type { ReactionCounts } from "@/services/reaction.service";
 
@@ -246,24 +246,23 @@ export function StoryCard({
         {story.category && (
           <span
             aria-hidden
-            className="text-muted hidden shrink-0 items-center justify-center border-r border-[var(--color-line)] pr-3 text-[0.68rem] font-extrabold tracking-[0.15em] uppercase [writing-mode:vertical-rl] sm:flex"
+            className="hidden shrink-0 items-center justify-center border-r border-[var(--color-line)] pr-3 text-[0.68rem] font-extrabold tracking-[0.15em] uppercase [writing-mode:vertical-rl] sm:flex"
+            style={{ color: story.category.accentColor ?? "var(--color-muted)" }}
           >
             <span className="rotate-180">{story.category.name}</span>
           </span>
         )}
-        <span className="border-line relative aspect-[4/3] w-28 shrink-0 overflow-hidden rounded-sm border sm:w-36">
-          <Picture story={story} sizes="(max-width: 640px) 112px, 144px" />
+        <span className="border-line relative aspect-[3/2] w-32 shrink-0 overflow-hidden rounded-sm border sm:w-44">
+          <Picture story={story} sizes="(max-width: 640px) 128px, 176px" />
         </span>
         <span className="flex min-w-0 flex-1 flex-col justify-center gap-1.5">
           {story.category && (
-            <span className="text-muted text-[0.7rem] font-bold tracking-wide uppercase sm:hidden">
+            <span
+              className="text-[0.7rem] font-bold tracking-wide uppercase sm:hidden"
+              style={{ color: story.category.accentColor ?? "var(--color-muted)" }}
+            >
               {story.category.name}
             </span>
-          )}
-          {story.publishedAt && (
-            <time dateTime={isoDate(story.publishedAt)} className="text-muted text-[0.75rem]">
-              {formatRelativeTime(story.publishedAt)}
-            </time>
           )}
           <h3
             className={`font-heading text-ink group-hover:text-ink/70 line-clamp-3 text-[1.05rem] leading-snug font-extrabold transition-colors sm:text-[1.15rem] ${headingClassName ?? ""}`}

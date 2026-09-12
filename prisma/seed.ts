@@ -11,7 +11,7 @@
  * Idempotent: everything is upserted by a natural key, so re-running is safe.
  */
 
-import { PrismaClient, type Prisma } from "@prisma/client";
+import { PrismaClient, type Prisma, type ReactionEmoji } from "@prisma/client";
 import bcrypt from "bcryptjs";
 
 const prisma = new PrismaClient();
@@ -20,27 +20,34 @@ const prisma = new PrismaClient();
 // Reference data
 // ---------------------------------------------------------------------------
 
+// accentColor: used only as text color (category labels on the homepage
+// feed/trending rail) — every value below is a Tailwind 700/800-depth shade,
+// chosen because that tier reliably clears WCAG AA (~4.5:1) against a white
+// background at small bold text sizes. Never use these as a background
+// fill with light text — pair backgrounds with dark text instead (see the
+// brand-yellow contrast note in globals.css for why that distinction matters).
 const CATEGORIES: {
   slug: string;
   name: string;
   iconKey: string;
   shortDescription: string;
   description: string;
+  accentColor: string;
 }[] = [
-  { slug: "viral", name: "Viral", iconKey: "flame", shortDescription: "Hot stories", description: "The stories everyone is talking about right now." },
-  { slug: "people", name: "People", iconKey: "users", shortDescription: "Celebrities & influencers", description: "Profiles and talking points from the people shaping culture." },
-  { slug: "tech", name: "Tech", iconKey: "cpu", shortDescription: "Innovation & AI", description: "How technology and AI are reshaping the way we live and work." },
-  { slug: "lifestyle", name: "Lifestyle", iconKey: "coffee", shortDescription: "Live better", description: "Ideas and small changes for a better everyday life." },
-  { slug: "entertainment", name: "Entertainment", iconKey: "film", shortDescription: "Movies, music & more", description: "The latest from film, TV, music and streaming." },
-  { slug: "travel", name: "Travel", iconKey: "plane", shortDescription: "Discover the world", description: "Destinations, guides and the places worth seeing." },
-  { slug: "health", name: "Health", iconKey: "heart", shortDescription: "Tips for a healthier you", description: "Practical takes on nutrition, fitness, sleep and wellbeing." },
-  { slug: "science", name: "Science", iconKey: "atom", shortDescription: "Discoveries & space", description: "Discoveries and research that change how we see the universe." },
-  { slug: "sports", name: "Sports", iconKey: "trophy", shortDescription: "The moments that matter", description: "Highlights, storylines and viral moments from sport." },
-  { slug: "amazing", name: "Amazing", iconKey: "sparkles", shortDescription: "Incredible facts", description: "Extraordinary facts, feats and stories worth a double take." },
-  { slug: "food", name: "Food", iconKey: "utensils", shortDescription: "Eat well", description: "Recipes, trends and food stories worth a second look." },
-  { slug: "money", name: "Money", iconKey: "wallet", shortDescription: "Smarter with money", description: "Everyday money and the economy explained simply." },
-  { slug: "culture", name: "Culture", iconKey: "palette", shortDescription: "Art & ideas", description: "Art, books, internet culture and the ideas moving the conversation." },
-  { slug: "world", name: "World", iconKey: "globe", shortDescription: "Around the globe", description: "Notable stories and human moments from around the world." },
+  { slug: "viral", name: "Viral", iconKey: "flame", shortDescription: "Hot stories", description: "The stories everyone is talking about right now.", accentColor: "#B91C1C" },
+  { slug: "people", name: "People", iconKey: "users", shortDescription: "Celebrities & influencers", description: "Profiles and talking points from the people shaping culture.", accentColor: "#6D28D9" },
+  { slug: "tech", name: "Tech", iconKey: "cpu", shortDescription: "Innovation & AI", description: "How technology and AI are reshaping the way we live and work.", accentColor: "#1D4ED8" },
+  { slug: "lifestyle", name: "Lifestyle", iconKey: "coffee", shortDescription: "Live better", description: "Ideas and small changes for a better everyday life.", accentColor: "#BE185D" },
+  { slug: "entertainment", name: "Entertainment", iconKey: "film", shortDescription: "Movies, music & more", description: "The latest from film, TV, music and streaming.", accentColor: "#7E22CE" },
+  { slug: "travel", name: "Travel", iconKey: "plane", shortDescription: "Discover the world", description: "Destinations, guides and the places worth seeing.", accentColor: "#0F766E" },
+  { slug: "health", name: "Health", iconKey: "heart", shortDescription: "Tips for a healthier you", description: "Practical takes on nutrition, fitness, sleep and wellbeing.", accentColor: "#15803D" },
+  { slug: "science", name: "Science", iconKey: "atom", shortDescription: "Discoveries & space", description: "Discoveries and research that change how we see the universe.", accentColor: "#0E7490" },
+  { slug: "sports", name: "Sports", iconKey: "trophy", shortDescription: "The moments that matter", description: "Highlights, storylines and viral moments from sport.", accentColor: "#C2410C" },
+  { slug: "amazing", name: "Amazing", iconKey: "sparkles", shortDescription: "Incredible facts", description: "Extraordinary facts, feats and stories worth a double take.", accentColor: "#92400E" },
+  { slug: "food", name: "Food", iconKey: "utensils", shortDescription: "Eat well", description: "Recipes, trends and food stories worth a second look.", accentColor: "#BE123C" },
+  { slug: "money", name: "Money", iconKey: "wallet", shortDescription: "Smarter with money", description: "Everyday money and the economy explained simply.", accentColor: "#047857" },
+  { slug: "culture", name: "Culture", iconKey: "palette", shortDescription: "Art & ideas", description: "Art, books, internet culture and the ideas moving the conversation.", accentColor: "#A21CAF" },
+  { slug: "world", name: "World", iconKey: "globe", shortDescription: "Around the globe", description: "Notable stories and human moments from around the world.", accentColor: "#4338CA" },
 ];
 
 const AD_PLACEMENTS: {
@@ -301,6 +308,7 @@ async function main() {
         iconKey: c.iconKey,
         shortDescription: c.shortDescription,
         description: c.description,
+        accentColor: c.accentColor,
         order: i,
       },
       create: {
@@ -309,6 +317,7 @@ async function main() {
         iconKey: c.iconKey,
         shortDescription: c.shortDescription,
         description: c.description,
+        accentColor: c.accentColor,
         order: i,
         imageUrl: img(`cat-${c.slug}`, 800, 600),
       },
@@ -607,6 +616,54 @@ ${LEGAL_PAGES.filter((p) => p.slug !== "sitemap")
         update: {},
         create: { articleId: article.id, tagId },
       });
+    }
+  }
+
+  // Random starting engagement (user request, 2026-09-12): "make the
+  // like/reaction system default and random initially for each post so it
+  // shows up and we can test it." Reactions are re-randomized on every seed
+  // run (that's the point — quick, repeatable test data); sample comments
+  // are only added once per article so re-seeding doesn't pile up
+  // duplicates.
+  console.log("→ demo engagement (reactions + comments)");
+  const REACTION_EMOJIS: ReactionEmoji[] = [
+    "LAUGH",
+    "LOVE",
+    "WOW",
+    "ANGRY",
+    "SAD",
+  ];
+  const SAMPLE_COMMENTS: { name: string; body: string }[] = [
+    { name: "Jordan M.", body: "This is exactly what I needed to read today, thanks for putting it together." },
+    { name: "Casey R.", body: "Wait, #3 actually surprised me — did not see that coming." },
+    { name: "Alex P.", body: "Sharing this with everyone I know, way too relatable." },
+    { name: "Sam T.", body: "Great write-up, would love a follow-up on this." },
+  ];
+  const allArticles = await prisma.article.findMany({ select: { id: true } });
+  for (const { id: articleId } of allArticles) {
+    for (const emoji of REACTION_EMOJIS) {
+      // Skewed toward small numbers with the occasional popular outlier —
+      // more realistic than a flat random range for a "trending" feel.
+      const count = Math.random() < 0.75
+        ? Math.floor(Math.random() * 12)
+        : Math.floor(Math.random() * 90) + 12;
+      if (count === 0) continue;
+      await prisma.articleReaction.upsert({
+        where: { articleId_emoji: { articleId, emoji } },
+        update: { count },
+        create: { articleId, emoji, count },
+      });
+    }
+
+    const existingComments = await prisma.comment.count({ where: { articleId } });
+    if (existingComments === 0) {
+      const n = Math.floor(Math.random() * 3) + 1; // 1-3 sample comments
+      const picks = [...SAMPLE_COMMENTS].sort(() => Math.random() - 0.5).slice(0, n);
+      for (const c of picks) {
+        await prisma.comment.create({
+          data: { articleId, name: c.name, body: c.body, status: "APPROVED" },
+        });
+      }
     }
   }
 

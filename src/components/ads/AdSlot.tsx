@@ -9,8 +9,10 @@ import { AdUnitRender } from "./AdUnitRender";
  *  - reserves height to avoid CLS
  *  - clearly labels the container "Advertisement" — never dressed as content
  *
- * When nothing resolves: renders a dashed dev placeholder (so layout can be
- * reviewed) and nothing at all in production.
+ * Renders nothing at all — in every environment — until a real Ad Unit is
+ * mapped to this placement in the admin (user feedback, 2026-09-12: the dev
+ * "inactive" placeholder was visible on the live site and looked like a
+ * broken ad, not a review aid).
  */
 export async function AdSlot({
   placement,
@@ -31,17 +33,7 @@ export async function AdSlot({
     "--ad-h-m": `${ad?.reservedHeightMobile ?? def?.reservedHeight.mobile ?? 0}px`,
   } as React.CSSProperties;
 
-  if (!ad) {
-    if (process.env.NODE_ENV !== "development") return null;
-    return (
-      <div
-        style={reserve}
-        className={`ad-reserve border-line text-muted flex items-center justify-center rounded-sm border border-dashed bg-[var(--color-surface)] text-[0.7rem] font-semibold tracking-wider uppercase ${className}`}
-      >
-        Ad slot · {def?.label ?? placement} · inactive
-      </div>
-    );
-  }
+  if (!ad) return null;
 
   const deviceClass = [
     ad.showMobile ? "" : "max-lg:hidden",

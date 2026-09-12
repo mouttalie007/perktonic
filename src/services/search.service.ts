@@ -28,7 +28,7 @@ const cardSelect = {
   publishedAt: true,
   isBreaking: true,
   featuredImage: { select: { url: true, alt: true, width: true, height: true } },
-  category: { select: { slug: true, name: true } },
+  category: { select: { slug: true, name: true, accentColor: true } },
   author: { select: { slug: true, name: true } },
 } as const;
 

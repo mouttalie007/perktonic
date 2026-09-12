@@ -36,7 +36,7 @@ export function TrendingRail({
           return (
             <li key={story.id} className="w-[62vw] shrink-0 snap-start sm:w-[280px]">
               <Link href={`/story/${story.slug}` as Route} className="group block">
-                <span className="border-line relative block aspect-[4/3] overflow-hidden rounded-md border">
+                <span className="border-line relative block aspect-[3/2] overflow-hidden rounded-md border">
                   {img?.url ? (
                     <Image
                       src={img.url}

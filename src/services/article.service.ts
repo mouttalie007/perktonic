@@ -20,7 +20,7 @@ const cardSelect = {
   featuredImage: {
     select: { url: true, alt: true, width: true, height: true },
   },
-  category: { select: { slug: true, name: true } },
+  category: { select: { slug: true, name: true, accentColor: true } },
   author: { select: { slug: true, name: true } },
 } satisfies Prisma.ArticleSelect;
 
