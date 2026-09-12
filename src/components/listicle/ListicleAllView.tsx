@@ -5,14 +5,18 @@ import { Breadcrumbs, type Crumb } from "@/components/ui/Breadcrumbs";
 import { ShareButtons } from "@/components/article/ShareButtons";
 import { AuthorBox } from "@/components/article/AuthorBox";
 import { RelatedStories } from "@/components/article/RelatedStories";
+import { ReactionBar } from "@/components/article/ReactionBar";
+import { CommentSection } from "@/components/article/CommentSection";
 import { NewsletterCTA } from "@/components/home/NewsletterCTA";
 import { AdSlot } from "@/components/ads/AdSlot";
+import { reactionService } from "@/services/reaction.service";
 import { formatDateLong, formatReadingTime } from "@/lib/format";
 import { DEFAULT_AUTHOR_NAME } from "@/config/site";
 import { subpagePath, type ListicleItemLike } from "@/lib/listicle";
 import { ListicleItemBlock } from "./ListicleItemBlock";
 
 type AllArticle = {
+  id: string;
   slug: string;
   title: string;
   intro: string | null;
@@ -33,7 +37,7 @@ type AllArticle = {
  * Single-page view of a whole listicle (spec §4 — the secondary "/all" route).
  * Its canonical points back to page 1 so it doesn't compete for indexing.
  */
-export function ListicleAllView({
+export async function ListicleAllView({
   article,
   items,
   canonical,
@@ -44,6 +48,7 @@ export function ListicleAllView({
   canonical: string;
   related: ArticleCard[];
 }) {
+  const reactionCounts = await reactionService.getCounts(article.id);
   const authorName = article.author?.name ?? DEFAULT_AUTHOR_NAME;
   const adCtx = {
     adsDisabled: article.adsDisabled,
@@ -126,11 +131,10 @@ export function ListicleAllView({
             ))}
           </div>
 
-          <ShareButtons
-            url={canonical}
-            title={article.title}
-            className="border-line mt-12 border-t pt-6"
-          />
+          <div className="border-line mt-12 flex flex-wrap items-center justify-between gap-4 border-t pt-6">
+            <ReactionBar articleId={article.id} initialCounts={reactionCounts} />
+            <ShareButtons url={canonical} title={article.title} />
+          </div>
           <div className="mt-8">
             <AuthorBox author={article.author} />
           </div>
@@ -138,6 +142,12 @@ export function ListicleAllView({
             placement="below-article"
             article={adCtx}
             className="mt-10"
+          />
+
+          <CommentSection
+            articleId={article.id}
+            path={subpagePath(article.slug, 1)}
+            className="mt-12"
           />
         </div>
 

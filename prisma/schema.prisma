@@ -174,6 +174,8 @@ model Article {
 
   tags          ArticleTag[]
   listicleItems ListicleItem[]
+  reactions     ArticleReaction[]
+  comments      Comment[]
 
   status       ContentStatus @default(DRAFT)
   publishedAt  DateTime?
@@ -461,4 +463,60 @@ model ContactMessage {
 
   @@index([status, createdAt])
   @@map("contact_messages")
+}
+
+// ----------------------------------------------------------------------------
+// Engagement: reactions & comments (homepage redesign, 2026-09-12)
+// ----------------------------------------------------------------------------
+
+enum ReactionEmoji {
+  LAUGH // 😂
+  LOVE // 😍
+  WOW // 😮
+  ANGRY // 😡
+  SAD // 😢
+}
+
+/// Aggregate reaction counters per article/emoji. Anonymous — there is no
+/// public user account system — so double-counting from the same visitor is
+/// only soft-guarded (client localStorage + a per-IP rate limit on the
+/// action), not cryptographically prevented. That's an accepted trade-off
+/// consistent with how this kind of lightweight reaction bar works site-wide
+/// on comparable publishers.
+model ArticleReaction {
+  id        String        @id @default(cuid())
+  articleId String
+  article   Article       @relation(fields: [articleId], references: [id], onDelete: Cascade)
+  emoji     ReactionEmoji
+  count     Int           @default(0)
+
+  @@unique([articleId, emoji])
+  @@map("article_reactions")
+}
+
+enum CommentStatus {
+  PENDING
+  APPROVED
+  SPAM
+}
+
+/// Flat (non-threaded) public comments. Default PENDING — an editor
+/// approves/marks-spam from the admin before a comment appears publicly, the
+/// same moderation posture as ContactMessage. No account system, so `name`
+/// is free text; `ipHash` (SHA-256, never the raw IP) backs the submit rate
+/// limit and gives an editor a spam-pattern signal without storing PII.
+model Comment {
+  id        String        @id @default(cuid())
+  articleId String
+  article   Article       @relation(fields: [articleId], references: [id], onDelete: Cascade)
+  name      String
+  body      String
+  status    CommentStatus @default(PENDING)
+  ipHash    String?
+
+  createdAt DateTime @default(now())
+
+  @@index([articleId, status, createdAt])
+  @@index([status, createdAt])
+  @@map("comments")
 }

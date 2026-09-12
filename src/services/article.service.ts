@@ -63,6 +63,33 @@ export const articleService = {
     });
   },
 
+  /**
+   * Paginated latest-across-all-categories feed (homepage redesign,
+   * 2026-09-12) — the main feed below the Trending rail, 12/page.
+   */
+  async listFeed(
+    { page = 1, pageSize = 12 }: { page?: number; pageSize?: number } = {},
+  ): Promise<Paginated<ArticleCard>> {
+    const where = published();
+    const [items, total] = await Promise.all([
+      prisma.article.findMany({
+        where,
+        orderBy: { publishedAt: "desc" },
+        skip: (page - 1) * pageSize,
+        take: pageSize,
+        select: cardSelect,
+      }),
+      prisma.article.count({ where }),
+    ]);
+    return {
+      items,
+      total,
+      page,
+      pageSize,
+      totalPages: Math.max(1, Math.ceil(total / pageSize)),
+    };
+  },
+
   /** Featured articles for the hero (spec §9, §62). */
   async listFeatured(limit = 3): Promise<ArticleCard[]> {
     return prisma.article.findMany({

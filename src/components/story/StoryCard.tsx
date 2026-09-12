@@ -2,21 +2,25 @@ import Link from "next/link";
 import Image from "next/image";
 import type { Route } from "next";
 import type { ArticleCard } from "@/services/article.service";
-import { formatDate, formatViews, isoDate } from "@/lib/format";
+import { formatDate, formatRelativeTime, formatViews, isoDate } from "@/lib/format";
+import { EngagementMeta } from "@/components/article/EngagementMeta";
+import type { ReactionCounts } from "@/services/reaction.service";
 
 /**
- * The reusable story card (spec §14, §15, §65). One component, four shapes:
- *  - `grid`    image-top card for grids (Latest Stories, category pages)
+ * The reusable story card (spec §14, §15, §65). One component, five shapes:
+ *  - `grid`    image-top card for grids (category pages)
  *  - `overlay` full-bleed image with text over a bottom gradient (hero)
  *  - `list`    thumb + text row, optional rank number (Trending)
  *  - `compact` small thumb + title only, no meta/badge — end-of-article
  *              "You May Also Like" rows
+ *  - `feed`    category label + thumb + title + engagement row — the main
+ *              homepage feed (homepage redesign, 2026-09-12)
  *
  * All images use a fixed aspect ratio + object-cover and reserve space to
  * avoid CLS. Only pass `priority` for the single above-the-fold hero image.
  */
 
-type Variant = "grid" | "overlay" | "list" | "compact";
+type Variant = "grid" | "overlay" | "list" | "compact" | "feed";
 
 interface Props {
   story: ArticleCard;
@@ -27,6 +31,9 @@ interface Props {
   sizes?: string;
   headingClassName?: string;
   className?: string;
+  /** `feed` variant only — engagement preview, batch-fetched by the caller. */
+  reactions?: ReactionCounts;
+  commentCount?: number;
 }
 
 function storyHref(slug: string): Route {
@@ -130,6 +137,8 @@ export function StoryCard({
   sizes,
   headingClassName,
   className = "",
+  reactions,
+  commentCount,
 }: Props) {
   const href = storyHref(story.slug);
 
@@ -222,6 +231,46 @@ export function StoryCard({
           <h3 className="text-ink group-hover:text-ink/70 line-clamp-2 text-[0.82rem] leading-snug font-semibold transition-colors">
             {story.title}
           </h3>
+        </span>
+      </Link>
+    );
+  }
+
+  /* ---------- feed (homepage main feed row) ---------- */
+  if (variant === "feed") {
+    return (
+      <Link
+        href={href}
+        className={`group flex items-stretch gap-4 py-5 ${className}`}
+      >
+        {story.category && (
+          <span
+            aria-hidden
+            className="text-muted hidden shrink-0 items-center justify-center border-r border-[var(--color-line)] pr-3 text-[0.68rem] font-extrabold tracking-[0.15em] uppercase [writing-mode:vertical-rl] sm:flex"
+          >
+            <span className="rotate-180">{story.category.name}</span>
+          </span>
+        )}
+        <span className="border-line relative aspect-[4/3] w-28 shrink-0 overflow-hidden rounded-sm border sm:w-36">
+          <Picture story={story} sizes="(max-width: 640px) 112px, 144px" />
+        </span>
+        <span className="flex min-w-0 flex-1 flex-col justify-center gap-1.5">
+          {story.category && (
+            <span className="text-muted text-[0.7rem] font-bold tracking-wide uppercase sm:hidden">
+              {story.category.name}
+            </span>
+          )}
+          {story.publishedAt && (
+            <time dateTime={isoDate(story.publishedAt)} className="text-muted text-[0.75rem]">
+              {formatRelativeTime(story.publishedAt)}
+            </time>
+          )}
+          <h3
+            className={`font-heading text-ink group-hover:text-ink/70 line-clamp-3 text-[1.05rem] leading-snug font-extrabold transition-colors sm:text-[1.15rem] ${headingClassName ?? ""}`}
+          >
+            {story.title}
+          </h3>
+          <EngagementMeta reactions={reactions ?? {}} commentCount={commentCount ?? 0} className="mt-1" />
         </span>
       </Link>
     );

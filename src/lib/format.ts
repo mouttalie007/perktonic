@@ -60,3 +60,21 @@ export function formatViews(n: number): string {
 export function formatReadingTime(minutes: number): string {
   return `${Math.max(1, minutes)} min read`;
 }
+
+/**
+ * "26 mins ago" / "2 hrs ago" / "3 days ago", falling back to the absolute
+ * date past a week out (matches the homepage feed reference design).
+ */
+export function formatRelativeTime(date: Date | string | null | undefined): string {
+  if (!date) return "";
+  const d = typeof date === "string" ? new Date(date) : date;
+  const diffMs = Date.now() - d.getTime();
+  const minutes = Math.floor(diffMs / 60_000);
+  if (minutes < 1) return "just now";
+  if (minutes < 60) return `${minutes} min${minutes === 1 ? "" : "s"} ago`;
+  const hours = Math.floor(minutes / 60);
+  if (hours < 24) return `${hours} hr${hours === 1 ? "" : "s"} ago`;
+  const days = Math.floor(hours / 24);
+  if (days < 7) return `${days} day${days === 1 ? "" : "s"} ago`;
+  return formatDate(d);
+}

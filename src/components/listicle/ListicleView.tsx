@@ -5,8 +5,11 @@ import { Breadcrumbs, type Crumb } from "@/components/ui/Breadcrumbs";
 import { ShareButtons } from "@/components/article/ShareButtons";
 import { AuthorBox } from "@/components/article/AuthorBox";
 import { RelatedStories } from "@/components/article/RelatedStories";
+import { ReactionBar } from "@/components/article/ReactionBar";
+import { CommentSection } from "@/components/article/CommentSection";
 import { NewsletterCTA } from "@/components/home/NewsletterCTA";
 import { AdSlot } from "@/components/ads/AdSlot";
+import { reactionService } from "@/services/reaction.service";
 import { formatDateLong, formatReadingTime } from "@/lib/format";
 import { DEFAULT_AUTHOR_NAME } from "@/config/site";
 import {
@@ -19,6 +22,7 @@ import { ListicleProgress } from "./ListicleProgress";
 import { ListicleNav } from "./ListicleNav";
 
 type ViewArticle = {
+  id: string;
   slug: string;
   title: string;
   intro: string | null;
@@ -38,7 +42,7 @@ type ViewArticle = {
 
 /** One listicle subpage (spec §4). Page 1 and the last page also carry the
  *  byline, author box, related stories and newsletter. */
-export function ListicleView({
+export async function ListicleView({
   article,
   items,
   position,
@@ -56,6 +60,9 @@ export function ListicleView({
   const isFirst = position === 1;
   const isLast = position === total;
   const showExtras = isFirst || isLast;
+  // Reactions/comments only once the reader has reached the end — showing
+  // the same thread on page 1 too would be a confusing duplicate.
+  const reactionCounts = isLast ? await reactionService.getCounts(article.id) : {};
   const authorName = article.author?.name ?? DEFAULT_AUTHOR_NAME;
 
   const adCtx = {
@@ -171,11 +178,10 @@ export function ListicleView({
             className="mt-4"
           />
 
-          <ShareButtons
-            url={canonical}
-            title={article.title}
-            className="border-line mt-10 border-t pt-6"
-          />
+          <div className="border-line mt-10 flex flex-wrap items-center justify-between gap-4 border-t pt-6">
+            {isLast && <ReactionBar articleId={article.id} initialCounts={reactionCounts} />}
+            <ShareButtons url={canonical} title={article.title} />
+          </div>
 
           {showExtras && (
             <>
@@ -188,6 +194,14 @@ export function ListicleView({
                 className="mt-10"
               />
             </>
+          )}
+
+          {isLast && (
+            <CommentSection
+              articleId={article.id}
+              path={subpagePath(article.slug, position)}
+              className="mt-12"
+            />
           )}
         </div>
 

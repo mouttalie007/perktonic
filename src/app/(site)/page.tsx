@@ -1,18 +1,25 @@
 import type { Metadata } from "next";
+import type { Route } from "next";
 import { articleService } from "@/services/article.service";
 import { trendingService } from "@/services/trending.service";
 import { categoryService } from "@/services/category.service";
 import { siteSettingsService } from "@/services/site-settings.service";
 import { seoService } from "@/services/seo.service";
-import { HeroSection } from "@/components/home/HeroSection";
-import { TrendingList } from "@/components/home/TrendingList";
+import { reactionService } from "@/services/reaction.service";
+import { commentService } from "@/services/comment.service";
+import { TrendingRail } from "@/components/home/TrendingRail";
 import { CategoryQuickNav } from "@/components/home/CategoryQuickNav";
-import { PopularCategories } from "@/components/home/PopularCategories";
 import { NewsletterCTA } from "@/components/home/NewsletterCTA";
-import { StoryGrid } from "@/components/story/StoryGrid";
-import { SectionHeading } from "@/components/ui/SectionHeading";
+import { StoryCard } from "@/components/story/StoryCard";
+import { Pagination } from "@/components/ui/Pagination";
 import { AdSlot } from "@/components/ads/AdSlot";
-import { POPULAR_CATEGORIES, QUICK_NAV_CATEGORIES } from "@/config/site";
+import { QUICK_NAV_CATEGORIES } from "@/config/site";
+
+const PAGE_SIZE = 12;
+
+function homeHref(page: number): Route {
+  return (page > 1 ? `/?page=${page}` : "/") as Route;
+}
 
 export async function generateMetadata(): Promise<Metadata> {
   const seo = await siteSettingsService.getSeoSettings();
@@ -25,24 +32,35 @@ export async function generateMetadata(): Promise<Metadata> {
   return { ...meta, title: { absolute: seo.defaultTitle } };
 }
 
-export default async function HomePage() {
-  const [featured, trending, categories, latestRaw] = await Promise.all([
-    articleService.listFeatured(3),
-    trendingService.list(5),
-    categoryService.listAll(),
-    articleService.listLatest({ limit: 12 }),
-  ]);
+export default async function HomePage({
+  searchParams,
+}: {
+  searchParams: Promise<{ page?: string }>;
+}) {
+  const { page: pageParam } = await searchParams;
+  const page = Math.max(1, Number(pageParam) || 1);
 
-  const featuredIds = new Set(featured.map((s) => s.id));
-  const latest = latestRaw.filter((s) => !featuredIds.has(s.id)).slice(0, 6);
+  const [trending, categories, feed] = await Promise.all([
+    trendingService.list(10),
+    categoryService.listAll(),
+    articleService.listFeed({ page, pageSize: PAGE_SIZE }),
+  ]);
 
   const bySlug = new Map(categories.map((c) => [c.slug, c]));
   const quickNav = QUICK_NAV_CATEGORIES.map((s) => bySlug.get(s)).filter(
     (c): c is (typeof categories)[number] => Boolean(c),
   );
-  const popular = POPULAR_CATEGORIES.map((s) => bySlug.get(s)).filter(
-    (c): c is (typeof categories)[number] => Boolean(c),
-  );
+
+  const engagementIds = [...trending.map((s) => s.id), ...feed.items.map((s) => s.id)];
+  const [reactionsById, commentCountsById] = await Promise.all([
+    reactionService.getCountsForArticles(engagementIds),
+    commentService.countApprovedForArticles(engagementIds),
+  ]);
+  const engagementFor = (id: string) => ({
+    reactions: reactionsById.get(id) ?? {},
+    commentCount: commentCountsById.get(id) ?? 0,
+  });
+  const trendingEngagement = new Map(trending.map((s) => [s.id, engagementFor(s.id)]));
 
   const jsonLd = await seoService.organizationAndWebsiteJsonLd();
 
@@ -53,39 +71,37 @@ export default async function HomePage() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
 
-      <div className="site-container space-y-12 py-6 sm:py-8">
+      <div className="site-container space-y-10 py-6 sm:py-8">
         <AdSlot placement="top-leaderboard" />
 
-        <HeroSection stories={featured} />
+        <TrendingRail stories={trending} engagement={trendingEngagement} />
 
-        <div className="flex flex-col gap-8 lg:grid lg:grid-cols-[minmax(0,1fr)_320px]">
-          <div className="min-w-0 space-y-12">
-            <CategoryQuickNav categories={quickNav} />
+        <CategoryQuickNav categories={quickNav} />
 
-            <section>
-              <SectionHeading title="Latest Stories" />
-              <StoryGrid
-                stories={latest}
-                columns={3}
-                sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 30vw"
-              />
-            </section>
+        <AdSlot placement="in-content" />
 
-            <AdSlot placement="in-content" />
+        {feed.total === 0 ? (
+          <p className="text-muted py-10 text-center text-sm">
+            No stories published yet — check back soon.
+          </p>
+        ) : (
+          <section aria-label="Latest stories" className="divide-line divide-y">
+            {feed.items.map((story) => {
+              const eng = engagementFor(story.id);
+              return (
+                <StoryCard
+                  key={story.id}
+                  story={story}
+                  variant="feed"
+                  reactions={eng.reactions}
+                  commentCount={eng.commentCount}
+                />
+              );
+            })}
+          </section>
+        )}
 
-            <TrendingList stories={trending} className="lg:hidden" />
-          </div>
-
-          <aside className="hidden min-w-0 space-y-6 lg:block">
-            <AdSlot placement="sidebar" />
-            <TrendingList stories={trending} className="lg:sticky lg:top-6" />
-          </aside>
-        </div>
-
-        <section>
-          <SectionHeading title="Popular Categories" as="h2" />
-          <PopularCategories categories={popular} />
-        </section>
+        <Pagination page={page} totalPages={feed.totalPages} buildHref={homeHref} />
       </div>
 
       <NewsletterCTA />

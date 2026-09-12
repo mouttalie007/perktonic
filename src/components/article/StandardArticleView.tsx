@@ -7,11 +7,15 @@ import { ArticleBody } from "./ArticleBody";
 import { ShareButtons } from "./ShareButtons";
 import { AuthorBox } from "./AuthorBox";
 import { RelatedStories } from "./RelatedStories";
+import { ReactionBar } from "./ReactionBar";
+import { CommentSection } from "./CommentSection";
 import { NewsletterCTA } from "@/components/home/NewsletterCTA";
 import { AdSlot } from "@/components/ads/AdSlot";
+import { reactionService } from "@/services/reaction.service";
 
 /* Loose shape — the article payload from articleService has all of this. */
 type ViewArticle = Parameters<typeof ArticleHeader>[0]["article"] & {
+  id: string;
   slug: string;
   content: string | null;
   adsDisabled: boolean;
@@ -20,7 +24,7 @@ type ViewArticle = Parameters<typeof ArticleHeader>[0]["article"] & {
   author: Parameters<typeof AuthorBox>[0]["author"];
 };
 
-export function StandardArticleView({
+export async function StandardArticleView({
   article,
   segments,
   toc,
@@ -33,6 +37,7 @@ export function StandardArticleView({
   canonical: string;
   related: ArticleCard[];
 }) {
+  const reactionCounts = await reactionService.getCounts(article.id);
   const adCtx = {
     adsDisabled: article.adsDisabled,
     adOverrides: (article.adOverrides ?? null) as Record<
@@ -65,17 +70,18 @@ export function StandardArticleView({
             <ArticleBody segments={segments} toc={toc} adCtx={adCtx} />
           </div>
 
-          <ShareButtons
-            url={canonical}
-            title={article.title}
-            className="border-line mt-10 border-t pt-6"
-          />
+          <div className="border-line mt-10 flex flex-wrap items-center justify-between gap-4 border-t pt-6">
+            <ReactionBar articleId={article.id} initialCounts={reactionCounts} />
+            <ShareButtons url={canonical} title={article.title} />
+          </div>
 
           <div className="mt-8">
             <AuthorBox author={article.author} />
           </div>
 
           <AdSlot placement="below-article" article={adCtx} className="mt-10" />
+
+          <CommentSection articleId={article.id} path={`/story/${article.slug}`} className="mt-12" />
         </div>
 
         {related.length > 0 && (

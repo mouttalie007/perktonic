@@ -209,18 +209,6 @@ export const QUICK_NAV_CATEGORIES: CategoryKey[] = [
   "health",
 ];
 
-/** Categories featured in the "Popular Categories" tile grid (spec §17). */
-export const POPULAR_CATEGORIES: CategoryKey[] = [
-  "viral",
-  "people",
-  "tech",
-  "lifestyle",
-  "entertainment",
-  "travel",
-  "health",
-  "amazing",
-];
-
 /**
  * Legal / trust pages (spec §20). The route always exists; content is managed
  * from the Admin Dashboard via the Page model.
