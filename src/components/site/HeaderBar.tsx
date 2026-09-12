@@ -7,6 +7,7 @@ import { usePathname } from "next/navigation";
 import { NAV_PRIMARY, NAV_MORE, type SocialPlatform } from "@/config/site";
 import { Logo } from "./Logo";
 import { SearchIcon, MenuIcon, ChevronDownIcon } from "@/components/icons";
+import { CategoryIcon } from "@/components/CategoryIcon";
 import { MobileNav } from "./MobileNav";
 import { SearchOverlay } from "./SearchOverlay";
 
@@ -57,7 +58,9 @@ export function HeaderBar({
 
   const isActive = (href: string) =>
     href === "/" ? pathname === "/" : pathname.startsWith(href);
-  const moreActive = NAV_MORE.some((i) => isActive(i.href));
+  const activeMoreItem = NAV_MORE.find((i) => isActive(i.href));
+  const moreActive = Boolean(activeMoreItem);
+  const moreAccent = activeMoreItem?.accentColor ?? "var(--color-brand)";
 
   return (
     <header className="bg-canvas border-line border-b">
@@ -69,62 +72,99 @@ export function HeaderBar({
           aria-label="Primary"
           className="hidden min-w-0 items-center lg:flex"
         >
-          {NAV_PRIMARY.map((item) => (
-            <Link
-              key={item.href}
-              href={item.href as Route}
-              aria-current={isActive(item.href) ? "page" : undefined}
-              className={`relative px-2 py-2 text-[0.75rem] font-bold uppercase transition-colors after:absolute after:inset-x-2 after:-bottom-[1.05rem] after:h-[3px] after:transition-colors xl:px-3 xl:text-[0.82rem] xl:tracking-wide xl:after:inset-x-3 ${
-                isActive(item.href)
-                  ? "text-ink after:bg-brand"
-                  : "text-ink/70 hover:text-ink after:bg-transparent"
-              }`}
-            >
-              {item.label}
-            </Link>
-          ))}
+          {NAV_PRIMARY.map((item) => {
+            const active = isActive(item.href);
+            const accent = item.accentColor ?? "var(--color-brand)";
+            return (
+              <Link
+                key={item.href}
+                href={item.href as Route}
+                aria-current={active ? "page" : undefined}
+                className="group relative flex items-center gap-1.5 px-2 py-2 text-[0.75rem] font-bold uppercase xl:px-3 xl:text-[0.82rem] xl:tracking-wide"
+              >
+                {/* Icons only from xl — at lg (1024-1279px) 8 items + MORE
+                    plus icons overflowed the header by ~9px (found via the
+                    responsive audit, the same "nav vs logo" squeeze as the
+                    original Phase 1 1024px fix). */}
+                <CategoryIcon
+                  iconKey={item.iconKey}
+                  width={15}
+                  height={15}
+                  className="hidden shrink-0 opacity-60 transition-[color,opacity,transform] duration-200 group-hover:scale-110 group-hover:opacity-100 xl:inline"
+                  style={{ color: active ? accent : undefined }}
+                />
+                <span
+                  className={`transition-colors duration-200 ${active ? "text-ink" : "text-ink/70 group-hover:text-ink"}`}
+                >
+                  {item.label}
+                </span>
+                <span
+                  aria-hidden
+                  className={`absolute inset-x-2 -bottom-[1.05rem] h-[3px] rounded-full transition-opacity duration-200 xl:inset-x-3 ${
+                    active ? "opacity-100" : "opacity-0 group-hover:opacity-40"
+                  }`}
+                  style={{ background: accent }}
+                />
+              </Link>
+            );
+          })}
 
           {/* MORE dropdown */}
-          <div ref={moreRef} className="relative">
+          <div ref={moreRef} className="group relative">
             <button
               type="button"
               onClick={() => setMoreOpen((v) => !v)}
               aria-expanded={moreOpen}
               aria-haspopup="menu"
-              className={`relative flex items-center gap-1 px-2 py-2 text-[0.75rem] font-bold uppercase transition-colors after:absolute after:inset-x-2 after:-bottom-[1.05rem] after:h-[3px] xl:px-3 xl:text-[0.82rem] xl:tracking-wide xl:after:inset-x-3 ${
-                moreActive || moreOpen
-                  ? "text-ink after:bg-brand"
-                  : "text-ink/70 hover:text-ink after:bg-transparent"
+              className={`relative flex items-center gap-1 px-2 py-2 text-[0.75rem] font-bold uppercase transition-colors xl:px-3 xl:text-[0.82rem] xl:tracking-wide ${
+                moreActive || moreOpen ? "text-ink" : "text-ink/70 hover:text-ink"
               }`}
             >
               More
               <ChevronDownIcon
                 width={14}
                 height={14}
-                className={moreOpen ? "rotate-180 transition-transform" : "transition-transform"}
+                className={`transition-transform duration-200 ${moreOpen ? "rotate-180" : ""}`}
+              />
+              <span
+                aria-hidden
+                className={`absolute inset-x-2 -bottom-[1.05rem] h-[3px] rounded-full transition-opacity duration-200 xl:inset-x-3 ${
+                  moreActive ? "opacity-100" : "opacity-0 group-hover:opacity-40"
+                }`}
+                style={{ background: moreAccent }}
               />
             </button>
             {moreOpen && (
               <div
                 role="menu"
                 aria-label="More categories"
-                className="animate-slide-down border-line bg-canvas absolute right-0 top-[calc(100%+0.9rem)] z-[80] min-w-44 rounded-md border py-1 shadow-[var(--shadow-raised)]"
+                className="animate-slide-down border-line bg-canvas absolute right-0 top-[calc(100%+0.9rem)] z-[80] min-w-48 origin-top-right rounded-md border py-1.5 shadow-[var(--shadow-raised)]"
               >
-                {NAV_MORE.map((item) => (
-                  <Link
-                    key={item.href}
-                    href={item.href as Route}
-                    role="menuitem"
-                    aria-current={isActive(item.href) ? "page" : undefined}
-                    className={`block px-4 py-2 text-[0.8rem] font-bold tracking-wide uppercase transition-colors ${
-                      isActive(item.href)
-                        ? "text-ink bg-surface"
-                        : "text-ink/75 hover:bg-surface hover:text-ink"
-                    }`}
-                  >
-                    {item.label}
-                  </Link>
-                ))}
+                {NAV_MORE.map((item) => {
+                  const active = isActive(item.href);
+                  const accent = item.accentColor ?? "var(--color-brand)";
+                  return (
+                    <Link
+                      key={item.href}
+                      href={item.href as Route}
+                      role="menuitem"
+                      aria-current={active ? "page" : undefined}
+                      className={`group/item flex items-center gap-2.5 border-l-2 px-4 py-2 text-[0.8rem] font-bold tracking-wide uppercase transition-colors duration-150 ${
+                        active ? "bg-surface text-ink" : "text-ink/75 hover:bg-surface hover:text-ink border-transparent"
+                      }`}
+                      style={{ borderLeftColor: active ? accent : undefined }}
+                    >
+                      <CategoryIcon
+                        iconKey={item.iconKey}
+                        width={15}
+                        height={15}
+                        className="shrink-0 opacity-60 transition-[color,opacity] duration-150 group-hover/item:opacity-100"
+                        style={{ color: active ? accent : undefined }}
+                      />
+                      {item.label}
+                    </Link>
+                  );
+                })}
               </div>
             )}
           </div>

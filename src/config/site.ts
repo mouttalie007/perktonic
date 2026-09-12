@@ -59,6 +59,12 @@ export interface CategoryDef {
   iconKey: string;
   shortDescription: string;
   description: string;
+  /** Text-safe accent (Tailwind 700/800-depth — see prisma/seed.ts's note
+   *  on why that tier, not the brighter 500/600, is what clears WCAG AA
+   *  against white). Kept in sync with the DB seed's category colors by
+   *  hand — this config predates the DB and several other fields
+   *  (name/description) are already duplicated the same way. */
+  accentColor: string;
 }
 
 export const CATEGORIES: CategoryDef[] = [
@@ -69,6 +75,7 @@ export const CATEGORIES: CategoryDef[] = [
     shortDescription: "Hot stories",
     description:
       "The stories everyone is talking about right now — the internet's biggest moments as they happen.",
+    accentColor: "#B91C1C",
   },
   {
     slug: "people",
@@ -77,6 +84,7 @@ export const CATEGORIES: CategoryDef[] = [
     shortDescription: "Celebrities & influencers",
     description:
       "Profiles, moments and talking points from the people shaping culture and conversation.",
+    accentColor: "#6D28D9",
   },
   {
     slug: "tech",
@@ -85,6 +93,7 @@ export const CATEGORIES: CategoryDef[] = [
     shortDescription: "Innovation & AI",
     description:
       "How technology and artificial intelligence are reshaping the way we live and work.",
+    accentColor: "#1D4ED8",
   },
   {
     slug: "lifestyle",
@@ -93,6 +102,7 @@ export const CATEGORIES: CategoryDef[] = [
     shortDescription: "Live better",
     description:
       "Ideas, habits and small changes for a better everyday life.",
+    accentColor: "#BE185D",
   },
   {
     slug: "entertainment",
@@ -101,6 +111,7 @@ export const CATEGORIES: CategoryDef[] = [
     shortDescription: "Movies, music & more",
     description:
       "The latest from film, television, music and streaming — plus the moments going viral.",
+    accentColor: "#7E22CE",
   },
   {
     slug: "travel",
@@ -109,6 +120,7 @@ export const CATEGORIES: CategoryDef[] = [
     shortDescription: "Discover the world",
     description:
       "Destinations, guides and the places worth seeing before they change.",
+    accentColor: "#0F766E",
   },
   {
     slug: "health",
@@ -117,6 +129,7 @@ export const CATEGORIES: CategoryDef[] = [
     shortDescription: "Tips for a healthier you",
     description:
       "Practical, evidence-minded takes on nutrition, fitness, sleep and wellbeing.",
+    accentColor: "#15803D",
   },
   {
     slug: "science",
@@ -125,6 +138,7 @@ export const CATEGORIES: CategoryDef[] = [
     shortDescription: "Discoveries & space",
     description:
       "Discoveries, research and the questions that change how we see the universe.",
+    accentColor: "#0E7490",
   },
   {
     slug: "sports",
@@ -133,6 +147,7 @@ export const CATEGORIES: CategoryDef[] = [
     shortDescription: "The moments that matter",
     description:
       "Highlights, storylines and the viral moments from the world of sport.",
+    accentColor: "#C2410C",
   },
   {
     slug: "amazing",
@@ -141,6 +156,7 @@ export const CATEGORIES: CategoryDef[] = [
     shortDescription: "Incredible facts",
     description:
       "Extraordinary facts, feats and stories that sound too good to be true.",
+    accentColor: "#92400E",
   },
   {
     slug: "food",
@@ -148,6 +164,7 @@ export const CATEGORIES: CategoryDef[] = [
     iconKey: "utensils",
     shortDescription: "Eat well",
     description: "Recipes, trends and the food stories worth a second look.",
+    accentColor: "#BE123C",
   },
   {
     slug: "money",
@@ -156,6 +173,7 @@ export const CATEGORIES: CategoryDef[] = [
     shortDescription: "Smarter with money",
     description:
       "Everyday money, side hustles and the economy explained simply.",
+    accentColor: "#047857",
   },
   {
     slug: "culture",
@@ -164,6 +182,7 @@ export const CATEGORIES: CategoryDef[] = [
     shortDescription: "Art & ideas",
     description:
       "Art, books, internet culture and the ideas moving the conversation.",
+    accentColor: "#A21CAF",
   },
   {
     slug: "world",
@@ -172,30 +191,45 @@ export const CATEGORIES: CategoryDef[] = [
     shortDescription: "Around the globe",
     description:
       "Notable stories and human moments from around the world.",
+    accentColor: "#4338CA",
   },
 ];
 
-/** Primary desktop navigation (spec §7). */
-export const NAV_PRIMARY: { label: string; href: string }[] = [
-  { label: "Home", href: "/" },
-  { label: "Viral", href: "/category/viral" },
-  { label: "People", href: "/category/people" },
-  { label: "Tech", href: "/category/tech" },
-  { label: "Lifestyle", href: "/category/lifestyle" },
-  { label: "Entertainment", href: "/category/entertainment" },
-  { label: "Travel", href: "/category/travel" },
-  { label: "Health", href: "/category/health" },
+export interface NavItem {
+  label: string;
+  href: string;
+  /** icons.tsx key ("home") or a CategoryIcon key — null falls back to no icon. */
+  iconKey: string | null;
+  /** Text-safe accent for the icon/underline on hover+active — null = brand yellow. */
+  accentColor: string | null;
+}
+
+function navItemFor(slug: CategoryKey): NavItem {
+  const c = CATEGORIES.find((cat) => cat.slug === slug)!;
+  return { label: c.name, href: `/category/${c.slug}`, iconKey: c.iconKey, accentColor: c.accentColor };
+}
+
+/** Primary desktop navigation (spec §7), with icon+accent for the redesigned nav (2026-09-12). */
+export const NAV_PRIMARY: NavItem[] = [
+  { label: "Home", href: "/", iconKey: "home", accentColor: null },
+  navItemFor("viral"),
+  navItemFor("people"),
+  navItemFor("tech"),
+  navItemFor("lifestyle"),
+  navItemFor("entertainment"),
+  navItemFor("travel"),
+  navItemFor("health"),
 ];
 
 /** "MORE" dropdown (spec §7). */
-export const NAV_MORE: { label: string; href: string }[] = [
-  { label: "Science", href: "/category/science" },
-  { label: "Sports", href: "/category/sports" },
-  { label: "Amazing", href: "/category/amazing" },
-  { label: "Food", href: "/category/food" },
-  { label: "Money", href: "/category/money" },
-  { label: "Culture", href: "/category/culture" },
-  { label: "World", href: "/category/world" },
+export const NAV_MORE: NavItem[] = [
+  navItemFor("science"),
+  navItemFor("sports"),
+  navItemFor("amazing"),
+  navItemFor("food"),
+  navItemFor("money"),
+  navItemFor("culture"),
+  navItemFor("world"),
 ];
 
 /** Categories shown in the homepage "quick navigation" strip (spec §13). */

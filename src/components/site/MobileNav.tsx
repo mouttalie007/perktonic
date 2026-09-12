@@ -3,8 +3,9 @@
 import { useRef } from "react";
 import Link from "next/link";
 import type { Route } from "next";
-import { NAV_PRIMARY, NAV_MORE, type SocialPlatform } from "@/config/site";
+import { NAV_PRIMARY, NAV_MORE, type SocialPlatform, type NavItem } from "@/config/site";
 import { CloseIcon } from "@/components/icons";
+import { CategoryIcon } from "@/components/CategoryIcon";
 import { SocialLinks } from "./SocialLinks";
 import { useFocusTrap } from "@/lib/use-focus-trap";
 import { useBodyScrollLock } from "@/lib/use-body-scroll-lock";
@@ -63,39 +64,27 @@ export function MobileNav({
         </div>
 
         <nav aria-label="Primary" className="flex flex-col px-2 py-3">
-          {NAV_PRIMARY.map((item) => (
-            <Link
+          {NAV_PRIMARY.map((item, i) => (
+            <MobileNavLink
               key={item.href}
-              href={item.href as Route}
+              item={item}
+              active={isActive(item.href)}
+              delay={i}
               onClick={onClose}
-              aria-current={isActive(item.href) ? "page" : undefined}
-              className={`rounded-sm px-3 py-2.5 text-[0.95rem] font-semibold transition-colors ${
-                isActive(item.href)
-                  ? "text-ink bg-surface"
-                  : "text-ink/80 hover:bg-surface"
-              }`}
-            >
-              {item.label}
-            </Link>
+            />
           ))}
 
           <span className="text-meta text-muted mt-3 px-3 pb-1 font-bold tracking-[0.2em] uppercase">
             More
           </span>
-          {NAV_MORE.map((item) => (
-            <Link
+          {NAV_MORE.map((item, i) => (
+            <MobileNavLink
               key={item.href}
-              href={item.href as Route}
+              item={item}
+              active={isActive(item.href)}
+              delay={NAV_PRIMARY.length + i}
               onClick={onClose}
-              aria-current={isActive(item.href) ? "page" : undefined}
-              className={`rounded-sm px-3 py-2.5 text-[0.95rem] font-semibold transition-colors ${
-                isActive(item.href)
-                  ? "text-ink bg-surface"
-                  : "text-ink/80 hover:bg-surface"
-              }`}
-            >
-              {item.label}
-            </Link>
+            />
           ))}
         </nav>
 
@@ -124,5 +113,43 @@ export function MobileNav({
         </div>
       </div>
     </div>
+  );
+}
+
+/** One row: icon tinted + left accent bar when active, staggered fade-in on open. */
+function MobileNavLink({
+  item,
+  active,
+  delay,
+  onClick,
+}: {
+  item: NavItem;
+  active: boolean;
+  delay: number;
+  onClick: () => void;
+}) {
+  const accent = item.accentColor ?? "var(--color-brand)";
+  return (
+    <Link
+      href={item.href as Route}
+      onClick={onClick}
+      aria-current={active ? "page" : undefined}
+      style={{
+        animationDelay: `${Math.min(delay, 10) * 25}ms`,
+        borderLeftColor: active ? accent : undefined,
+      }}
+      className={`animate-nav-item-in flex items-center gap-3 rounded-sm border-l-2 px-3 py-2.5 text-[0.95rem] font-semibold opacity-0 transition-colors ${
+        active ? "bg-surface text-ink" : "text-ink/80 hover:bg-surface border-transparent"
+      }`}
+    >
+      <CategoryIcon
+        iconKey={item.iconKey}
+        width={18}
+        height={18}
+        className="shrink-0 opacity-70"
+        style={{ color: active ? accent : undefined }}
+      />
+      {item.label}
+    </Link>
   );
 }
