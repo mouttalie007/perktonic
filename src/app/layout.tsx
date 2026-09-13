@@ -3,8 +3,12 @@ import type { ReactNode } from "react";
 import { Inter, Plus_Jakarta_Sans } from "next/font/google";
 import "./globals.css";
 import { SITE } from "@/config/site";
-import { ConsentBanner } from "@/components/consent/ConsentBanner";
-import { AnalyticsScripts } from "@/components/consent/AnalyticsScripts";
+// Consent banner + analytics scripts live in (site)/layout.tsx, not here —
+// they're a public-site concern and were blocking the admin UI (the
+// banner sits over form submit buttons; found while testing the new GA4
+// admin field, 2026-09-13). The admin route group intentionally has none
+// of this: staff using an internal tool don't need a cookie-consent
+// prompt, and admin pages shouldn't load third-party analytics anyway.
 
 const inter = Inter({
   subsets: ["latin"],
@@ -53,8 +57,6 @@ export default function RootLayout({
     <html lang="en" className={`${inter.variable} ${plusJakarta.variable} h-full`}>
       <body className="bg-canvas text-ink flex min-h-full flex-col antialiased">
         {children}
-        <ConsentBanner />
-        <AnalyticsScripts />
       </body>
     </html>
   );

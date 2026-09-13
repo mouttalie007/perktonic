@@ -48,6 +48,8 @@ const DEFAULT_SEO: SeoSettings = {
   twitterHandle: null,
   tagPagesIndexable: false,
   searchPagesIndexable: false,
+  ga4MeasurementId: null,
+  gtmContainerId: null,
   createdAt: new Date(0),
   updatedAt: new Date(0),
 };

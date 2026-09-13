@@ -50,6 +50,8 @@ export async function updateSeoSettings(formData: FormData) {
       twitterHandle: str(formData, "twitterHandle"),
       tagPagesIndexable: formData.get("tagPagesIndexable") === "on",
       searchPagesIndexable: formData.get("searchPagesIndexable") === "on",
+      ga4MeasurementId: str(formData, "ga4MeasurementId"),
+      gtmContainerId: str(formData, "gtmContainerId"),
     },
     create: { id: "singleton" },
   });

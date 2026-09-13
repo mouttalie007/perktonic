@@ -49,6 +49,31 @@ export default async function SeoSettingsPage() {
           </div>
         </Card>
 
+        <Card className="space-y-4">
+          <h2 className="font-bold">Analytics</h2>
+          <p className="text-muted text-sm">
+            Takes effect immediately, site-wide, with no redeploy — and only ever
+            loads for a visitor after they grant the &quot;Analytics&quot; cookie
+            category in the consent banner.
+          </p>
+          <div className="grid gap-4 sm:grid-cols-2">
+            <Field
+              label="Google Analytics (GA4) Measurement ID"
+              htmlFor="ga4MeasurementId"
+              hint="e.g. G-XXXXXXXXXX, from GA4 -> Admin -> Data Streams."
+            >
+              <Input id="ga4MeasurementId" name="ga4MeasurementId" defaultValue={s.ga4MeasurementId ?? ""} placeholder="G-XXXXXXXXXX" />
+            </Field>
+            <Field
+              label="Google Tag Manager Container ID"
+              htmlFor="gtmContainerId"
+              hint="Optional — only if you manage tags via GTM instead of/alongside GA4 directly."
+            >
+              <Input id="gtmContainerId" name="gtmContainerId" defaultValue={s.gtmContainerId ?? ""} placeholder="GTM-XXXXXXX" />
+            </Field>
+          </div>
+        </Card>
+
         <Card className="space-y-3">
           <h2 className="font-bold">Thin-page indexing</h2>
           <Checkbox label="Allow tag pages to be indexed (each tag's own robotsIndex still applies)" name="tagPagesIndexable" defaultChecked={s.tagPagesIndexable} />

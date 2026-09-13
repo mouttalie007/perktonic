@@ -355,6 +355,13 @@ model SeoSettings {
   tagPagesIndexable    Boolean @default(false)
   searchPagesIndexable Boolean @default(false)
 
+  // Analytics (spec §50) — admin-editable so it never needs a redeploy to
+  // change. AnalyticsScripts fetches these via a small dynamic API route
+  // rather than importing them directly, since a client-bundled value would
+  // otherwise be frozen in at build time.
+  ga4MeasurementId String? // "G-XXXXXXXXXX"
+  gtmContainerId   String? // "GTM-XXXXXXX"
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 

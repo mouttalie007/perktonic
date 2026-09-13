@@ -5,6 +5,8 @@ import { trendingService } from "@/services/trending.service";
 import { UtilityBar } from "@/components/site/UtilityBar";
 import { HeaderBar } from "@/components/site/HeaderBar";
 import { SiteFooter } from "@/components/site/SiteFooter";
+import { ConsentBanner } from "@/components/consent/ConsentBanner";
+import { AnalyticsScripts } from "@/components/consent/AnalyticsScripts";
 
 const dateFmt = new Intl.DateTimeFormat("en-US", {
   weekday: "long",
@@ -46,6 +48,8 @@ export default async function SiteLayout({
         {children}
       </main>
       <SiteFooter social={social} />
+      <ConsentBanner />
+      <AnalyticsScripts />
     </>
   );
 }
