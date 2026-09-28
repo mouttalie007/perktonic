@@ -156,6 +156,24 @@ Skipped for now by choice, not by blocker — do this whenever ready:
    were measured on a local dev machine against picsum.photos placeholder
    images, not representative of the real deploy.
 
+## Periodic health check (run this after any gap of more than a few days)
+
+Caught a real, silent bug this way on 2026-09-28 (the chown issue above) —
+the site was serving 200s the whole time, nothing user-facing pointed at
+it. Worth a couple of minutes before assuming "it's fine because it's up":
+
+```sh
+systemctl is-active dimabac-live livekit nginx postgresql viraltrendly
+journalctl -u viraltrendly.service --since '7 days ago' | grep -iE 'error|fail|exception' | tail -60
+find /srv/viraltrendly -not -user viraltrendly | head -20   # should be empty
+```
+
+A `find` result full of `node_modules`/`.next` paths means the chown-after-
+build step got skipped on the last redeploy — see above. Bot-scanner noise
+(`/.env.*`, `/phpinfo`, garbage Server-Action-ID POSTs, etc., all 404/
+rejected) in the journal is normal background internet traffic on any
+public IP, not a compromise — don't chase it.
+
 ## Post-deploy smoke test (repeat after any real content/config change)
 
 - Homepage loads, no console errors, no mixed-content warnings once on TLS
@@ -175,5 +193,18 @@ git pull   # once a remote exists — otherwise repeat the tarball step above
 npm ci
 npx prisma migrate deploy   # no-op if there are no new migrations
 npm run build
+sudo chown -R viraltrendly:viraltrendly /srv/viraltrendly   # see below — don't skip this
 sudo systemctl restart viraltrendly.service
 ```
+
+**Don't skip the `chown -R` step, even though step 2's first-deploy version
+already did it once.** Real bug hit on 2026-09-28, ~2 weeks after the
+Sep 13 redeploy that added GA4 settings: that redeploy ran `npm ci`/
+`npm run build` as root over SSH and skipped re-chowning afterward, which
+left `node_modules/` and the freshly-built `.next/server/app/` tree
+root-owned while the service itself runs as `viraltrendly`. Next.js kept
+serving 200s the whole time (not a crash), but every prerender-cache write
+for a not-found dynamic path failed silently with `EACCES` — only visible
+in `journalctl -u viraltrendly`, not in any user-facing symptom. Whenever
+a build/install step ran as a different user than `viraltrendly`, chown
+the whole tree again before restarting, every time.
