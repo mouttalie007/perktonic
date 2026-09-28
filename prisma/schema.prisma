@@ -527,3 +527,33 @@ model Comment {
   @@index([status, createdAt])
   @@map("comments")
 }
+
+// ----------------------------------------------------------------------------
+// Quick Article prompt queue (2026-09-28)
+// ----------------------------------------------------------------------------
+
+/// One pre-written, ready-to-copy ChatGPT prompt for a specific writer +
+/// title, imported once from a local folder of 210 hand-prepared prompts
+/// (see scripts/import-prompt-queue.ts). The admin's "Quick Article" tab
+/// serves a random `pending` row, the editor copies `promptText` into
+/// ChatGPT, pastes the reply back, and the row flips to `used` only once
+/// the resulting article is actually saved — never at copy time, so an
+/// abandoned draft doesn't burn a topic.
+model PromptQueueItem {
+  id         String  @id @default(cuid())
+  writerSlug String // matches Author.slug (alex-carter | mia-reynolds | daniel-brooks)
+  writerName String // denormalized for display without a join
+  category   String // resolved to a real Category.name at import time
+
+  title      String
+  promptText String // the full production prompt, with the output-format addendum already appended
+
+  status            String    @default("pending") // pending | used
+  usedAt            DateTime?
+  resultArticleSlug String?
+
+  createdAt DateTime @default(now())
+
+  @@index([status])
+  @@map("prompt_queue_items")
+}

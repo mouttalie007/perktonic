@@ -8,8 +8,10 @@ import { RichTextEditor } from "../RichTextEditor";
 import { Field, Textarea, Card, Button, LinkButton } from "../ui";
 import { PublishingCard, TaxonomyCard, FeaturedImageField, SeoCard } from "./SharedFields";
 import { ImportPanel } from "./ImportPanel";
+import { QuickArticlePanel } from "./QuickArticlePanel";
 import { InternalLinkSuggestions } from "./InternalLinkSuggestions";
 import type { ParsedArticleMeta } from "@/lib/article-import";
+import type { PromptQueueItem } from "@prisma/client";
 
 const initial: SaveState = { status: "idle" };
 
@@ -21,6 +23,7 @@ type SeedValues = {
   metaDescription: string;
   content: string;
   categoryId: string;
+  authorId: string;
   tagIds: string[];
 };
 
@@ -38,10 +41,11 @@ export function StandardArticleForm({
   tags: Tag[];
 }) {
   const [state, formAction, pending] = useActionState(saveStandardArticle, initial);
-  const [mode, setMode] = useState<"import" | "manual">(article ? "manual" : "import");
+  const [mode, setMode] = useState<"quick" | "import" | "manual">(article ? "manual" : "quick");
   const [importSeed, setImportSeed] = useState(0);
   const [liveTitle, setLiveTitle] = useState(article?.title ?? "");
   const [paragraphCount, setParagraphCount] = useState(0);
+  const [promptQueueItemId, setPromptQueueItemId] = useState("");
   const [seed, setSeed] = useState<SeedValues>({
     title: article?.title ?? "",
     slug: article?.slug ?? "",
@@ -50,6 +54,7 @@ export function StandardArticleForm({
     metaDescription: article?.metaDescription ?? "",
     content: article?.content ?? "",
     categoryId: article?.categoryId ?? "",
+    authorId: article?.authorId ?? "",
     tagIds: article?.tagIds ?? [],
   });
 
@@ -71,9 +76,38 @@ export function StandardArticleForm({
       metaDescription: meta.metaDescription ?? prev.metaDescription,
       content: bodyHtml.trim() || prev.content,
       categoryId: matchedCategory?.id ?? prev.categoryId,
+      authorId: prev.authorId,
       tagIds: matchedTagIds ?? prev.tagIds,
     }));
     if (meta.title) setLiveTitle(meta.title);
+    setImportSeed((s) => s + 1);
+    setMode("manual");
+  }
+
+  /**
+   * Quick Article: same field distribution as Import, plus we already know
+   * the exact category + author from the queue item itself — no need to
+   * parse/guess them from ChatGPT's reply.
+   */
+  function applyQuickArticle(meta: ParsedArticleMeta, bodyHtml: string, item: PromptQueueItem) {
+    const matchedCategory = categories.find(
+      (c) => c.name.toLowerCase() === item.category.toLowerCase(),
+    );
+    const matchedAuthor = authors.find((a) => a.slug === item.writerSlug);
+
+    setSeed((prev) => ({
+      title: meta.title ?? prev.title,
+      slug: meta.slug ?? prev.slug,
+      excerpt: meta.excerpt ?? prev.excerpt,
+      seoTitle: meta.seoTitle ?? prev.seoTitle,
+      metaDescription: meta.metaDescription ?? prev.metaDescription,
+      content: bodyHtml.trim() || prev.content,
+      categoryId: matchedCategory?.id ?? prev.categoryId,
+      authorId: matchedAuthor?.id ?? prev.authorId,
+      tagIds: prev.tagIds,
+    }));
+    if (meta.title) setLiveTitle(meta.title);
+    setPromptQueueItemId(item.id);
     setImportSeed((s) => s + 1);
     setMode("manual");
   }
@@ -85,16 +119,27 @@ export function StandardArticleForm({
     seoTitle: seed.seoTitle,
     metaDescription: seed.metaDescription,
     categoryId: seed.categoryId,
+    authorId: seed.authorId,
     tagIds: seed.tagIds,
   };
 
   return (
     <form action={formAction} className="grid gap-6 lg:grid-cols-[1fr_20rem]">
       {article && <input type="hidden" name="id" value={article.id} />}
+      {!article && promptQueueItemId && (
+        <input type="hidden" name="promptQueueItemId" value={promptQueueItemId} />
+      )}
 
       <div className="min-w-0 space-y-6">
         {!article && (
           <div className="flex gap-1 text-sm font-bold">
+            <button
+              type="button"
+              onClick={() => setMode("quick")}
+              className={`rounded-t-sm px-4 py-2 ${mode === "quick" ? "bg-ink text-white" : "bg-surface text-muted"}`}
+            >
+              Quick Article
+            </button>
             <button
               type="button"
               onClick={() => setMode("import")}
@@ -111,6 +156,7 @@ export function StandardArticleForm({
             </button>
           </div>
         )}
+        {!article && mode === "quick" && <QuickArticlePanel onExtract={applyQuickArticle} />}
         {!article && mode === "import" && <ImportPanel onExtract={applyImport} />}
 
         <Card className="space-y-4">

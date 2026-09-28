@@ -138,6 +138,21 @@ export async function saveStandardArticle(
     throw e;
   }
 
+  // Quick Article tab: the source prompt only gets consumed once the
+  // article it produced is actually saved — never at copy time, so
+  // abandoning a draft doesn't burn a topic from the queue.
+  const promptQueueItemId = String(formData.get("promptQueueItemId") || "");
+  if (!id && promptQueueItemId) {
+    await prisma.promptQueueItem
+      .update({
+        where: { id: promptQueueItemId },
+        data: { status: "used", usedAt: new Date(), resultArticleSlug: v.slug },
+      })
+      .catch(() => {
+        /* non-critical — the article itself already saved successfully */
+      });
+  }
+
   revalidatePath("/admin/articles");
   revalidatePath(`/story/${v.slug}`);
   redirect(`/admin/articles/${articleId}/edit?saved=1` as Route);
