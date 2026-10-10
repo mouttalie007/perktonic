@@ -43,10 +43,12 @@
     "bcryptjs": "^3.0.3",
     "next": "16.3.4",
     "node-html-parser": "^9.0.4",
+    "prisma": "^6.19.3",
     "react": "19.2.8",
     "react-dom": "19.2.8",
     "server-only": "^0.0.1",
     "sharp": "^0.35.4",
+    "tsx": "^4.23.13",
     "zod": "^4.6.1"
   },
   "devDependencies": {
@@ -62,9 +64,7 @@
     "playwright": "^1.63.0",
     "prettier": "^3.9.6",
     "prettier-plugin-tailwindcss": "^0.8.1",
-    "prisma": "^6.19.3",
     "tailwindcss": "^4",
-    "tsx": "^4.23.13",
     "typescript": "^5"
   },
   "allowScripts": {
