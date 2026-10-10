@@ -109,7 +109,9 @@ export function HeaderBar({
             );
           })}
 
-          {/* MORE dropdown */}
+          {/* MORE dropdown — hidden entirely when there's nothing to put in it
+              (all categories fit in the primary bar, as of the PerkTonic pivot) */}
+          {NAV_MORE.length > 0 && (
           <div ref={moreRef} className="group relative">
             <button
               type="button"
@@ -168,6 +170,7 @@ export function HeaderBar({
               </div>
             )}
           </div>
+          )}
         </nav>
 
         {/* Right controls */}

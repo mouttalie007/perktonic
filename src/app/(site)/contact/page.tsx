@@ -8,7 +8,7 @@ export async function generateMetadata(): Promise<Metadata> {
   const page = await pageService.getBySlug("contact");
   return seoService.buildMetadata({
     title: page?.seoTitle ?? page?.title ?? "Contact",
-    description: page?.metaDescription ?? "Get in touch with the ViralTrendly team.",
+    description: page?.metaDescription ?? "Get in touch with the PerkTonic team.",
     path: "/contact",
     robotsIndex: page?.robotsIndex ?? true,
   });

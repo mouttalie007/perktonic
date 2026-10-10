@@ -1,9 +1,11 @@
 import Link from "next/link";
+import { SITE } from "@/config/site";
 
 /**
- * ViralTrendly wordmark (spec §7). Text/vector — never a raster image.
- * "Viral" + ".com" take the foreground colour, "Trendly" is brand yellow.
- * Pass `onDark` on dark surfaces (footer) so it keeps AA contrast.
+ * PerkTonic wordmark (spec §7; renamed from ViralTrendly 2026-10-08).
+ * Text/vector — never a raster image. "Perk" + ".com" take the foreground
+ * colour, "Tonic" is brand yellow. Pass `onDark` on dark surfaces (footer)
+ * so it keeps AA contrast.
  */
 export function Logo({
   withTagline = false,
@@ -21,22 +23,18 @@ export function Logo({
   const brand = onDark ? "text-brand" : "text-brand-ink";
 
   return (
-    <Link
-      href="/"
-      className={`group inline-flex flex-col leading-none ${className}`}
-      aria-label="ViralTrendly.com — home"
-    >
+    <Link href="/" className={`group inline-flex flex-col leading-none ${className}`}>
       <span
         className={`text-xl font-extrabold tracking-tight sm:text-2xl xl:text-[1.7rem] ${fg}`}
       >
-        Viral<span className={brand}>Trendly</span>
+        Perk<span className={brand}>Tonic</span>
         <span className={fg}>.com</span>
       </span>
       {withTagline && (
         <span
           className={`mt-1 text-[0.6rem] font-semibold tracking-[0.22em] uppercase sm:text-[0.65rem] ${tag}`}
         >
-          Trend Today. Talk Tomorrow.
+          {SITE.tagline}
         </span>
       )}
     </Link>

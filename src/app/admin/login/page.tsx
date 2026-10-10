@@ -3,7 +3,7 @@ import { redirect } from "next/navigation";
 import { getSessionUser } from "@/lib/auth";
 import { LoginForm } from "./LoginForm";
 
-export const metadata: Metadata = { title: "Sign in — ViralTrendly Admin", robots: { index: false, follow: false } };
+export const metadata: Metadata = { title: "Sign in — PerkTonic Admin", robots: { index: false, follow: false } };
 
 export default async function LoginPage() {
   const user = await getSessionUser();
@@ -14,7 +14,7 @@ export default async function LoginPage() {
       <div className="w-full max-w-sm">
         <div className="mb-8 text-center">
           <span className="text-2xl font-extrabold tracking-tight">
-            Viral<span className="text-brand-ink">Trendly</span>
+            Perk<span className="text-brand-ink">Tonic</span>
             <span>.com</span>
           </span>
           <p className="text-muted mt-1 text-xs font-semibold tracking-[0.2em] uppercase">

@@ -50,10 +50,10 @@ export function SearchOverlay({
         ref={panelRef}
         role="dialog"
         aria-modal="true"
-        aria-label="Search ViralTrendly"
+        aria-label="Search PerkTonic"
         className="bg-canvas w-full max-w-2xl rounded-lg p-3 shadow-[var(--shadow-overlay)] sm:p-4"
       >
-        {/* On narrow phones, icon + "Search ViralTrendly..." placeholder +
+        {/* On narrow phones, icon + "Search PerkTonic..." placeholder +
             a text button + a close button left almost no room for the
             input itself (it was truncating after ~8 characters). Icon-only
             submit button + a shorter placeholder below `sm` fixes that

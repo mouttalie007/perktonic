@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import type { PromptQueueItem } from "@prisma/client";
 import { getRandomPendingPrompt } from "@/app/actions/prompt-queue";
 import { parseMetaBlock, type ParsedArticleMeta } from "@/lib/article-import";
-import { splitQuickArticleOutput, INLINE_IMAGE_MARKER } from "@/lib/quick-article";
+import { splitQuickArticleOutput } from "@/lib/quick-article";
 import { Button } from "../ui";
 
 /**
@@ -14,10 +14,22 @@ import { Button } from "../ui";
  * back in one box, and the platform distributes every field to its place —
  * same mechanism as the Import tab, just a single combined paste instead
  * of two, plus the prompt is picked for you instead of written by hand.
+ *
+ * Category and author are chosen once at the top of the whole form
+ * (perktonic workflow, 2026-10-09) — this panel no longer sets them from
+ * the queue item. `writerSlug` filters the queue to that author's prompts
+ * only. There's no category filter: the 210 queued prompts were written
+ * before the PerkTonic pivot and still carry the old 14-category names
+ * (Tech, Lifestyle, Viral, ...) — none of them match a current category,
+ * so filtering by category would just return nothing. The queue is
+ * writer-scoped only until/unless those prompts get reworked for the new
+ * 4 categories.
  */
 export function QuickArticlePanel({
+  writerSlug,
   onExtract,
 }: {
+  writerSlug?: string;
   onExtract: (meta: ParsedArticleMeta, bodyHtml: string, item: PromptQueueItem) => void;
 }) {
   const [item, setItem] = useState<PromptQueueItem | null | undefined>(undefined);
@@ -28,16 +40,18 @@ export function QuickArticlePanel({
   async function loadNext() {
     setItem(undefined);
     setCopied(false);
-    const next = await getRandomPendingPrompt();
+    const next = await getRandomPendingPrompt({ writerSlug });
     setItem(next);
   }
 
   useEffect(() => {
     // Fetching the first random prompt is a server round-trip, not a
-    // derivable-from-props value — has to happen after mount.
+    // derivable-from-props value — has to happen after mount. Also re-runs
+    // when the author at the top of the form changes.
     // eslint-disable-next-line react-hooks/set-state-in-effect
     loadNext();
-  }, []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [writerSlug]);
 
   async function copyPrompt() {
     if (!item) return;
@@ -54,9 +68,9 @@ export function QuickArticlePanel({
     if (!item) return;
     const { metaText, bodyHtml } = splitQuickArticleOutput(outputText);
     const meta = parseMetaBlock(metaText);
-    // Only one description is requested from ChatGPT (spec: drop keywords,
-    // keep it to one field) — use it for both the SEO meta tag and the
-    // card excerpt rather than asking for a second, near-identical field.
+    // Only one description is requested from ChatGPT (keep it to one field)
+    // — use it for both the SEO meta tag and the card excerpt rather than
+    // asking for a second, near-identical field.
     if (!meta.excerpt && meta.metaDescription) meta.excerpt = meta.metaDescription;
     onExtract(meta, bodyHtml, item);
     setLastResult(meta);
@@ -70,7 +84,9 @@ export function QuickArticlePanel({
           {item === undefined && <p className="text-muted text-xs">Picking a topic…</p>}
           {item === null && (
             <p className="text-accent-red text-xs font-semibold">
-              No unused prompts left in the queue — every topic has been used.
+              {writerSlug
+                ? "No unused prompts left in the queue for this author."
+                : "No unused prompts left in the queue — every topic has been used."}
             </p>
           )}
           {item && (
@@ -103,7 +119,7 @@ export function QuickArticlePanel({
           value={outputText}
           onChange={(e) => setOutputText(e.target.value)}
           rows={10}
-          placeholder={`Title: …\nSlug: …\nMeta Description: …\n---\n<p>…</p>`}
+          placeholder={`Title: …\nSlug: …\nMeta Description: …\nKeywords: …\nCategory: …\nAuthor: …\n---\n<p>…</p>`}
           className="border-line w-full rounded-sm border bg-white p-2 font-mono text-xs"
         />
       </div>
@@ -114,17 +130,26 @@ export function QuickArticlePanel({
         </Button>
         {lastResult && (
           <p className="text-muted text-xs">
-            Filled: {[lastResult.title && "title", lastResult.slug && "slug", lastResult.excerpt && "excerpt/description"]
+            Filled:{" "}
+            {[
+              lastResult.title && "title",
+              lastResult.slug && "slug",
+              lastResult.excerpt && "excerpt/description",
+              lastResult.keywords?.length && "keywords",
+              lastResult.category && `category (${lastResult.category})`,
+              lastResult.author && `author (${lastResult.author})`,
+            ]
               .filter(Boolean)
               .join(", ") || "nothing recognised — check the format"}
-            . Category &amp; author were set automatically from the prompt.
+            .
           </p>
         )}
       </div>
 
       <p className="text-muted text-[0.7rem]">
-        Tip: after filling the form, look for <code className="bg-canvas rounded-sm px-1">{INLINE_IMAGE_MARKER}</code> inside
-        the article body below — click right there, paste your second image (Ctrl+V), then delete the marker text.
+        Tip: every <code className="bg-canvas rounded-sm px-1">[IMAGE: …]</code> line in the article body below
+        becomes a box you can click — use &quot;Copy prompt&quot; to generate/source that image, then click the box
+        and press Ctrl+V to drop it in. Publishing is blocked while any box is still unresolved.
       </p>
     </div>
   );

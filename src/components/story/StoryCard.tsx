@@ -7,20 +7,20 @@ import { EngagementMeta } from "@/components/article/EngagementMeta";
 import type { ReactionCounts } from "@/services/reaction.service";
 
 /**
- * The reusable story card (spec §14, §15, §65). One component, five shapes:
- *  - `grid`    image-top card for grids (category pages)
+ * The reusable story card (spec §14, §15, §65). One component, four shapes:
+ *  - `grid`    image-top card for grids (category pages, homepage feed —
+ *              optionally shows reactions/comments instead of date/views
+ *              when `reactions`/`commentCount` are passed)
  *  - `overlay` full-bleed image with text over a bottom gradient (hero)
  *  - `list`    thumb + text row, optional rank number (Trending)
  *  - `compact` small thumb + title only, no meta/badge — end-of-article
  *              "You May Also Like" rows
- *  - `feed`    category label + thumb + title + engagement row — the main
- *              homepage feed (homepage redesign, 2026-09-12)
  *
  * All images use a fixed aspect ratio + object-cover and reserve space to
  * avoid CLS. Only pass `priority` for the single above-the-fold hero image.
  */
 
-type Variant = "grid" | "overlay" | "list" | "compact" | "feed";
+type Variant = "grid" | "overlay" | "list" | "compact";
 
 interface Props {
   story: ArticleCard;
@@ -31,7 +31,7 @@ interface Props {
   sizes?: string;
   headingClassName?: string;
   className?: string;
-  /** `feed` variant only — engagement preview, batch-fetched by the caller. */
+  /** `feed`/`grid` variants only — engagement preview, batch-fetched by the caller. */
   reactions?: ReactionCounts;
   commentCount?: number;
 }
@@ -105,7 +105,7 @@ function Picture({
         className={`from-ink to-ink-deep flex items-center justify-center bg-gradient-to-br ${className}`}
       >
         <span className="text-brand text-lg font-extrabold tracking-tight">
-          {story.category?.name ?? "ViralTrendly"}
+          {story.category?.name ?? "PerkTonic"}
         </span>
       </div>
     );
@@ -236,51 +236,19 @@ export function StoryCard({
     );
   }
 
-  /* ---------- feed (homepage main feed row) ---------- */
-  if (variant === "feed") {
-    return (
-      <Link
-        href={href}
-        className={`group flex items-stretch gap-4 py-5 ${className}`}
-      >
-        {story.category && (
-          <span
-            aria-hidden
-            className="hidden shrink-0 items-center justify-center border-r border-[var(--color-line)] pr-3 text-[0.68rem] font-extrabold tracking-[0.15em] uppercase [writing-mode:vertical-rl] sm:flex"
-            style={{ color: story.category.accentColor ?? "var(--color-muted)" }}
-          >
-            <span className="rotate-180">{story.category.name}</span>
-          </span>
-        )}
-        <span className="border-line relative aspect-[3/2] w-32 shrink-0 overflow-hidden rounded-sm border sm:w-44">
-          <Picture story={story} sizes="(max-width: 640px) 128px, 176px" />
-        </span>
-        <span className="flex min-w-0 flex-1 flex-col justify-center gap-1.5">
-          {story.category && (
-            <span
-              className="text-[0.7rem] font-bold tracking-wide uppercase sm:hidden"
-              style={{ color: story.category.accentColor ?? "var(--color-muted)" }}
-            >
-              {story.category.name}
-            </span>
-          )}
-          <h3
-            className={`font-heading text-ink group-hover:text-ink/70 line-clamp-3 text-[1.05rem] leading-snug font-extrabold transition-colors sm:text-[1.15rem] ${headingClassName ?? ""}`}
-          >
-            {story.title}
-          </h3>
-          <EngagementMeta reactions={reactions ?? {}} commentCount={commentCount ?? 0} className="mt-1" />
-        </span>
-      </Link>
-    );
-  }
-
   /* ---------- grid (default) ---------- */
   return (
     <Link
       href={href}
       className={`group border-line bg-canvas flex flex-col overflow-hidden rounded-sm border transition-shadow hover:shadow-[var(--shadow-raised)] ${className}`}
     >
+      {story.category?.accentColor && (
+        <span
+          aria-hidden
+          className="block h-[3px] shrink-0"
+          style={{ background: story.category.accentColor }}
+        />
+      )}
       <span className="relative block aspect-[16/10] overflow-hidden">
         <Picture
           story={story}
@@ -297,7 +265,11 @@ export function StoryCard({
           {story.title}
         </h3>
         <span className="mt-auto pt-3">
-          <Meta story={story} />
+          {reactions || commentCount ? (
+            <EngagementMeta reactions={reactions ?? {}} commentCount={commentCount ?? 0} />
+          ) : (
+            <Meta story={story} />
+          )}
         </span>
       </span>
     </Link>

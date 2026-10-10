@@ -8,6 +8,8 @@ import { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { requireUser } from "@/lib/require-admin";
 import { readingTimeMinutes, listicleReadingTimeMinutes } from "@/lib/reading-time";
+import { hasUnresolvedImagePrompt } from "@/lib/quick-article";
+import { applyDemoEngagementToArticle } from "@/lib/demo-engagement";
 
 export type SaveState = { status: "idle" | "error"; message?: string };
 
@@ -115,6 +117,17 @@ export async function saveStandardArticle(
   const v = parsed.data;
   const id = String(formData.get("id") || "");
   const tagIds = tagIdsFrom(formData);
+
+  // Hard backstop (perktonic workflow, 2026-10-09): an [IMAGE: ...] prompt
+  // marker left in the body means a visitor would see raw prompt text
+  // instead of an image — refuse to publish until every one is replaced.
+  if (v.status === "PUBLISHED" && hasUnresolvedImagePrompt(v.content ?? "")) {
+    return {
+      status: "error",
+      message: "This article still has an unresolved [IMAGE: ...] placeholder — paste the image there before publishing.",
+    };
+  }
+
   const data = {
     ...commonData(v),
     type: "STANDARD" as const,
@@ -136,6 +149,16 @@ export async function saveStandardArticle(
     const msg = friendlyDbError(e);
     if (msg) return { status: "error", message: msg };
     throw e;
+  }
+
+  // Pre-launch demo engagement (perktonic workflow, 2026-10-09): a newly
+  // published article gets random reactions/comments right away, so it
+  // never shows up with zero engagement. Only for a brand-new article
+  // being published for the first time — never re-applies on edits.
+  if (!id && data.status === "PUBLISHED" && data.publishedAt) {
+    await applyDemoEngagementToArticle(articleId, data.publishedAt).catch(() => {
+      /* non-critical — the article itself already saved successfully */
+    });
   }
 
   // Quick Article tab: the source prompt only gets consumed once the
@@ -229,6 +252,12 @@ export async function saveListicleArticle(
     const msg = friendlyDbError(e);
     if (msg) return { status: "error", message: msg };
     throw e;
+  }
+
+  if (!id && data.status === "PUBLISHED" && data.publishedAt) {
+    await applyDemoEngagementToArticle(articleId, data.publishedAt).catch(() => {
+      /* non-critical — the article itself already saved successfully */
+    });
   }
 
   revalidatePath("/admin/articles");

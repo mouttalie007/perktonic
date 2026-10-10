@@ -1,6 +1,6 @@
 import Link from "next/link";
 import type { Route } from "next";
-import { CATEGORIES, type SocialPlatform } from "@/config/site";
+import { CATEGORIES, SITE, type SocialPlatform } from "@/config/site";
 import { Logo } from "./Logo";
 import { SocialLinks } from "./SocialLinks";
 import { CookiePreferencesButton } from "@/components/consent/CookiePreferencesButton";
@@ -29,14 +29,14 @@ const RESOURCES: { label: string; href: Route }[] = [
 const BOTTOM_LINKS: { label: string; href: Route }[] = [
   { label: "Cookie Policy", href: "/cookie-policy" as Route },
   { label: "Disclaimer", href: "/disclaimer" as Route },
+  { label: "Affiliate Disclosure", href: "/affiliate-disclosure" as Route },
   { label: "Accessibility", href: "/accessibility" as Route },
+  { label: "DMCA", href: "/dmca" as Route },
 ];
 
-const FOOTER_CATEGORIES = CATEGORIES.filter((c) =>
-  ["viral", "people", "tech", "lifestyle", "entertainment", "travel", "health", "amazing"].includes(
-    c.slug,
-  ),
-);
+// All 4 categories fit directly in the footer column now (was a curated
+// subset of 14 before the 2026-10-08 PerkTonic pivot).
+const FOOTER_CATEGORIES = CATEGORIES;
 
 function Column({
   title,
@@ -78,11 +78,12 @@ export function SiteFooter({
           <div>
             <Logo onDark />
             <p className="text-meta mt-2 font-semibold tracking-[0.2em] text-white/50 uppercase">
-              Trend Today. Talk Tomorrow.
+              {SITE.tagline}
             </p>
             <p className="mt-4 max-w-xs text-sm text-white/60">
-              ViralTrendly brings you the most interesting, inspiring and
-              trending stories from around the world.
+              PerkTonic finds the free samples, AI tools, rewards and
+              discounts actually worth your time — verified before we share
+              them.
             </p>
             <SocialLinks
               links={social}
@@ -106,7 +107,7 @@ export function SiteFooter({
 
       <div className="border-t border-white/10">
         <div className="site-container flex flex-col items-center justify-between gap-3 py-5 text-xs text-white/50 sm:flex-row">
-          <p>© {new Date().getFullYear()} ViralTrendly.com. All rights reserved.</p>
+          <p>© {new Date().getFullYear()} {SITE.name}. All rights reserved.</p>
           <ul className="flex flex-wrap items-center gap-x-4 gap-y-1">
             {BOTTOM_LINKS.map((l) => (
               <li key={l.href}>

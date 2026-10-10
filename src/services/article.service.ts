@@ -156,6 +156,56 @@ export const articleService = {
     };
   },
 
+  /** Paginated list for an author page (perktonic-seo.md §4.9). */
+  async listByAuthor(
+    authorSlug: string,
+    { page = 1, pageSize = 12 }: { page?: number; pageSize?: number } = {},
+  ): Promise<Paginated<ArticleCard>> {
+    const where: Prisma.ArticleWhereInput = {
+      ...published(),
+      author: { slug: authorSlug },
+    };
+    const [items, total] = await Promise.all([
+      prisma.article.findMany({
+        where,
+        orderBy: { publishedAt: "desc" },
+        skip: (page - 1) * pageSize,
+        take: pageSize,
+        select: cardSelect,
+      }),
+      prisma.article.count({ where }),
+    ]);
+    return {
+      items,
+      total,
+      page,
+      pageSize,
+      totalPages: Math.max(1, Math.ceil(total / pageSize)),
+    };
+  },
+
+  /** Popular stories from OTHER categories, for an article page's sidebar
+   *  discovery widget (perktonic workflow, 2026-10-10) — deliberately
+   *  excludes the current category so it's a genuinely different "what
+   *  else is on the site" prompt, distinct from `listRelated`'s same-
+   *  category-first pick. */
+  async listFromOtherCategories(
+    categoryId: string | null,
+    excludeId: string,
+    limit = 4,
+  ): Promise<ArticleCard[]> {
+    return prisma.article.findMany({
+      where: {
+        ...published(),
+        id: { not: excludeId },
+        ...(categoryId ? { categoryId: { not: categoryId } } : {}),
+      },
+      orderBy: { viewCount: "desc" },
+      take: limit,
+      select: cardSelect,
+    });
+  },
+
   /** Top-viewed stories within a category, for a category page's aside. */
   async listTopViewedInCategory(
     categoryId: string,

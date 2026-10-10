@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
-import { PageHeader } from "@/components/admin/ui";
+import { PageHeader, LinkButton } from "@/components/admin/ui";
 import { StandardArticleForm } from "@/components/admin/article/StandardArticleForm";
 import { ListicleArticleForm } from "@/components/admin/article/ListicleArticleForm";
 import { articleFormData } from "@/lib/admin-article-data";
@@ -35,6 +35,13 @@ export default async function EditArticlePage({
       <PageHeader
         title={`Edit: ${article.title}`}
         description={saved ? "Saved." : undefined}
+        action={
+          saved ? (
+            <LinkButton href="/admin/articles/new/standard">
+              + Add another article
+            </LinkButton>
+          ) : undefined
+        }
       />
       {article.type === "LISTICLE" ? (
         <ListicleArticleForm

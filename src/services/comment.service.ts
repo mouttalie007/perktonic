@@ -14,7 +14,7 @@ export const commentService = {
       where: { articleId, status: "APPROVED" },
       orderBy: { createdAt: "desc" },
       take: limit,
-      select: { id: true, name: true, body: true, createdAt: true },
+      select: { id: true, name: true, body: true, createdAt: true, avatarUrl: true },
     });
   },
 

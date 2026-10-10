@@ -70,8 +70,9 @@ export default async function StoryPage({ params }: Params) {
     { name: article.title, path },
   ];
 
-  const [related, adRule] = await Promise.all([
+  const [related, otherCategory, adRule] = await Promise.all([
     articleService.listRelated(article.id, article.categoryId, 4),
+    articleService.listFromOtherCategories(article.categoryId, article.id, 4),
     adService.getInContentRule(article.type),
   ]);
 
@@ -102,6 +103,7 @@ export default async function StoryPage({ params }: Params) {
           position={1}
           canonical={canonical}
           related={related}
+          otherCategory={otherCategory}
         />
       </>
     );
@@ -134,6 +136,7 @@ export default async function StoryPage({ params }: Params) {
         toc={toc}
         canonical={canonical}
         related={related}
+        otherCategory={otherCategory}
       />
     </>
   );

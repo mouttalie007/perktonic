@@ -53,7 +53,7 @@ export function ImportPanel({
             value={metaText}
             onChange={(e) => setMetaText(e.target.value)}
             rows={8}
-            placeholder={"Title: …\nSlug: …\nExcerpt: …\nSEO Title: …\nMeta Description: …\nCategory: …\nTags: …"}
+            placeholder={"Title: …\nSlug: …\nExcerpt: …\nSEO Title: …\nMeta Description: …\nCategory: …\nAuthor: …\nTags: …"}
             className="border-line w-full rounded-sm border bg-white p-2 font-mono text-xs"
           />
         </div>
@@ -86,6 +86,7 @@ export function ImportPanel({
               lastResult.seoTitle && "SEO title",
               lastResult.metaDescription && "meta description",
               lastResult.category && "category",
+              lastResult.author && "author",
               lastResult.tags?.length && "tags",
             ]
               .filter(Boolean)

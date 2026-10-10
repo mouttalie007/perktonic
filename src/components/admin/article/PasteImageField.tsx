@@ -15,6 +15,13 @@ export interface PastedImage {
  * library" step). Click the box, press Ctrl+V; the clipboard image uploads
  * (compressed server-side) and becomes the value immediately. Alt defaults
  * to `${altBase} ${altNumber}` and stays editable.
+ *
+ * The box's click only focuses it for Ctrl+V — it deliberately does NOT
+ * also open the native file picker (per feedback, 2026-10-10: the admin's
+ * workflow is paste-only, and a click silently doing two different things
+ * depending on what happens next was confusing). A file picker is still
+ * available as a clearly separate "Or choose a file" button below, for the
+ * rare case paste isn't an option.
  */
 export function PasteImageField({
   name,
@@ -74,8 +81,6 @@ export function PasteImageField({
         role="button"
         aria-label="Paste an image here with Ctrl+V"
         onPaste={handlePaste}
-        onClick={() => fileInputRef.current?.click()}
-        onKeyDown={(e) => e.key === "Enter" && fileInputRef.current?.click()}
         className={`border-line hover:border-ink focus-visible:ring-accent-blue relative w-full cursor-pointer overflow-hidden rounded-sm border-2 border-dashed transition-colors focus-visible:ring-2 focus-visible:outline-none ${aspect}`}
       >
         {image ? (
@@ -104,6 +109,14 @@ export function PasteImageField({
           e.target.value = "";
         }}
       />
+
+      <button
+        type="button"
+        onClick={() => fileInputRef.current?.click()}
+        className="text-muted hover:text-ink mt-1 text-xs font-semibold underline"
+      >
+        Or choose a file
+      </button>
 
       {error && <p className="text-accent-red mt-1 text-xs">{error}</p>}
 

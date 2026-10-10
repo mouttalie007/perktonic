@@ -32,7 +32,7 @@ export default async function SeoSettingsPage() {
               <Input id="organizationLogoUrl" name="organizationLogoUrl" defaultValue={s.organizationLogoUrl ?? ""} />
             </Field>
           </div>
-          <Field label="X / Twitter handle" htmlFor="twitterHandle" hint="e.g. @viraltrendly">
+          <Field label="X / Twitter handle" htmlFor="twitterHandle" hint="e.g. @perktonic">
             <Input id="twitterHandle" name="twitterHandle" defaultValue={s.twitterHandle ?? ""} />
           </Field>
         </Card>

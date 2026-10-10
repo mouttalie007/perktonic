@@ -58,6 +58,19 @@ const nextConfig: NextConfig = {
   // Typed <Link href> / router (spec §86 — type safety).
   typedRoutes: true,
 
+  experimental: {
+    serverActions: {
+      // Pasted images go straight to a Server Action (uploadImageDirect,
+      // admin-media.ts) before any server-side compression runs — the
+      // raw file hits this limit first. admin-media.ts's own MAX_BYTES
+      // (12MB) is the real ceiling; this just has to be >= that or every
+      // upload over Next's 1MB default silently fails with "Body
+      // exceeded 1 MB limit" before MAX_BYTES ever gets a chance to
+      // return its own friendlier error.
+      bodySizeLimit: "15mb",
+    },
+  },
+
   async headers() {
     return [{ source: "/:path*", headers: SECURITY_HEADERS }];
   },
@@ -70,6 +83,9 @@ const nextConfig: NextConfig = {
       { protocol: "https", hostname: "picsum.photos" },
       { protocol: "https", hostname: "fastly.picsum.photos" },
       { protocol: "https", hostname: "images.unsplash.com" },
+      // Demo-engagement commenter avatars (src/lib/demo-engagement.ts) —
+      // real-looking placeholder faces, not real user photos.
+      { protocol: "https", hostname: "randomuser.me" },
       // Production media CDNs — activated when MEDIA_PROVIDER is set.
       { protocol: "https", hostname: "res.cloudinary.com" },
       { protocol: "https", hostname: "**.r2.dev" },

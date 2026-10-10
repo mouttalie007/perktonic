@@ -9,11 +9,12 @@ import { reactionService } from "@/services/reaction.service";
 import { commentService } from "@/services/comment.service";
 import { TrendingRail } from "@/components/home/TrendingRail";
 import { CategoryQuickNav } from "@/components/home/CategoryQuickNav";
-import { NewsletterCTA } from "@/components/home/NewsletterCTA";
-import { StoryCard } from "@/components/story/StoryCard";
+import { NewsletterSidebarCTA } from "@/components/article/NewsletterSidebarCTA";
+import { StoryGrid } from "@/components/story/StoryGrid";
+import { TrendingList } from "@/components/home/TrendingList";
 import { Pagination } from "@/components/ui/Pagination";
 import { AdSlot } from "@/components/ads/AdSlot";
-import { QUICK_NAV_CATEGORIES } from "@/config/site";
+import { QUICK_NAV_CATEGORIES, SITE } from "@/config/site";
 
 const PAGE_SIZE = 12;
 
@@ -28,7 +29,7 @@ export async function generateMetadata(): Promise<Metadata> {
     description: seo.defaultMetaDescription,
     path: "/",
   });
-  // Home keeps its full title — the "%s — ViralTrendly" template must not apply.
+  // Home keeps its full title — the "%s — PerkTonic" template must not apply.
   return { ...meta, title: { absolute: seo.defaultTitle } };
 }
 
@@ -72,6 +73,13 @@ export default async function HomePage({
       />
 
       <div className="site-container space-y-10 py-6 sm:py-8">
+        <header className="max-w-2xl">
+          <h1 className="text-2xl font-extrabold tracking-tight sm:text-3xl">
+            Internet Secrets, Free Perks &amp; Smart Deals That Actually Work
+          </h1>
+          <p className="text-muted mt-1.5 text-sm">{SITE.tagline}</p>
+        </header>
+
         <AdSlot placement="top-leaderboard" />
 
         <TrendingRail stories={trending} engagement={trendingEngagement} />
@@ -80,31 +88,30 @@ export default async function HomePage({
 
         <AdSlot placement="in-content" />
 
-        {feed.total === 0 ? (
-          <p className="text-muted py-10 text-center text-sm">
-            No stories published yet — check back soon.
-          </p>
-        ) : (
-          <section aria-label="Latest stories" className="divide-line divide-y">
-            {feed.items.map((story) => {
-              const eng = engagementFor(story.id);
-              return (
-                <StoryCard
-                  key={story.id}
-                  story={story}
-                  variant="feed"
-                  reactions={eng.reactions}
-                  commentCount={eng.commentCount}
-                />
-              );
-            })}
-          </section>
-        )}
+        <div className="grid gap-10 lg:grid-cols-[minmax(0,1fr)_300px]">
+          <div className="min-w-0 space-y-8">
+            {feed.total === 0 ? (
+              <p className="text-muted py-10 text-center text-sm">
+                No stories published yet — check back soon.
+              </p>
+            ) : (
+              <section aria-label="Latest stories">
+                <StoryGrid stories={feed.items} columns={2} engagementFor={engagementFor} />
+              </section>
+            )}
 
-        <Pagination page={page} totalPages={feed.totalPages} buildHref={homeHref} />
+            <Pagination page={page} totalPages={feed.totalPages} buildHref={homeHref} />
+          </div>
+
+          <aside className="space-y-6 lg:sticky lg:top-6 lg:self-start">
+            <AdSlot placement="sidebar" />
+            {trending.length > 0 && (
+              <TrendingList stories={trending.slice(0, 5)} title="Trending Now" />
+            )}
+            <NewsletterSidebarCTA />
+          </aside>
+        </div>
       </div>
-
-      <NewsletterCTA />
     </>
   );
 }

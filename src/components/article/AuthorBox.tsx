@@ -4,6 +4,7 @@ import type { Route } from "next";
 import { DEFAULT_AUTHOR_NAME } from "@/config/site";
 
 type Author = {
+  slug: string;
   name: string;
   role: string | null;
   bio: string | null;
@@ -18,7 +19,7 @@ export function AuthorBox({ author }: { author: Author }) {
   const name = author?.name ?? DEFAULT_AUTHOR_NAME;
   const bio =
     author?.bio ??
-    "Stories researched, written and edited by the ViralTrendly newsroom.";
+    "Guides and deals researched, verified and written by the PerkTonic team.";
 
   return (
     <aside className="border-line bg-surface/60 flex gap-4 rounded-sm border p-5">
@@ -41,7 +42,16 @@ export function AuthorBox({ author }: { author: Author }) {
         <p className="text-[0.68rem] font-bold tracking-[0.16em] text-[var(--color-muted)] uppercase">
           Written by
         </p>
-        <p className="text-ink text-[1.05rem] font-bold">{name}</p>
+        {author?.slug ? (
+          <Link
+            href={`/author/${author.slug}` as Route}
+            className="text-ink text-[1.05rem] font-bold hover:underline"
+          >
+            {name}
+          </Link>
+        ) : (
+          <p className="text-ink text-[1.05rem] font-bold">{name}</p>
+        )}
         {author?.role && (
           <p className="text-muted text-[0.82rem] font-medium">{author.role}</p>
         )}

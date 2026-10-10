@@ -12,6 +12,9 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // CommonJS cPanel/Passenger entry point (deploy/namecheap-cpanel.md) —
+    // outside src/, same category as next.config.ts and scripts/*.mjs.
+    "server.js",
   ]),
 ]);
 

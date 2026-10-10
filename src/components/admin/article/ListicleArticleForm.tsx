@@ -6,7 +6,8 @@ import { saveListicleArticle, type SaveState } from "@/app/actions/admin-article
 import { TitleSlugFields } from "../TitleSlugFields";
 import { ItemsEditor, type ItemDraft } from "./ItemsEditor";
 import { Field, Textarea, Checkbox, Card, Button, LinkButton } from "../ui";
-import { PublishingCard, TaxonomyCard, FeaturedImageField, SeoCard } from "./SharedFields";
+import { PublishingCard, TagsCard, FeaturedImageField, SeoCard } from "./SharedFields";
+import { TopTaxonomyBar } from "./TopTaxonomyBar";
 
 const initial: SaveState = { status: "idle" };
 
@@ -29,6 +30,8 @@ export function ListicleArticleForm({
 }) {
   const [state, formAction, pending] = useActionState(saveListicleArticle, initial);
   const [liveTitle, setLiveTitle] = useState(article?.title ?? "");
+  const [categoryId, setCategoryId] = useState(article?.categoryId ?? "");
+  const [authorId, setAuthorId] = useState(article?.authorId ?? "");
 
   const defaultItems: ItemDraft[] = (items ?? []).map((it) => ({
     heading: it.heading ?? "",
@@ -45,6 +48,16 @@ export function ListicleArticleForm({
       {article && <input type="hidden" name="id" value={article.id} />}
 
       <div className="min-w-0 space-y-6">
+        <TopTaxonomyBar
+          categories={categories}
+          authors={authors}
+          categoryId={categoryId}
+          authorId={authorId}
+          onCategoryChange={setCategoryId}
+          onAuthorChange={setAuthorId}
+          persist={!article}
+        />
+
         <Card className="space-y-4">
           <TitleSlugFields defaultTitle={article?.title} defaultSlug={article?.slug} onTitleChange={setLiveTitle} />
           <Field label="Excerpt" htmlFor="excerpt" hint="Shown in cards and search results.">
@@ -81,7 +94,7 @@ export function ListicleArticleForm({
           {pending ? "Saving…" : article ? "Save changes" : "Publish list"}
         </Button>
         <PublishingCard article={article} />
-        <TaxonomyCard article={article} categories={categories} authors={authors} tags={tags} />
+        <TagsCard article={article} tags={tags} />
         <LinkButton href="/admin/articles">Back to articles</LinkButton>
       </div>
     </form>

@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 /* ==========================================================================
-   ViralTrendly — Design tokens (spec §3, §4, §5, §66)
+   PerkTonic — Design tokens (spec §3, §4, §5, §66)
    Identity: WHITE + BLACK + YELLOW. Light editorial UI. No public dark mode.
    Keep this file the single source of truth; the TS mirror lives in
    src/lib/design-tokens.ts for use in JS/structured-data contexts.
@@ -212,6 +212,22 @@ body {
   }
   .page-prose ol {
     list-style: decimal;
+  }
+  .page-prose table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.92rem;
+  }
+  .page-prose th,
+  .page-prose td {
+    border: 1px solid var(--color-line);
+    padding: 0.6rem 0.75rem;
+    text-align: left;
+    vertical-align: top;
+  }
+  .page-prose th {
+    background: var(--color-surface);
+    font-weight: 700;
   }
 
   /* Ad container — reserves height to prevent CLS (spec §16, §43, §82).

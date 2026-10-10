@@ -26,7 +26,7 @@ export function AdminShell({
       {/* Desktop sidebar */}
       <aside className="bg-ink-deep hidden w-64 shrink-0 flex-col p-4 text-white lg:flex">
         <Link href="/admin" className="mb-6 block px-3 text-lg font-extrabold">
-          Viral<span className="text-brand">Trendly</span>
+          Perk<span className="text-brand">Tonic</span>
           <span className="text-white/50"> Admin</span>
         </Link>
         <AdminSidebar role={user.role} />
@@ -47,7 +47,7 @@ export function AdminShell({
           >
             <div className="mb-6 flex items-center justify-between">
               <span className="text-lg font-extrabold">
-                Viral<span className="text-brand">Trendly</span>
+                Perk<span className="text-brand">Tonic</span>
               </span>
               <button
                 type="button"

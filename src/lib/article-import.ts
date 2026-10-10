@@ -12,6 +12,7 @@ import { slugify } from "./slug";
  *   SEO Title: How AI Is Changing Work in 2026: What You Need to Know
  *   Meta Description: A look at how AI tools are changing daily workflows,
  *   from research to creative work.
+ *   Keywords: AI tools, free AI tools, internet tricks
  *   Category: Tech
  *   Tags: AI, Internet, Automation
  *
@@ -26,13 +27,18 @@ export interface ParsedArticleMeta {
   excerpt?: string;
   seoTitle?: string;
   metaDescription?: string;
+  /** Comma-separated in the paste; first one seeds pasted-image alt text
+   *  (perktonic workflow, 2026-10-09 — see QuickArticlePanel/altBase). */
+  keywords?: string[];
   category?: string;
+  /** Matched against Author.name (see quick-article.ts's AUTHOR_FOR_CATEGORY note on why the piece states this itself rather than us re-deriving it from category). */
+  author?: string;
   tags?: string[];
 }
 
-type FieldKey = Exclude<keyof ParsedArticleMeta, "tags">;
+type FieldKey = Exclude<keyof ParsedArticleMeta, "tags" | "keywords">;
 
-const LABELS: Record<string, FieldKey | "tags"> = {
+const LABELS: Record<string, FieldKey | "tags" | "keywords"> = {
   title: "title",
   slug: "slug",
   excerpt: "excerpt",
@@ -43,7 +49,9 @@ const LABELS: Record<string, FieldKey | "tags"> = {
   description: "metaDescription",
   "meta description": "metaDescription",
   "meta-description": "metaDescription",
+  keywords: "keywords",
   category: "category",
+  author: "author",
   tags: "tags",
 };
 
@@ -77,6 +85,13 @@ export function parseMetaBlock(raw: string): ParsedArticleMeta {
     seoTitle: collected.seoTitle || undefined,
     metaDescription: collected.metaDescription || undefined,
     category: collected.category || undefined,
+    author: collected.author || undefined,
+    keywords: collected.keywords
+      ? collected.keywords
+          .split(",")
+          .map((k) => k.trim())
+          .filter(Boolean)
+      : undefined,
     tags: collected.tags
       ? collected.tags
           .split(",")
@@ -91,5 +106,7 @@ Slug: how-ai-is-changing-our-lives-in-2026
 Excerpt: From automated research to creative tools, AI is reshaping everyday workflows.
 SEO Title: How AI Is Changing Work in 2026: What You Need to Know
 Meta Description: A look at how AI tools are changing daily workflows, from research to creative work.
-Category: Tech
+Keywords: AI tools, free AI tools, internet tricks
+Category: Internet Secrets & AI Tools
+Author: Alex Carter
 Tags: AI, Internet, Automation`;

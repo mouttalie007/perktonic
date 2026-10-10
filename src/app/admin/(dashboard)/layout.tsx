@@ -4,7 +4,7 @@ import { requireUser } from "@/lib/require-admin";
 import { AdminShell } from "@/components/admin/AdminShell";
 
 export const metadata: Metadata = {
-  title: { default: "Admin", template: "%s — ViralTrendly Admin" },
+  title: { default: "Admin", template: "%s — PerkTonic Admin" },
   robots: { index: false, follow: false },
 };
 

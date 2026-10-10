@@ -41,7 +41,7 @@ export async function generateMetadata({ searchParams }: Params): Promise<Metada
   const seo = await siteSettingsService.getSeoSettings();
   return seoService.buildMetadata({
     title: q ? `Search results for “${q}”` : "Search",
-    description: `Search ViralTrendly for trending stories, people, tech, lifestyle and more.`,
+    description: `Search PerkTonic for free samples, AI tools, rewards and money-saving guides.`,
     path: "/search",
     robotsIndex: seo.searchPagesIndexable,
   });
@@ -80,7 +80,7 @@ export default async function SearchPage({ searchParams }: Params) {
       <div className="mt-10">
         {!q ? (
           <EmptyState
-            title="Search ViralTrendly"
+            title="Search PerkTonic"
             description="Type a keyword above to search trending stories, people, tech, lifestyle, travel and more."
           />
         ) : results && results.total > 0 ? (

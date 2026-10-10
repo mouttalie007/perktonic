@@ -6,11 +6,11 @@ import { ArticleHeader } from "./ArticleHeader";
 import { ArticleBody } from "./ArticleBody";
 import { ShareButtons } from "./ShareButtons";
 import { AuthorBox } from "./AuthorBox";
-import { RelatedStories } from "./RelatedStories";
 import { ReactionBar } from "./ReactionBar";
 import { CommentSection } from "./CommentSection";
-import { NewsletterCTA } from "@/components/home/NewsletterCTA";
+import { NewsletterSidebarCTA } from "./NewsletterSidebarCTA";
 import { AdSlot } from "@/components/ads/AdSlot";
+import { TrendingList } from "@/components/home/TrendingList";
 import { reactionService } from "@/services/reaction.service";
 
 /* Loose shape — the article payload from articleService has all of this. */
@@ -30,12 +30,14 @@ export async function StandardArticleView({
   toc,
   canonical,
   related,
+  otherCategory,
 }: {
   article: ViewArticle;
   segments: string[];
   toc: TocItem[];
   canonical: string;
   related: ArticleCard[];
+  otherCategory: ArticleCard[];
 }) {
   const reactionCounts = await reactionService.getCounts(article.id);
   const adCtx = {
@@ -60,10 +62,15 @@ export async function StandardArticleView({
   ];
 
   return (
-    <>
-      <article className="site-container py-8 sm:py-10">
-        <div className="mx-auto max-w-[var(--width-article)]">
-          <Breadcrumbs items={crumbs} />
+    <article className="site-container py-8 sm:py-10">
+      {/* Drops the current page from the visible trail (unlike the JSON-LD
+          BreadcrumbList, which keeps it per schema.org convention) — the
+          H1 right below already shows the full title, repeating it here
+          read as noise rather than navigation. */}
+      <Breadcrumbs items={crumbs.slice(0, -1)} />
+
+      <div className="mt-4 grid gap-10 lg:grid-cols-[minmax(0,1fr)_300px]">
+        <div className="min-w-0 max-w-[var(--width-article)]">
           <ArticleHeader article={article} />
 
           <div className="mt-8">
@@ -84,14 +91,15 @@ export async function StandardArticleView({
           <CommentSection articleId={article.id} path={`/story/${article.slug}`} className="mt-12" />
         </div>
 
-        {related.length > 0 && (
-          <div className="mx-auto mt-16 max-w-5xl">
-            <RelatedStories stories={related} />
-          </div>
-        )}
-      </article>
-
-      <NewsletterCTA />
-    </>
+        <aside className="space-y-6 lg:sticky lg:top-6 lg:self-start">
+          <AdSlot placement="sidebar" />
+          {related.length > 0 && <TrendingList stories={related} title="More Good Stuff" />}
+          {otherCategory.length > 0 && (
+            <TrendingList stories={otherCategory} title="Popular Elsewhere" />
+          )}
+          <NewsletterSidebarCTA />
+        </aside>
+      </div>
+    </article>
   );
 }

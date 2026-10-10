@@ -112,7 +112,7 @@ export default async function CategoryPage({ params, searchParams }: Params) {
                 />
               )}
 
-              <StoryGrid stories={gridItems} columns={3} />
+              <StoryGrid stories={gridItems} columns={2} />
 
               <Pagination
                 page={page}
@@ -122,14 +122,10 @@ export default async function CategoryPage({ params, searchParams }: Params) {
               />
             </div>
 
-            <aside className="space-y-6">
+            <aside className="space-y-6 lg:sticky lg:top-6 lg:self-start">
               <AdSlot placement="sidebar" />
               {topViewed.length > 0 && (
-                <TrendingList
-                  stories={topViewed}
-                  title={`Most Read in ${category.name}`}
-                  className="lg:sticky lg:top-6"
-                />
+                <TrendingList stories={topViewed} title={`Most Read in ${category.name}`} />
               )}
             </aside>
           </div>

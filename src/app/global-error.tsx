@@ -42,7 +42,7 @@ export default function GlobalError({
               textTransform: "uppercase",
             }}
           >
-            ViralTrendly
+            PerkTonic
           </p>
           <h1 style={{ fontSize: 26, fontWeight: 800, marginTop: 12 }}>
             Something went wrong.

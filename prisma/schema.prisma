@@ -1,4 +1,4 @@
-// ViralTrendly.com — Prisma schema v1 (Phase 0)
+// PerkTonic.com — Prisma schema v1 (Phase 0; site renamed from ViralTrendly 2026-10-08)
 // Public content model + settings + ads. Auth/session tables land in Phase 7.
 // Every configurable frontend element has a data source here so the future
 // Admin Dashboard can control it without schema churn.
@@ -309,9 +309,9 @@ model Page {
 
 model SiteSettings {
   id       String @id @default("singleton")
-  siteName String @default("ViralTrendly.com")
-  siteUrl  String @default("https://viraltrendly.com")
-  tagline  String @default("TREND TODAY. TALK TOMORROW.")
+  siteName String @default("PerkTonic.com")
+  siteUrl  String @default("https://perktonic.com")
+  tagline  String @default("Find the good stuff before everyone else does.")
 
   logoUrl           String?
   defaultOgImageUrl String?
@@ -332,6 +332,13 @@ model SiteSettings {
   homepageConfig   Json?
   navigationConfig Json?
 
+  // Pre-launch demo engagement (perktonic workflow, 2026-10-09) — a pool of
+  // generic comments the admin pastes in once; applyDemoEngagementToArticle
+  // (src/lib/demo-engagement.ts) picks a random subset per article. One
+  // comment per line. Cleared along with the demo Comment/ArticleReaction
+  // rows by the "Clear demo engagement" button once real traffic exists.
+  demoCommentPool String?
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -340,17 +347,17 @@ model SiteSettings {
 
 model SeoSettings {
   id                     String  @id @default("singleton")
-  defaultTitle           String  @default("ViralTrendly — Trending Stories, Viral News & Stories Worth Sharing")
-  titleTemplate          String  @default("%s — ViralTrendly")
-  defaultMetaDescription String  @default("Trending stories, viral news and fascinating reads worth sharing — across tech, people, lifestyle, entertainment, travel, health and more.")
+  defaultTitle           String  @default("PerkTonic: Free Stuff, Hidden Web Tricks & Smart Deals")
+  titleTemplate          String  @default("%s — PerkTonic")
+  defaultMetaDescription String  @default("Discover free samples, hidden Google features, free AI tools, rewards and money-saving tricks. Honest, tested guides updated regularly.")
   defaultRobotsIndex     Boolean @default(true)
 
   googleSiteVerification String?
   bingSiteVerification   String?
 
-  organizationName    String  @default("ViralTrendly")
+  organizationName    String  @default("PerkTonic")
   organizationLogoUrl String?
-  twitterHandle       String? // "@viraltrendly"
+  twitterHandle       String? // "@perktonic"
 
   tagPagesIndexable    Boolean @default(false)
   searchPagesIndexable Boolean @default(false)
@@ -520,6 +527,14 @@ model Comment {
   body      String
   status    CommentStatus @default(PENDING)
   ipHash    String?
+  // Seeded by applyDemoEngagementToArticle (src/lib/demo-engagement.ts), not
+  // a real visitor — lets "Clear demo engagement" delete precisely these
+  // rows without risking any genuine comment received in the meantime.
+  isSeed    Boolean       @default(false)
+  // Demo comments only — fetched once from randomuser.me at seed time and
+  // stored directly (never fetched live on page render). Null for every
+  // real visitor comment; the UI falls back to initials when absent.
+  avatarUrl String?
 
   createdAt DateTime @default(now())
 

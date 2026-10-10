@@ -22,6 +22,13 @@ const s = (props: P) => ({
 });
 
 const ICONS: Record<string, (p: P) => React.ReactElement> = {
+  gift: (p) => (
+    <svg {...s(p)}>
+      <rect x="3" y="8" width="18" height="4" rx="1" />
+      <rect x="4" y="12" width="16" height="9" rx="1" />
+      <path d="M12 8v13M12 8c-1.5-3.5-6-4-6-1 0 1.8 2 1 6 1Zm0 0c1.5-3.5 6-4 6-1 0 1.8-2 1-6 1Z" />
+    </svg>
+  ),
   home: (p) => (
     <svg {...s(p)}>
       <path d="M4 11 12 4l8 7v8a1 1 0 0 1-1 1h-4v-6H9v6H5a1 1 0 0 1-1-1v-8Z" />

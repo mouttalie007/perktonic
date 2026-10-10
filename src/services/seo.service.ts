@@ -138,6 +138,25 @@ export const seoService = {
     };
   },
 
+  /** JSON-LD: Person, for an author profile page (perktonic-seo.md §4.9). */
+  personJsonLd(input: {
+    name: string;
+    url: string;
+    bio?: string | null;
+    imageUrl?: string | null;
+    sameAs?: string[];
+  }) {
+    return {
+      "@context": "https://schema.org",
+      "@type": "Person",
+      name: input.name,
+      url: absoluteUrl(input.url),
+      ...(input.bio ? { description: input.bio } : {}),
+      ...(input.imageUrl ? { image: absoluteUrl(input.imageUrl) } : {}),
+      ...(input.sameAs && input.sameAs.length > 0 ? { sameAs: input.sameAs } : {}),
+    };
+  },
+
   /** JSON-LD: BreadcrumbList (spec §71). */
   breadcrumbJsonLd(crumbs: { name: string; path: string }[]) {
     return {

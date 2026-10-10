@@ -8,6 +8,8 @@ import TiptapLink from "@tiptap/extension-link";
 import TiptapImage from "@tiptap/extension-image";
 import Placeholder from "@tiptap/extension-placeholder";
 import { uploadImageDirect } from "@/app/actions/admin-media";
+import { ImagePromptNode } from "./image-prompt-node";
+import { markersToPlaceholderHtml } from "@/lib/quick-article";
 
 /**
  * The article/page rich text editor (per the original brief: "an advanced
@@ -53,8 +55,9 @@ export function RichTextEditor({
       TiptapLink.configure({ openOnClick: false, autolink: true }),
       TiptapImage,
       Placeholder.configure({ placeholder }),
+      ImagePromptNode,
     ],
-    content: defaultValue,
+    content: markersToPlaceholderHtml(defaultValue),
     immediatelyRender: false,
     editorProps: {
       attributes: {
@@ -115,7 +118,7 @@ export function RichTextEditor({
   }
 
   function applyImport() {
-    editor?.commands.setContent(importText);
+    editor?.commands.setContent(markersToPlaceholderHtml(importText));
     setHtml(editor?.getHTML() ?? "");
     setImportText("");
     setImportOpen(false);
@@ -123,7 +126,7 @@ export function RichTextEditor({
 
   function applySource(next: string) {
     setHtml(next);
-    editor?.commands.setContent(next);
+    editor?.commands.setContent(markersToPlaceholderHtml(next));
   }
 
   return (

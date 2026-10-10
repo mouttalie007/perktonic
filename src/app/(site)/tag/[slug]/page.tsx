@@ -40,7 +40,7 @@ export async function generateMetadata({
   const page = Math.max(1, Number(pageParam) || 1);
   return seoService.buildMetadata({
     title: `${tag.name}`,
-    description: `Stories tagged “${tag.name}” on ViralTrendly.`,
+    description: `Stories tagged “${tag.name}” on PerkTonic.`,
     path: tagHref(slug, page),
     robotsIndex: seo.tagPagesIndexable && tag.robotsIndex,
   });

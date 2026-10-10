@@ -14,8 +14,8 @@ export async function updateSiteSettings(formData: FormData) {
   await prisma.siteSettings.upsert({
     where: { id: "singleton" },
     update: {
-      siteName: str(formData, "siteName") ?? "ViralTrendly.com",
-      tagline: str(formData, "tagline") ?? "TREND TODAY. TALK TOMORROW.",
+      siteName: str(formData, "siteName") ?? "PerkTonic.com",
+      tagline: str(formData, "tagline") ?? "Find the good stuff before everyone else does.",
       logoUrl: str(formData, "logoUrl"),
       defaultOgImageUrl: str(formData, "defaultOgImageUrl"),
       contactEmail: str(formData, "contactEmail"),
@@ -39,13 +39,13 @@ export async function updateSeoSettings(formData: FormData) {
     update: {
       defaultTitle:
         str(formData, "defaultTitle") ??
-        "ViralTrendly — Trending Stories, Viral News & Stories Worth Sharing",
-      titleTemplate: str(formData, "titleTemplate") ?? "%s — ViralTrendly",
+        "PerkTonic: Free Stuff, Hidden Web Tricks & Smart Deals",
+      titleTemplate: str(formData, "titleTemplate") ?? "%s — PerkTonic",
       defaultMetaDescription: str(formData, "defaultMetaDescription") ?? "",
       defaultRobotsIndex: formData.get("defaultRobotsIndex") === "on",
       googleSiteVerification: str(formData, "googleSiteVerification"),
       bingSiteVerification: str(formData, "bingSiteVerification"),
-      organizationName: str(formData, "organizationName") ?? "ViralTrendly",
+      organizationName: str(formData, "organizationName") ?? "PerkTonic",
       organizationLogoUrl: str(formData, "organizationLogoUrl"),
       twitterHandle: str(formData, "twitterHandle"),
       tagPagesIndexable: formData.get("tagPagesIndexable") === "on",

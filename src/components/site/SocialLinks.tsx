@@ -1,5 +1,5 @@
 import type { ComponentType, SVGProps } from "react";
-import { SOCIAL_PLATFORMS, type SocialPlatform } from "@/config/site";
+import { SITE, SOCIAL_PLATFORMS, type SocialPlatform } from "@/config/site";
 import {
   FacebookIcon,
   XIcon,
@@ -47,7 +47,7 @@ export function SocialLinks({
                 href={href}
                 target="_blank"
                 rel="noopener noreferrer"
-                aria-label={`ViralTrendly on ${label}`}
+                aria-label={`${SITE.shortName} on ${label}`}
                 className={`inline-flex items-center justify-center rounded-sm p-1.5 transition-colors ${linkClassName}`}
               >
                 <Icon width={size} height={size} />

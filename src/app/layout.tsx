@@ -3,6 +3,7 @@ import type { ReactNode } from "react";
 import { Inter, Plus_Jakarta_Sans } from "next/font/google";
 import "./globals.css";
 import { SITE } from "@/config/site";
+import { BackToTop } from "@/components/site/BackToTop";
 // Consent banner + analytics scripts live in (site)/layout.tsx, not here —
 // they're a public-site concern and were blocking the admin UI (the
 // banner sits over form submit buttons; found while testing the new GA4
@@ -35,8 +36,8 @@ export const metadata: Metadata = {
   metadataBase: new URL(SITE.url),
   title: {
     default:
-      "ViralTrendly — Trending Stories, Viral News & Stories Worth Sharing",
-    template: "%s — ViralTrendly",
+      "PerkTonic — Free Samples, AI Tools, Rewards & Money-Saving Guides",
+    template: "%s — PerkTonic",
   },
   description: SITE.description,
   applicationName: SITE.shortName,
@@ -57,6 +58,7 @@ export default function RootLayout({
     <html lang="en" className={`${inter.variable} ${plusJakarta.variable} h-full`}>
       <body className="bg-canvas text-ink flex min-h-full flex-col antialiased">
         {children}
+        <BackToTop />
       </body>
     </html>
   );

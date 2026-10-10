@@ -13,9 +13,9 @@ const SINGLETON_ID = "singleton";
 
 const DEFAULT_SITE: SiteSettings = {
   id: SINGLETON_ID,
-  siteName: "ViralTrendly.com",
-  siteUrl: "https://viraltrendly.com",
-  tagline: "TREND TODAY. TALK TOMORROW.",
+  siteName: "PerkTonic.com",
+  siteUrl: "https://perktonic.com",
+  tagline: "Find the good stuff before everyone else does.",
   logoUrl: null,
   defaultOgImageUrl: null,
   contactEmail: null,
@@ -29,21 +29,21 @@ const DEFAULT_SITE: SiteSettings = {
   tickerEnabled: true,
   homepageConfig: null,
   navigationConfig: null,
+  demoCommentPool: null,
   createdAt: new Date(0),
   updatedAt: new Date(0),
 };
 
 const DEFAULT_SEO: SeoSettings = {
   id: SINGLETON_ID,
-  defaultTitle:
-    "ViralTrendly — Trending Stories, Viral News & Stories Worth Sharing",
-  titleTemplate: "%s — ViralTrendly",
+  defaultTitle: "PerkTonic: Free Stuff, Hidden Web Tricks & Smart Deals",
+  titleTemplate: "%s — PerkTonic",
   defaultMetaDescription:
-    "Trending stories, viral news and fascinating reads worth sharing — across tech, people, lifestyle, entertainment, travel, health and more.",
+    "Discover free samples, hidden Google features, free AI tools, rewards and money-saving tricks. Honest, tested guides updated regularly.",
   defaultRobotsIndex: true,
   googleSiteVerification: null,
   bingSiteVerification: null,
-  organizationName: "ViralTrendly",
+  organizationName: "PerkTonic",
   organizationLogoUrl: null,
   twitterHandle: null,
   tagPagesIndexable: false,

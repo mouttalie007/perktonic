@@ -8,13 +8,13 @@ import { clientEnv } from "./env";
  */
 
 export const SITE = {
-  name: "ViralTrendly.com",
-  shortName: "ViralTrendly",
-  tagline: "TREND TODAY. TALK TOMORROW.",
+  name: "PerkTonic.com",
+  shortName: "PerkTonic",
+  tagline: "Find the good stuff before everyone else does.",
   url: clientEnv.NEXT_PUBLIC_SITE_URL,
   locale: "en_US",
   description:
-    "Trending stories, viral news and fascinating reads worth sharing — across tech, people, lifestyle, entertainment, travel, health and more.",
+    "Legit freebies, free AI tools, hidden web tricks and smart deals. Checked, honest and updated.",
 } as const;
 
 /** Social profiles. Empty until set from the Admin Dashboard / env. */
@@ -38,20 +38,10 @@ export const SOCIAL_PLATFORMS: { key: SocialPlatform; label: string }[] = [
 ];
 
 export type CategoryKey =
-  | "viral"
-  | "people"
-  | "tech"
-  | "lifestyle"
-  | "entertainment"
-  | "travel"
-  | "health"
-  | "science"
-  | "sports"
-  | "amazing"
-  | "food"
-  | "money"
-  | "culture"
-  | "world";
+  | "free-samples"
+  | "ai-tools"
+  | "rewards-perks"
+  | "money-saving";
 
 export interface CategoryDef {
   slug: CategoryKey;
@@ -67,131 +57,45 @@ export interface CategoryDef {
   accentColor: string;
 }
 
+// Replaced 2026-10-08 (pivot to PerkTonic.com — a verified free-samples/
+// AI-tools/rewards/savings niche, per the AdSense-approval-focused site
+// structure doc). The old 14-category "viral magazine" taxonomy is gone.
 export const CATEGORIES: CategoryDef[] = [
   {
-    slug: "viral",
-    name: "Viral",
-    iconKey: "flame",
-    shortDescription: "Hot stories",
+    slug: "free-samples",
+    name: "Free Samples & Products",
+    iconKey: "gift",
+    shortDescription: "Real freebies, verified",
     description:
-      "The stories everyone is talking about right now — the internet's biggest moments as they happen.",
-    accentColor: "#B91C1C",
-  },
-  {
-    slug: "people",
-    name: "People",
-    iconKey: "users",
-    shortDescription: "Celebrities & influencers",
-    description:
-      "Profiles, moments and talking points from the people shaping culture and conversation.",
-    accentColor: "#6D28D9",
-  },
-  {
-    slug: "tech",
-    name: "Tech",
-    iconKey: "cpu",
-    shortDescription: "Innovation & AI",
-    description:
-      "How technology and artificial intelligence are reshaping the way we live and work.",
-    accentColor: "#1D4ED8",
-  },
-  {
-    slug: "lifestyle",
-    name: "Lifestyle",
-    iconKey: "coffee",
-    shortDescription: "Live better",
-    description:
-      "Ideas, habits and small changes for a better everyday life.",
-    accentColor: "#BE185D",
-  },
-  {
-    slug: "entertainment",
-    name: "Entertainment",
-    iconKey: "film",
-    shortDescription: "Movies, music & more",
-    description:
-      "The latest from film, television, music and streaming — plus the moments going viral.",
-    accentColor: "#7E22CE",
-  },
-  {
-    slug: "travel",
-    name: "Travel",
-    iconKey: "plane",
-    shortDescription: "Discover the world",
-    description:
-      "Destinations, guides and the places worth seeing before they change.",
-    accentColor: "#0F766E",
-  },
-  {
-    slug: "health",
-    name: "Health",
-    iconKey: "heart",
-    shortDescription: "Tips for a healthier you",
-    description:
-      "Practical, evidence-minded takes on nutrition, fitness, sleep and wellbeing.",
-    accentColor: "#15803D",
-  },
-  {
-    slug: "science",
-    name: "Science",
-    iconKey: "atom",
-    shortDescription: "Discoveries & space",
-    description:
-      "Discoveries, research and the questions that change how we see the universe.",
-    accentColor: "#0E7490",
-  },
-  {
-    slug: "sports",
-    name: "Sports",
-    iconKey: "trophy",
-    shortDescription: "The moments that matter",
-    description:
-      "Highlights, storylines and the viral moments from the world of sport.",
-    accentColor: "#C2410C",
-  },
-  {
-    slug: "amazing",
-    name: "Amazing",
-    iconKey: "sparkles",
-    shortDescription: "Incredible facts",
-    description:
-      "Extraordinary facts, feats and stories that sound too good to be true.",
-    accentColor: "#92400E",
-  },
-  {
-    slug: "food",
-    name: "Food",
-    iconKey: "utensils",
-    shortDescription: "Eat well",
-    description: "Recipes, trends and the food stories worth a second look.",
-    accentColor: "#BE123C",
-  },
-  {
-    slug: "money",
-    name: "Money",
-    iconKey: "wallet",
-    shortDescription: "Smarter with money",
-    description:
-      "Everyday money, side hustles and the economy explained simply.",
+      "Legitimate free samples, product-testing programs and freebie offers — checked for scams before we share them.",
     accentColor: "#047857",
   },
   {
-    slug: "culture",
-    name: "Culture",
-    iconKey: "palette",
-    shortDescription: "Art & ideas",
+    slug: "ai-tools",
+    name: "Internet Secrets & AI Tools",
+    iconKey: "cpu",
+    shortDescription: "Hidden tools & AI tricks",
     description:
-      "Art, books, internet culture and the ideas moving the conversation.",
-    accentColor: "#A21CAF",
+      "Free AI tools, hidden Google features and useful websites most people have never heard of.",
+    accentColor: "#1D4ED8",
   },
   {
-    slug: "world",
-    name: "World",
-    iconKey: "globe",
-    shortDescription: "Around the globe",
+    slug: "rewards-perks",
+    name: "Rewards, Trials & Digital Perks",
+    iconKey: "trophy",
+    shortDescription: "Gift cards, trials & perks",
     description:
-      "Notable stories and human moments from around the world.",
-    accentColor: "#4338CA",
+      "Gift card programs, free trials, cashback apps and digital perks worth knowing about — including how to cancel before you're charged.",
+    accentColor: "#6D28D9",
+  },
+  {
+    slug: "money-saving",
+    name: "Money-Saving Guides",
+    iconKey: "wallet",
+    shortDescription: "Smarter spending",
+    description:
+      "Coupon tools, price-history tricks and the discounts most people miss — practical ways to spend less.",
+    accentColor: "#92400E",
   },
 ];
 
@@ -209,38 +113,32 @@ function navItemFor(slug: CategoryKey): NavItem {
   return { label: c.name, href: `/category/${c.slug}`, iconKey: c.iconKey, accentColor: c.accentColor };
 }
 
-/** Primary desktop navigation (spec §7), with icon+accent for the redesigned nav (2026-09-12). */
+/**
+ * Primary desktop navigation (spec §7), with icon+accent for the redesigned
+ * nav (2026-09-12). Only 4 categories now (PerkTonic pivot, 2026-10-08) —
+ * all of them fit directly in the primary bar, so there's nothing left for
+ * a "MORE" dropdown (HeaderBar hides that button entirely when NAV_MORE is
+ * empty).
+ */
 export const NAV_PRIMARY: NavItem[] = [
   { label: "Home", href: "/", iconKey: "home", accentColor: null },
-  navItemFor("viral"),
-  navItemFor("people"),
-  navItemFor("tech"),
-  navItemFor("lifestyle"),
-  navItemFor("entertainment"),
-  navItemFor("travel"),
-  navItemFor("health"),
+  navItemFor("free-samples"),
+  navItemFor("ai-tools"),
+  navItemFor("rewards-perks"),
+  navItemFor("money-saving"),
 ];
 
-/** "MORE" dropdown (spec §7). */
-export const NAV_MORE: NavItem[] = [
-  navItemFor("science"),
-  navItemFor("sports"),
-  navItemFor("amazing"),
-  navItemFor("food"),
-  navItemFor("money"),
-  navItemFor("culture"),
-  navItemFor("world"),
-];
+/** "MORE" dropdown (spec §7) — empty since the 2026-10-08 pivot; kept as a
+ *  typed array (not deleted) so HeaderBar's empty-state guard has something
+ *  to check against, and so a future 5th+ category has somewhere to go. */
+export const NAV_MORE: NavItem[] = [];
 
 /** Categories shown in the homepage "quick navigation" strip (spec §13). */
 export const QUICK_NAV_CATEGORIES: CategoryKey[] = [
-  "viral",
-  "people",
-  "tech",
-  "lifestyle",
-  "entertainment",
-  "travel",
-  "health",
+  "free-samples",
+  "ai-tools",
+  "rewards-perks",
+  "money-saving",
 ];
 
 /**
@@ -271,7 +169,11 @@ export const LEGAL_PAGES: {
   },
   { slug: "disclaimer", title: "Disclaimer", footerColumn: "resources" },
   { slug: "accessibility", title: "Accessibility", footerColumn: "resources" },
+  { slug: "affiliate-disclosure", title: "Affiliate Disclosure", footerColumn: "resources" },
+  // Added 2026-10-08 — required page per the AdSense trust-pack checklist
+  // (perktonic-seo.md §4).
+  { slug: "dmca", title: "DMCA & Copyright", footerColumn: "resources" },
 ];
 
 /** Fallback byline when no individual author is assigned (spec §73). */
-export const DEFAULT_AUTHOR_NAME = "ViralTrendly Editorial Team";
+export const DEFAULT_AUTHOR_NAME = "PerkTonic Editorial Team";

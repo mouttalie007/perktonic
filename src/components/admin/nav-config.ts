@@ -55,6 +55,7 @@ export const ADMIN_NAV: AdminNavGroup[] = [
     items: [
       { label: "Site Settings", href: "/admin/settings/site" as Route, minRole: "ADMIN" },
       { label: "SEO Settings", href: "/admin/settings/seo" as Route, minRole: "ADMIN" },
+      { label: "Demo Engagement", href: "/admin/settings/demo-engagement" as Route, minRole: "ADMIN" },
       { label: "Redirects", href: "/admin/redirects" as Route, minRole: "ADMIN" },
       { label: "Users", href: "/admin/users" as Route, minRole: "ADMIN" },
     ],

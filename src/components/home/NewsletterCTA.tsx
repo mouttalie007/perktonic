@@ -25,11 +25,11 @@ export function NewsletterCTA() {
       <div className="site-container flex flex-col items-center gap-6 py-14 text-center lg:flex-row lg:justify-between lg:gap-10 lg:text-left">
         <div className="max-w-xl">
           <h2 className="text-2xl font-extrabold tracking-tight sm:text-[1.75rem]">
-            Get the Best Viral Stories{" "}
+            Get the Best Deals{" "}
             <span className="text-brand">Straight to Your Inbox</span>
           </h2>
           <p className="mt-2 text-sm text-white/70">
-            Join thousands of curious minds. No spam, just the good stuff.
+            Join thousands of smart shoppers. No spam, just the good stuff.
           </p>
         </div>
 

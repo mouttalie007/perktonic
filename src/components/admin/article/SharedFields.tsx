@@ -1,18 +1,32 @@
-import type { Author, Category, Media, Tag, Article } from "@prisma/client";
+import type { Media, Tag, Article } from "@prisma/client";
 import { Field, Input, Textarea, Select, Checkbox, Card } from "../ui";
 import { PasteImageField } from "./PasteImageField";
 
 type ArticleDefaults = Partial<Article> & { tagIds?: string[] };
 
-export function PublishingCard({ article }: { article?: ArticleDefaults }) {
+export function PublishingCard({
+  article,
+  defaultPublishedAt,
+}: {
+  article?: ArticleDefaults;
+  /** Used only for a brand-new article (no `article` prop) — see the random
+   *  backdating in StandardArticleForm/ListicleArticleForm. */
+  defaultPublishedAt?: string;
+}) {
   const publishedAtValue = article?.publishedAt
     ? new Date(article.publishedAt).toISOString().slice(0, 16)
-    : "";
+    : defaultPublishedAt ?? "";
   return (
     <Card className="space-y-4">
       <h2 className="font-bold">Publishing</h2>
       <Field label="Status" htmlFor="status">
-        <Select id="status" name="status" defaultValue={article?.status ?? "DRAFT"}>
+        {/* New articles default to Published (2026-10-10) — the submit
+            button already says "Publish article" for a new one; leaving
+            this on Draft meant that promise was silently false unless the
+            admin remembered to change it themselves, and a "published"
+            article that's actually a draft doesn't show up anywhere on
+            the site with no visible error. */}
+        <Select id="status" name="status" defaultValue={article?.status ?? "PUBLISHED"}>
           <option value="DRAFT">Draft</option>
           <option value="SCHEDULED">Scheduled</option>
           <option value="PUBLISHED">Published</option>
@@ -35,60 +49,37 @@ export function PublishingCard({ article }: { article?: ArticleDefaults }) {
   );
 }
 
-export function TaxonomyCard({
+/**
+ * Tags only — Category and Author moved to the top of the form (see
+ * TopTaxonomyBar, 2026-10-09), chosen before the paste instead of in the
+ * sidebar after.
+ */
+export function TagsCard({
   article,
-  categories,
-  authors,
   tags,
 }: {
   article?: ArticleDefaults;
-  categories: Category[];
-  authors: Author[];
   tags: Tag[];
 }) {
   const selectedTags = new Set(article?.tagIds ?? []);
+  if (tags.length === 0) return null;
   return (
     <Card className="space-y-4">
-      <h2 className="font-bold">Category &amp; byline</h2>
-      <Field label="Category" htmlFor="categoryId">
-        <Select id="categoryId" name="categoryId" defaultValue={article?.categoryId ?? ""}>
-          <option value="">No category</option>
-          {categories.map((c) => (
-            <option key={c.id} value={c.id}>
-              {c.name}
-            </option>
-          ))}
-        </Select>
-      </Field>
-      <Field label="Author" htmlFor="authorId">
-        <Select id="authorId" name="authorId" defaultValue={article?.authorId ?? ""}>
-          <option value="">ViralTrendly Editorial Team</option>
-          {authors.map((a) => (
-            <option key={a.id} value={a.id}>
-              {a.name}
-            </option>
-          ))}
-        </Select>
-      </Field>
-      {tags.length > 0 && (
-        <fieldset>
-          <legend className="mb-1 text-sm font-semibold">Tags</legend>
-          <div className="flex flex-wrap gap-x-4 gap-y-1">
-            {tags.map((t) => (
-              <label key={t.id} className="flex items-center gap-1.5 text-sm">
-                <input
-                  type="checkbox"
-                  name="tags"
-                  value={t.id}
-                  defaultChecked={selectedTags.has(t.id)}
-                  className="border-line h-4 w-4"
-                />
-                {t.name}
-              </label>
-            ))}
-          </div>
-        </fieldset>
-      )}
+      <h2 className="font-bold">Tags</h2>
+      <div className="flex flex-wrap gap-x-4 gap-y-1">
+        {tags.map((t) => (
+          <label key={t.id} className="flex items-center gap-1.5 text-sm">
+            <input
+              type="checkbox"
+              name="tags"
+              value={t.id}
+              defaultChecked={selectedTags.has(t.id)}
+              className="border-line h-4 w-4"
+            />
+            {t.name}
+          </label>
+        ))}
+      </div>
     </Card>
   );
 }

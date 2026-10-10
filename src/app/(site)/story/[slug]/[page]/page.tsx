@@ -92,11 +92,10 @@ export default async function ListicleSubpage({ params }: Params) {
 
   // ---- /all ----
   if (parsed === "all") {
-    const related = await articleService.listRelated(
-      article.id,
-      article.categoryId,
-      4,
-    );
+    const [related, otherCategory] = await Promise.all([
+      articleService.listRelated(article.id, article.categoryId, 4),
+      articleService.listFromOtherCategories(article.categoryId, article.id, 4),
+    ]);
     const canonical = seoService.absoluteUrl(subpagePath(article.slug, 1));
     return (
       <>
@@ -106,6 +105,7 @@ export default async function ListicleSubpage({ params }: Params) {
           items={items}
           canonical={canonical}
           related={related}
+          otherCategory={otherCategory}
         />
       </>
     );
@@ -115,9 +115,12 @@ export default async function ListicleSubpage({ params }: Params) {
   const meta = buildSubpageMeta(article, items, parsed);
   const canonical = seoService.absoluteUrl(meta.canonicalPath);
   const isLast = parsed === items.length;
-  const related = isLast
-    ? await articleService.listRelated(article.id, article.categoryId, 4)
-    : [];
+  const [related, otherCategory] = isLast
+    ? await Promise.all([
+        articleService.listRelated(article.id, article.categoryId, 4),
+        articleService.listFromOtherCategories(article.categoryId, article.id, 4),
+      ])
+    : [[], []];
 
   return (
     <>
@@ -146,6 +149,7 @@ export default async function ListicleSubpage({ params }: Params) {
         position={parsed}
         canonical={canonical}
         related={related}
+        otherCategory={otherCategory}
       />
     </>
   );
