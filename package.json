@@ -31,7 +31,6 @@
     "seed": "node --import tsx prisma/seed.ts"
   },
   "dependencies": {
-    "@axe-core/playwright": "^4.13.0",
     "@prisma/client": "^6.19.3",
     "@tailwindcss/postcss": "^4",
     "@tiptap/extension-image": "^3.31.3",
@@ -49,10 +48,8 @@
     "bcryptjs": "^3.0.3",
     "eslint": "^9",
     "eslint-config-next": "16.3.4",
-    "lighthouse": "^13.4.1",
     "next": "16.3.4",
     "node-html-parser": "^9.0.4",
-    "playwright": "^1.63.0",
     "prettier": "^3.9.6",
     "prettier-plugin-tailwindcss": "^0.8.1",
     "prisma": "^6.19.3",
@@ -64,6 +61,11 @@
     "tsx": "^4.23.13",
     "typescript": "^5",
     "zod": "^4.6.1"
+  },
+  "devDependencies": {
+    "@axe-core/playwright": "^4.13.0",
+    "lighthouse": "^13.4.1",
+    "playwright": "^1.63.0"
   },
   "allowScripts": {
     "@prisma/engines": true,
