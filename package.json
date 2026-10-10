@@ -29,7 +29,7 @@
     "audit:perf": "node scripts/perf-audit.mjs"
   },
   "prisma": {
-    "seed": "node node_modules/tsx/dist/cli.mjs prisma/seed.ts"
+    "seed": "node --import tsx prisma/seed.ts"
   },
   "dependencies": {
     "@prisma/client": "^6.19.3",
