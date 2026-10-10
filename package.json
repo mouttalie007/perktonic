@@ -23,7 +23,6 @@
     "db:import-prompts": "node scripts/import-prompt-queue.mjs",
     "db:reset": "prisma migrate reset --force",
     "db:studio": "prisma studio",
-    "postinstall": "prisma generate",
     "audit": "node scripts/responsive-audit.mjs",
     "audit:a11y": "node scripts/a11y-audit.mjs",
     "audit:perf": "node scripts/perf-audit.mjs"
