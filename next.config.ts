@@ -59,6 +59,12 @@ const nextConfig: NextConfig = {
   typedRoutes: true,
 
   experimental: {
+    // The shared-hosting build server caps concurrent processes per
+    // account (CloudLinux/LVE limit) -- Next's default worker pool spawns
+    // enough child processes during build to hit it (`spawn ... EAGAIN`).
+    // Force a single worker so the build never forks.
+    cpus: 1,
+    workerThreads: false,
     serverActions: {
       // Pasted images go straight to a Server Action (uploadImageDirect,
       // admin-media.ts) before any server-side compression runs — the
