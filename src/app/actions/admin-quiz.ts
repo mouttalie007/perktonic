@@ -4,7 +4,6 @@ import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import { requireUser } from "@/lib/require-admin";
 import { parseQuizPaste } from "@/lib/quiz-parse";
-import { generateQuizCode } from "@/lib/quiz-codes";
 
 export type SaveQuizResult =
   | { ok: true; quizId: string; title: string; questionCount: number }
@@ -46,29 +45,4 @@ export async function deleteQuizAction(articleId: string): Promise<void> {
   await requireUser("EDITOR");
   await prisma.quiz.deleteMany({ where: { articleId } });
   revalidatePath(`/adminiyad/articles/${articleId}/edit`);
-}
-
-export type GenerateCodesResult = { ok: true; codes: string[] } | { ok: false; error: string };
-
-/** Tops the code pool up by 10 (never replaces existing codes). */
-export async function generateQuizCodesAction(
-  quizId: string,
-  articleId: string,
-): Promise<GenerateCodesResult> {
-  await requireUser("EDITOR");
-
-  const codes: string[] = [];
-  // Retries on the rare random collision rather than failing the batch.
-  while (codes.length < 10) {
-    const candidate = generateQuizCode();
-    try {
-      await prisma.quizCode.create({ data: { quizId, code: candidate } });
-      codes.push(candidate);
-    } catch {
-      // Unique constraint hit -- try another random code.
-    }
-  }
-
-  revalidatePath(`/adminiyad/articles/${articleId}/edit`);
-  return { ok: true, codes };
 }

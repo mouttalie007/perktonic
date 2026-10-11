@@ -63,11 +63,7 @@ export function CompletionModal({
     if (res.ok) {
       setCode(res.code);
     } else {
-      setCodeError(
-        res.reason === "exhausted"
-          ? "All codes for this quiz have been claimed — check back soon!"
-          : "Something went wrong. Please try again.",
-      );
+      setCodeError("Something went wrong. Please try again.");
     }
   }
 

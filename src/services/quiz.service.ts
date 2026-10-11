@@ -23,12 +23,4 @@ export const quizService = {
     });
     return quiz;
   },
-
-  async getCodeStats(quizId: string) {
-    const [total, used] = await Promise.all([
-      prisma.quizCode.count({ where: { quizId } }),
-      prisma.quizCode.count({ where: { quizId, isUsed: true } }),
-    ]);
-    return { total, used, available: total - used };
-  },
 };

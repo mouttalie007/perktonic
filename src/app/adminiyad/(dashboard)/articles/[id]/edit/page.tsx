@@ -4,7 +4,6 @@ import { PageHeader, LinkButton } from "@/components/admin/ui";
 import { StandardArticleForm } from "@/components/admin/article/StandardArticleForm";
 import { ListicleArticleForm } from "@/components/admin/article/ListicleArticleForm";
 import { articleFormData } from "@/lib/admin-article-data";
-import { quizService } from "@/services/quiz.service";
 
 export default async function EditArticlePage({
   params,
@@ -34,7 +33,6 @@ export default async function EditArticlePage({
   if (!article) notFound();
 
   const withTagIds = { ...article, tagIds: article.tags.map((t) => t.tagId) };
-  const codeStats = quiz ? await quizService.getCodeStats(quiz.id) : null;
 
   return (
     <div>
@@ -55,7 +53,6 @@ export default async function EditArticlePage({
           items={article.listicleItems}
           featuredImageMedia={article.featuredImage}
           initialQuiz={quiz}
-          initialCodeStats={codeStats}
           {...formData}
         />
       ) : (
@@ -63,7 +60,6 @@ export default async function EditArticlePage({
           article={withTagIds}
           featuredImageMedia={article.featuredImage}
           initialQuiz={quiz}
-          initialCodeStats={codeStats}
           {...formData}
         />
       )}

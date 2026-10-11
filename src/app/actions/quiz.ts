@@ -1,40 +1,30 @@
 "use server";
 
 import { prisma } from "@/lib/prisma";
+import { generateQuizCode } from "@/lib/quiz-codes";
 
-export type ClaimCodeResult =
-  | { ok: true; code: string }
-  | { ok: false; reason: "no-quiz" | "exhausted" };
+export type ClaimCodeResult = { ok: true; code: string } | { ok: false; reason: "no-quiz" };
 
 /**
- * Atomically claims one unused code for the article's quiz (FOR UPDATE SKIP
- * LOCKED so two simultaneous visitors can never be handed the same code).
- * Public action -- no auth, called by any visitor who finishes the quiz.
+ * Mints a brand-new, globally unique code the moment a visitor finishes a
+ * quiz and shares the article -- there is no pre-generated pool. Retries on
+ * the astronomically rare random collision against the unique constraint.
+ * Public action -- no auth, called by any visitor.
  */
 export async function claimQuizCodeAction(articleSlug: string): Promise<ClaimCodeResult> {
-  const rows = await prisma.$queryRaw<{ code: string }[]>`
-    UPDATE "quiz_codes"
-    SET "isUsed" = true, "usedAt" = now()
-    WHERE id = (
-      SELECT qc.id
-      FROM "quiz_codes" qc
-      JOIN "quizzes" q ON q.id = qc."quizId"
-      JOIN "articles" a ON a.id = q."articleId"
-      WHERE a.slug = ${articleSlug} AND qc."isUsed" = false
-      LIMIT 1
-      FOR UPDATE SKIP LOCKED
-    )
-    RETURNING code;
-  `;
+  const quiz = await prisma.quiz.findFirst({
+    where: { article: { slug: articleSlug } },
+    select: { id: true },
+  });
+  if (!quiz) return { ok: false, reason: "no-quiz" };
 
-  const row = rows[0];
-  if (!row) {
-    const hasQuiz = await prisma.quiz.findFirst({
-      where: { article: { slug: articleSlug } },
-      select: { id: true },
-    });
-    return { ok: false, reason: hasQuiz ? "exhausted" : "no-quiz" };
+  for (;;) {
+    const candidate = generateQuizCode();
+    try {
+      await prisma.quizCode.create({ data: { quizId: quiz.id, code: candidate } });
+      return { ok: true, code: candidate };
+    } catch {
+      // Unique constraint hit -- vanishingly rare, just try another code.
+    }
   }
-
-  return { ok: true, code: row.code };
 }

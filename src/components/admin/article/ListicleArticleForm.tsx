@@ -22,7 +22,6 @@ export function ListicleArticleForm({
   authors,
   tags,
   initialQuiz,
-  initialCodeStats,
 }: {
   article?: Article & { tagIds?: string[] };
   items?: ListicleItemWithMedia[];
@@ -31,7 +30,6 @@ export function ListicleArticleForm({
   authors: Author[];
   tags: Tag[];
   initialQuiz?: (Quiz & { questions: QuizQuestion[] }) | null;
-  initialCodeStats?: { total: number; used: number; available: number } | null;
 }) {
   const [state, formAction, pending] = useActionState(saveListicleArticle, initial);
   const [liveTitle, setLiveTitle] = useState(article?.title ?? "");
@@ -93,7 +91,6 @@ export function ListicleArticleForm({
             articleId={article.id}
             articleSlug={article.slug}
             initialQuiz={initialQuiz ?? null}
-            initialCodeStats={initialCodeStats ?? null}
           />
         )}
       </div>

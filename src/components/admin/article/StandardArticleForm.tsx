@@ -37,7 +37,6 @@ export function StandardArticleForm({
   authors,
   tags,
   initialQuiz,
-  initialCodeStats,
 }: {
   article?: Article & { tagIds?: string[] };
   featuredImageMedia?: Media | null;
@@ -45,7 +44,6 @@ export function StandardArticleForm({
   authors: Author[];
   tags: Tag[];
   initialQuiz?: (Quiz & { questions: QuizQuestion[] }) | null;
-  initialCodeStats?: { total: number; used: number; available: number } | null;
 }) {
   const [state, formAction, pending] = useActionState(saveStandardArticle, initial);
   const [mode, setMode] = useState<"quick" | "import" | "manual">(article ? "manual" : "quick");
@@ -237,7 +235,6 @@ export function StandardArticleForm({
             articleId={article.id}
             articleSlug={article.slug}
             initialQuiz={initialQuiz ?? null}
-            initialCodeStats={initialCodeStats ?? null}
           />
         )}
       </div>
