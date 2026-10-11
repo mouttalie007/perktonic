@@ -1,4 +1,5 @@
 import type { Route } from "next";
+import { resolveOgImage } from "./resolve-og-image";
 
 /**
  * Shared logic for Top-N listicle articles (spec §4, discussion notes):
@@ -20,6 +21,7 @@ export type ListicleItemLike = {
   imageAlt: string | null;
   media: {
     url: string;
+    ogUrl?: string | null;
     alt: string | null;
     credit: string | null;
     width: number | null;
@@ -30,6 +32,7 @@ export type ListicleItemLike = {
 export function itemImage(item: ListicleItemLike) {
   return {
     url: item.media?.url ?? item.imageUrl ?? null,
+    ogUrl: item.media?.ogUrl ?? null,
     alt: item.media?.alt ?? item.imageAlt ?? item.heading ?? "",
     credit: item.media?.credit ?? item.credit ?? null,
     width: item.media?.width ?? null,
@@ -70,8 +73,8 @@ export function buildSubpageMeta(
     intro: string | null;
     robotsIndex: boolean;
     listicleIndexSubpages: boolean;
-    featuredImage: { url: string } | null;
-    ogImage: { url: string } | null;
+    featuredImage: { url: string; ogUrl?: string | null } | null;
+    ogImage: { url: string; ogUrl?: string | null } | null;
   },
   items: ListicleItemLike[],
   position: number,
@@ -79,6 +82,8 @@ export function buildSubpageMeta(
   const total = items.length;
   const item = items[position - 1];
   const isFirst = position === 1;
+  const firstItemImg = item ? itemImage(item) : null;
+  const itemImgCandidate = firstItemImg?.url ? { url: firstItemImg.url, ogUrl: firstItemImg.ogUrl } : null;
 
   const title = isFirst
     ? (article.seoTitle ?? article.title)
@@ -92,13 +97,8 @@ export function buildSubpageMeta(
     : (item?.description?.slice(0, 160) ?? article.title);
 
   const ogImageUrl = isFirst
-    ? (article.ogImage?.url ??
-      article.featuredImage?.url ??
-      itemImage(item as ListicleItemLike)?.url ??
-      null)
-    : (itemImage(item as ListicleItemLike)?.url ??
-      article.featuredImage?.url ??
-      null);
+    ? (resolveOgImage(article.ogImage, article.featuredImage, itemImgCandidate) ?? null)
+    : (resolveOgImage(itemImgCandidate, article.featuredImage) ?? null);
 
   return {
     position,

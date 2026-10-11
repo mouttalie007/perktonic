@@ -6,6 +6,7 @@ import { seoService } from "@/services/seo.service";
 import { quizService } from "@/services/quiz.service";
 import { processArticleHtml } from "@/lib/article-html";
 import { buildSubpageMeta } from "@/lib/listicle";
+import { resolveOgImage } from "@/lib/resolve-og-image";
 import { StandardArticleView } from "@/components/article/StandardArticleView";
 import { ListicleView } from "@/components/listicle/ListicleView";
 import { JsonLd } from "@/components/seo/JsonLd";
@@ -42,7 +43,7 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
     description: article.metaDescription ?? article.excerpt ?? undefined,
     path: `/story/${article.slug}`,
     type: "article",
-    ogImage: article.ogImage?.url ?? article.featuredImage?.url,
+    ogImage: resolveOgImage(article.ogImage, article.featuredImage),
     robotsIndex: article.robotsIndex,
     publishedTime: article.publishedAt?.toISOString(),
     modifiedTime: article.updatedAt.toISOString(),
@@ -125,7 +126,7 @@ export default async function StoryPage({ params }: Params) {
           headline: article.title,
           description: article.metaDescription ?? article.excerpt ?? "",
           path,
-          imageUrl: article.ogImage?.url ?? article.featuredImage?.url,
+          imageUrl: resolveOgImage(article.ogImage, article.featuredImage),
           datePublished: article.publishedAt?.toISOString(),
           dateModified: article.updatedAt.toISOString(),
           authorName,

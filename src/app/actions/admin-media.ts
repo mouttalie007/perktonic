@@ -17,6 +17,8 @@ const ALLOWED_TYPES = new Set([
 ]);
 const MAX_BYTES = 12 * 1024 * 1024; // 12MB — pre-compression ceiling
 const MAX_WIDTH = 2000;
+const OG_WIDTH = 1200;
+const OG_HEIGHT = 630; // 1.91:1 — the aspect ratio social platforms expect
 
 export type UploadState = { status: "idle" | "error" | "success"; message?: string };
 export type UploadResult = {
@@ -45,6 +47,20 @@ async function compressImage(
   return { buffer: data, mimeType: "image/webp", ext: ".webp", width: info.width, height: info.height };
 }
 
+/**
+ * 1200x630 center-cropped WebP for social share previews only (spec: link
+ * unfurls on Facebook/X/LinkedIn expect exactly 1.91:1, or they crop it
+ * awkwardly). Built once at upload time, never on page render — no runtime
+ * cost. Always a static frame, even for an animated GIF source.
+ */
+async function buildOgVariant(buffer: Buffer): Promise<Buffer> {
+  return sharp(buffer)
+    .rotate()
+    .resize(OG_WIDTH, OG_HEIGHT, { fit: "cover", position: "centre" })
+    .webp({ quality: 82 })
+    .toBuffer();
+}
+
 /** Shared core — writes to public/uploads, compresses, records a Media row. */
 async function performUpload(
   file: File,
@@ -65,10 +81,19 @@ async function performUpload(
   await mkdir(dir, { recursive: true });
   await writeFile(path.join(dir, key), buffer);
 
+  let ogUrl: string | null = null;
+  const ogBuffer = await buildOgVariant(original).catch(() => null);
+  if (ogBuffer) {
+    const ogKey = `${randomUUID()}-og.webp`;
+    await writeFile(path.join(dir, ogKey), ogBuffer);
+    ogUrl = `/uploads/${ogKey}`;
+  }
+
   const alt = meta.alt?.trim() || null;
   const media = await prisma.media.create({
     data: {
       url: `/uploads/${key}`,
+      ogUrl,
       storageKey: key,
       provider: "local",
       filename: file.name,
@@ -154,6 +179,9 @@ export async function deleteMedia(formData: FormData) {
     await unlink(path.join(process.cwd(), "public", "uploads", media.storageKey)).catch(
       () => {},
     );
+  }
+  if (media.provider === "local" && media.ogUrl) {
+    await unlink(path.join(process.cwd(), "public", media.ogUrl)).catch(() => {});
   }
   revalidatePath("/adminiyad/media");
 }

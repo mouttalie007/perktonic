@@ -4,6 +4,7 @@ import { articleService } from "@/services/article.service";
 import { seoService } from "@/services/seo.service";
 import { quizService } from "@/services/quiz.service";
 import { buildSubpageMeta, subpagePath } from "@/lib/listicle";
+import { resolveOgImage } from "@/lib/resolve-og-image";
 import { ListicleView } from "@/components/listicle/ListicleView";
 import { ListicleAllView } from "@/components/listicle/ListicleAllView";
 import { JsonLd } from "@/components/seo/JsonLd";
@@ -49,7 +50,7 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
         article.metaDescription ?? article.excerpt ?? article.title,
       path: subpagePath(article.slug, 1),
       type: "article",
-      ogImage: article.ogImage?.url ?? article.featuredImage?.url,
+      ogImage: resolveOgImage(article.ogImage, article.featuredImage),
       robotsIndex: false,
       modifiedTime: article.updatedAt.toISOString(),
     });

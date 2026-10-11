@@ -252,6 +252,7 @@ model ListicleItem {
 model Media {
   id         String  @id @default(cuid())
   url        String // canonical delivery URL (CDN)
+  ogUrl      String? // 1200x630 (1.91:1) center-cropped variant, for social share previews only
   storageKey String? // provider object key / path
   provider   String  @default("local") // local | r2 | cloudinary
   filename   String
