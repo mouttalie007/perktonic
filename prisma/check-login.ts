@@ -1,8 +1,8 @@
 // One-time diagnostic: usage `npx tsx prisma/check-login.ts <email> <password>`
 // Reports exactly why a login would succeed or fail, without exposing the
 // password hash. Safe to delete after use.
+import bcrypt from "bcryptjs";
 import { prisma } from "../src/lib/prisma";
-import { verifyPassword } from "../src/lib/auth";
 
 async function main() {
   const [email, password] = process.argv.slice(2);
@@ -28,7 +28,7 @@ async function main() {
     id: user.id,
   });
 
-  const matches = await verifyPassword(password, user.passwordHash);
+  const matches = await bcrypt.compare(password, user.passwordHash);
   console.log("Password matches:", matches);
 
   const sessionCount = await prisma.session.count({ where: { userId: user.id } });
