@@ -33,12 +33,15 @@ export async function loginAction(
   }
   const { email, password } = parsed.data;
 
-  if (isLoginRateLimited(email)) {
-    return {
-      status: "error",
-      message: "Too many attempts. Try again in a few minutes.",
-    };
-  }
+  // TEMPORARILY DISABLED at the user's request while sorting out a login
+  // issue (2026-10-11) -- re-enable once confirmed working.
+  // if (isLoginRateLimited(email)) {
+  //   return {
+  //     status: "error",
+  //     message: "Too many attempts. Try again in a few minutes.",
+  //   };
+  // }
+  void isLoginRateLimited;
 
   const user = await prisma.user.findUnique({ where: { email } });
   const ok = user && (await verifyPassword(password, user.passwordHash));
