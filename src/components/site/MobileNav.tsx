@@ -89,22 +89,6 @@ export function MobileNav({
         </nav>
 
         <div className="border-line mt-auto flex flex-col gap-3 border-t px-5 py-4">
-          <div className="flex items-center gap-3">
-            <Link
-              href={"/sign-in" as Route}
-              onClick={onClose}
-              className="border-line text-ink flex-1 rounded-sm border px-3 py-2 text-center text-sm font-bold"
-            >
-              Sign In
-            </Link>
-            <Link
-              href={"/subscribe" as Route}
-              onClick={onClose}
-              className="bg-brand text-ink flex-1 rounded-sm px-3 py-2 text-center text-sm font-bold"
-            >
-              Subscribe
-            </Link>
-          </div>
           <SocialLinks
             links={social}
             size={18}

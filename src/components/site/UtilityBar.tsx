@@ -4,9 +4,14 @@ import { SocialLinks } from "./SocialLinks";
 import type { SocialPlatform } from "@/config/site";
 
 /**
- * Top utility bar (spec §6). Dark, ~34px. Date · Trending ticker · social +
- * Sign In + Subscribe. Heavily simplified on mobile — no horizontal overflow.
- * Pure server component, zero client JS.
+ * Top utility bar (spec §6). Dark, ~34px. Date · Trending ticker · social.
+ * Heavily simplified on mobile — no horizontal overflow. Pure server
+ * component, zero client JS.
+ *
+ * Sign In / Subscribe links removed 2026-10-11 -- there is no public reader
+ * account system in this product (admin-only CMS), and no single newsletter
+ * page/anchor exists on every route to point Subscribe at (it's already a
+ * prominent CTA in article/category sidebars). Both linked to 404s.
  */
 export function UtilityBar({
   todayLabel,
@@ -48,18 +53,6 @@ export function UtilityBar({
             className="hidden lg:flex"
             linkClassName="text-white/70 hover:text-white"
           />
-          <Link
-            href={"/sign-in" as Route}
-            className="hidden text-white/80 transition-colors hover:text-white sm:inline"
-          >
-            Sign In
-          </Link>
-          <Link
-            href={"/subscribe" as Route}
-            className="bg-brand text-ink hover:bg-brand-strong rounded-sm px-3 py-1 text-[0.75rem] font-bold transition-colors"
-          >
-            Subscribe
-          </Link>
         </div>
       </div>
     </div>
