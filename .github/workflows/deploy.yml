@@ -25,6 +25,7 @@ jobs:
             npx prisma generate
             npx prisma migrate deploy
             npm run db:import-prompts
+            npx tsx prisma/backfill-og-variants.ts
             npm run build
             mkdir -p tmp
             touch tmp/restart.txt
