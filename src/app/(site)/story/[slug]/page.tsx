@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { articleService } from "@/services/article.service";
 import { adService } from "@/services/ad.service";
 import { seoService } from "@/services/seo.service";
+import { quizService } from "@/services/quiz.service";
 import { processArticleHtml } from "@/lib/article-html";
 import { buildSubpageMeta } from "@/lib/listicle";
 import { StandardArticleView } from "@/components/article/StandardArticleView";
@@ -70,10 +71,11 @@ export default async function StoryPage({ params }: Params) {
     { name: article.title, path },
   ];
 
-  const [related, otherCategory, adRule] = await Promise.all([
+  const [related, otherCategory, adRule, quiz] = await Promise.all([
     articleService.listRelated(article.id, article.categoryId, 4),
     articleService.listFromOtherCategories(article.categoryId, article.id, 4),
     adService.getInContentRule(article.type),
+    quizService.getSummaryForArticle(article.id),
   ]);
 
   // ---- Listicle: page 1 (intro + first item) ----
@@ -104,6 +106,7 @@ export default async function StoryPage({ params }: Params) {
           canonical={canonical}
           related={related}
           otherCategory={otherCategory}
+          quiz={quiz}
         />
       </>
     );
@@ -137,6 +140,7 @@ export default async function StoryPage({ params }: Params) {
         canonical={canonical}
         related={related}
         otherCategory={otherCategory}
+        quiz={quiz}
       />
     </>
   );

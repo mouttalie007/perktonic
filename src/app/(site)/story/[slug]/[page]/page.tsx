@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { articleService } from "@/services/article.service";
 import { seoService } from "@/services/seo.service";
+import { quizService } from "@/services/quiz.service";
 import { buildSubpageMeta, subpagePath } from "@/lib/listicle";
 import { ListicleView } from "@/components/listicle/ListicleView";
 import { ListicleAllView } from "@/components/listicle/ListicleAllView";
@@ -92,9 +93,10 @@ export default async function ListicleSubpage({ params }: Params) {
 
   // ---- /all ----
   if (parsed === "all") {
-    const [related, otherCategory] = await Promise.all([
+    const [related, otherCategory, quiz] = await Promise.all([
       articleService.listRelated(article.id, article.categoryId, 4),
       articleService.listFromOtherCategories(article.categoryId, article.id, 4),
+      quizService.getSummaryForArticle(article.id),
     ]);
     const canonical = seoService.absoluteUrl(subpagePath(article.slug, 1));
     return (
@@ -106,6 +108,7 @@ export default async function ListicleSubpage({ params }: Params) {
           canonical={canonical}
           related={related}
           otherCategory={otherCategory}
+          quiz={quiz}
         />
       </>
     );
@@ -115,12 +118,13 @@ export default async function ListicleSubpage({ params }: Params) {
   const meta = buildSubpageMeta(article, items, parsed);
   const canonical = seoService.absoluteUrl(meta.canonicalPath);
   const isLast = parsed === items.length;
-  const [related, otherCategory] = isLast
+  const [related, otherCategory, quiz] = isLast
     ? await Promise.all([
         articleService.listRelated(article.id, article.categoryId, 4),
         articleService.listFromOtherCategories(article.categoryId, article.id, 4),
+        quizService.getSummaryForArticle(article.id),
       ])
-    : [[], []];
+    : [[], [], null];
 
   return (
     <>
@@ -150,6 +154,7 @@ export default async function ListicleSubpage({ params }: Params) {
         canonical={canonical}
         related={related}
         otherCategory={otherCategory}
+        quiz={quiz}
       />
     </>
   );

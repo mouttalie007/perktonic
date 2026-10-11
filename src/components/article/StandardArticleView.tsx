@@ -9,6 +9,7 @@ import { AuthorBox } from "./AuthorBox";
 import { ReactionBar } from "./ReactionBar";
 import { CommentSection } from "./CommentSection";
 import { NewsletterSidebarCTA } from "./NewsletterSidebarCTA";
+import { QuizCta } from "./QuizCta";
 import { AdSlot } from "@/components/ads/AdSlot";
 import { TrendingList } from "@/components/home/TrendingList";
 import { reactionService } from "@/services/reaction.service";
@@ -31,6 +32,7 @@ export async function StandardArticleView({
   canonical,
   related,
   otherCategory,
+  quiz,
 }: {
   article: ViewArticle;
   segments: string[];
@@ -38,6 +40,7 @@ export async function StandardArticleView({
   canonical: string;
   related: ArticleCard[];
   otherCategory: ArticleCard[];
+  quiz: { title: string; questionCount: number } | null;
 }) {
   const reactionCounts = await reactionService.getCounts(article.id);
   const adCtx = {
@@ -85,6 +88,8 @@ export async function StandardArticleView({
           <div className="mt-8">
             <AuthorBox author={article.author} />
           </div>
+
+          <QuizCta slug={article.slug} quiz={quiz} />
 
           <AdSlot placement="below-article" article={adCtx} className="mt-10" />
 

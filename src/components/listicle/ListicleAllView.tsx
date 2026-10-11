@@ -7,6 +7,7 @@ import { AuthorBox } from "@/components/article/AuthorBox";
 import { ReactionBar } from "@/components/article/ReactionBar";
 import { CommentSection } from "@/components/article/CommentSection";
 import { NewsletterSidebarCTA } from "@/components/article/NewsletterSidebarCTA";
+import { QuizCta } from "@/components/article/QuizCta";
 import { AdSlot } from "@/components/ads/AdSlot";
 import { TrendingList } from "@/components/home/TrendingList";
 import { reactionService } from "@/services/reaction.service";
@@ -44,12 +45,14 @@ export async function ListicleAllView({
   canonical,
   related,
   otherCategory,
+  quiz,
 }: {
   article: AllArticle;
   items: ListicleItemLike[];
   canonical: string;
   related: ArticleCard[];
   otherCategory: ArticleCard[];
+  quiz: { title: string; questionCount: number } | null;
 }) {
   const reactionCounts = await reactionService.getCounts(article.id);
   const authorName = article.author?.name ?? DEFAULT_AUTHOR_NAME;
@@ -142,6 +145,9 @@ export async function ListicleAllView({
           <div className="mt-8">
             <AuthorBox author={article.author} />
           </div>
+
+          <QuizCta slug={article.slug} quiz={quiz} />
+
           <AdSlot
             placement="below-article"
             article={adCtx}

@@ -1,13 +1,14 @@
 "use client";
 
 import { useActionState, useState } from "react";
-import type { Article, Author, Category, ListicleItem, Media, Tag } from "@prisma/client";
+import type { Article, Author, Category, ListicleItem, Media, Quiz, QuizQuestion, Tag } from "@prisma/client";
 import { saveListicleArticle, type SaveState } from "@/app/actions/admin-articles";
 import { TitleSlugFields } from "../TitleSlugFields";
 import { ItemsEditor, type ItemDraft } from "./ItemsEditor";
 import { Field, Textarea, Checkbox, Card, Button, LinkButton } from "../ui";
 import { PublishingCard, TagsCard, FeaturedImageField, SeoCard } from "./SharedFields";
 import { TopTaxonomyBar } from "./TopTaxonomyBar";
+import { QuizBox } from "./QuizBox";
 
 const initial: SaveState = { status: "idle" };
 
@@ -20,6 +21,8 @@ export function ListicleArticleForm({
   categories,
   authors,
   tags,
+  initialQuiz,
+  initialCodeStats,
 }: {
   article?: Article & { tagIds?: string[] };
   items?: ListicleItemWithMedia[];
@@ -27,6 +30,8 @@ export function ListicleArticleForm({
   categories: Category[];
   authors: Author[];
   tags: Tag[];
+  initialQuiz?: (Quiz & { questions: QuizQuestion[] }) | null;
+  initialCodeStats?: { total: number; used: number; available: number } | null;
 }) {
   const [state, formAction, pending] = useActionState(saveListicleArticle, initial);
   const [liveTitle, setLiveTitle] = useState(article?.title ?? "");
@@ -82,6 +87,10 @@ export function ListicleArticleForm({
         </Card>
 
         <SeoCard article={article} />
+
+        {article && (
+          <QuizBox articleId={article.id} initialQuiz={initialQuiz ?? null} initialCodeStats={initialCodeStats ?? null} />
+        )}
       </div>
 
       <div className="space-y-6">

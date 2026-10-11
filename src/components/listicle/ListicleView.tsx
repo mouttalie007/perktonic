@@ -7,6 +7,7 @@ import { AuthorBox } from "@/components/article/AuthorBox";
 import { ReactionBar } from "@/components/article/ReactionBar";
 import { CommentSection } from "@/components/article/CommentSection";
 import { NewsletterSidebarCTA } from "@/components/article/NewsletterSidebarCTA";
+import { QuizCta } from "@/components/article/QuizCta";
 import { AdSlot } from "@/components/ads/AdSlot";
 import { TrendingList } from "@/components/home/TrendingList";
 import { reactionService } from "@/services/reaction.service";
@@ -50,6 +51,7 @@ export async function ListicleView({
   canonical,
   related,
   otherCategory,
+  quiz,
 }: {
   article: ViewArticle;
   items: ListicleItemLike[];
@@ -57,6 +59,7 @@ export async function ListicleView({
   canonical: string;
   related: ArticleCard[];
   otherCategory: ArticleCard[];
+  quiz: { title: string; questionCount: number } | null;
 }) {
   const total = items.length;
   const item = items[position - 1];
@@ -200,6 +203,8 @@ export async function ListicleView({
               />
             </>
           )}
+
+          {isLast && <QuizCta slug={article.slug} quiz={quiz} />}
 
           {isLast && (
             <CommentSection

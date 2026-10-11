@@ -11,9 +11,10 @@ import { TopTaxonomyBar, STORAGE_KEY_CATEGORY, STORAGE_KEY_AUTHOR } from "./TopT
 import { ImportPanel } from "./ImportPanel";
 import { QuickArticlePanel } from "./QuickArticlePanel";
 import { InternalLinkSuggestions } from "./InternalLinkSuggestions";
+import { QuizBox } from "./QuizBox";
 import { randomBackdatedPublishedAt } from "@/lib/random-backdate";
 import type { ParsedArticleMeta } from "@/lib/article-import";
-import type { PromptQueueItem } from "@prisma/client";
+import type { PromptQueueItem, Quiz, QuizQuestion } from "@prisma/client";
 
 const initial: SaveState = { status: "idle" };
 
@@ -35,12 +36,16 @@ export function StandardArticleForm({
   categories,
   authors,
   tags,
+  initialQuiz,
+  initialCodeStats,
 }: {
   article?: Article & { tagIds?: string[] };
   featuredImageMedia?: Media | null;
   categories: Category[];
   authors: Author[];
   tags: Tag[];
+  initialQuiz?: (Quiz & { questions: QuizQuestion[] }) | null;
+  initialCodeStats?: { total: number; used: number; available: number } | null;
 }) {
   const [state, formAction, pending] = useActionState(saveStandardArticle, initial);
   const [mode, setMode] = useState<"quick" | "import" | "manual">(article ? "manual" : "quick");
@@ -226,6 +231,10 @@ export function StandardArticleForm({
         />
 
         <SeoCard key={`seo-${importSeed}`} article={effectiveArticle} />
+
+        {article && (
+          <QuizBox articleId={article.id} initialQuiz={initialQuiz ?? null} initialCodeStats={initialCodeStats ?? null} />
+        )}
       </div>
 
       <div className="space-y-6">

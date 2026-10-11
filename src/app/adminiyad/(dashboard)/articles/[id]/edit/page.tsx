@@ -4,6 +4,7 @@ import { PageHeader, LinkButton } from "@/components/admin/ui";
 import { StandardArticleForm } from "@/components/admin/article/StandardArticleForm";
 import { ListicleArticleForm } from "@/components/admin/article/ListicleArticleForm";
 import { articleFormData } from "@/lib/admin-article-data";
+import { quizService } from "@/services/quiz.service";
 
 export default async function EditArticlePage({
   params,
@@ -15,7 +16,7 @@ export default async function EditArticlePage({
   const { id } = await params;
   const { saved } = await searchParams;
 
-  const [article, formData] = await Promise.all([
+  const [article, formData, quiz] = await Promise.all([
     prisma.article.findUnique({
       where: { id },
       include: {
@@ -25,10 +26,15 @@ export default async function EditArticlePage({
       },
     }),
     articleFormData(),
+    prisma.quiz.findUnique({
+      where: { articleId: id },
+      include: { questions: { orderBy: { position: "asc" } } },
+    }),
   ]);
   if (!article) notFound();
 
   const withTagIds = { ...article, tagIds: article.tags.map((t) => t.tagId) };
+  const codeStats = quiz ? await quizService.getCodeStats(quiz.id) : null;
 
   return (
     <div>
@@ -48,10 +54,18 @@ export default async function EditArticlePage({
           article={withTagIds}
           items={article.listicleItems}
           featuredImageMedia={article.featuredImage}
+          initialQuiz={quiz}
+          initialCodeStats={codeStats}
           {...formData}
         />
       ) : (
-        <StandardArticleForm article={withTagIds} featuredImageMedia={article.featuredImage} {...formData} />
+        <StandardArticleForm
+          article={withTagIds}
+          featuredImageMedia={article.featuredImage}
+          initialQuiz={quiz}
+          initialCodeStats={codeStats}
+          {...formData}
+        />
       )}
     </div>
   );
