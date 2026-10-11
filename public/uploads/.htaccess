@@ -1,0 +1,13 @@
+# The production host's LiteSpeed server serves files in this directory
+# directly from disk, bypassing the Next.js app entirely for performance --
+# confirmed via `server: LiteSpeed` in the response headers, meaning
+# next.config.ts's headers() rule for /uploads/:path* never applies here.
+# Filenames are randomUUID-based and never reused/overwritten
+# (src/app/actions/admin-media.ts), so a year-long immutable cache is safe.
+<IfModule mod_expires.c>
+  ExpiresActive On
+  ExpiresDefault "access plus 1 year"
+</IfModule>
+<IfModule mod_headers.c>
+  Header set Cache-Control "public, max-age=31536000, immutable"
+</IfModule>

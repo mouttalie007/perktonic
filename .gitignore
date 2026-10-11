@@ -49,6 +49,7 @@ next-env.d.ts
 # local media uploads (dev)
 /public/uploads/*
 !/public/uploads/.gitkeep
+!/public/uploads/.htaccess
 
 # project credentials — never commit
 /VPS login
