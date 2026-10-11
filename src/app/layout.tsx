@@ -56,6 +56,26 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className={`${inter.variable} ${plusJakarta.variable} h-full`}>
+      <head>
+        {/* Zod v4 probes `new Function("")` once per load to decide whether
+            it can use a faster JIT-compiled validator path. It's wrapped in
+            try/catch and always degrades gracefully, but our CSP has no
+            'unsafe-eval' in script-src (by design), so strict browsers log
+            the caught throw as a blocked securitypolicyviolation anyway --
+            Zod's own source (node_modules/zod/v4/core/util.js) has a
+            comment acknowledging this exact case, and exposes `jitless` to
+            skip the probe. No functional or security trade-off: we were
+            never allowing eval, this just stops Zod from asking.
+            Must run as a raw blocking inline script in <head>, before any
+            webpack chunk -- which chunk's code executes first varies by
+            route (confirmed: a prior fix that set this from a "use client"
+            component worked on the homepage but not on article pages,
+            because that page's own schema-validating chunk sometimes wins
+            the race). This sets the same globalThis slot Zod's module
+            reads, so by the time Zod's code runs anywhere, the probe is
+            already skipped regardless of chunk load order. */}
+        <script dangerouslySetInnerHTML={{ __html: "window.__zod_globalConfig={jitless:true};" }} />
+      </head>
       <body className="bg-canvas text-ink flex min-h-full flex-col antialiased">
         {children}
         <BackToTop />

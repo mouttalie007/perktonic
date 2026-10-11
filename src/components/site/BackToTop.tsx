@@ -2,9 +2,6 @@
 
 import { useEffect, useState } from "react";
 import { ArrowUpIcon } from "@/components/icons";
-// Side-effect only: disables Zod's eval-probe before any form on the page
-// can trigger it. See src/lib/zod-config.ts for why.
-import "@/lib/zod-config";
 
 const SHOW_AFTER_PX = 600;
 
