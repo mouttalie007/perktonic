@@ -16,7 +16,7 @@ export async function saveQuizAction(articleId: string, raw: string): Promise<Sa
   const parsed = parseQuizPaste(raw);
   if (!parsed.ok) return { ok: false, error: parsed.error };
 
-  const article = await prisma.article.findUnique({ where: { id: articleId }, select: { id: true } });
+  const article = await prisma.article.findUnique({ where: { id: articleId }, select: { id: true, slug: true } });
   if (!article) return { ok: false, error: "Article not found." };
 
   const quizId = await prisma.$transaction(async (tx) => {
@@ -38,11 +38,14 @@ export async function saveQuizAction(articleId: string, raw: string): Promise<Sa
   });
 
   revalidatePath(`/adminiyad/articles/${articleId}/edit`);
+  revalidatePath(`/story/${article.slug}`);
   return { ok: true, quizId, title: parsed.title, questionCount: parsed.questions.length };
 }
 
 export async function deleteQuizAction(articleId: string): Promise<void> {
   await requireUser("EDITOR");
+  const article = await prisma.article.findUnique({ where: { id: articleId }, select: { slug: true } });
   await prisma.quiz.deleteMany({ where: { articleId } });
   revalidatePath(`/adminiyad/articles/${articleId}/edit`);
+  if (article) revalidatePath(`/story/${article.slug}`);
 }
