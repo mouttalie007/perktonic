@@ -82,6 +82,13 @@ const nextConfig: NextConfig = {
   },
 
   images: {
+    // Next's built-in on-the-fly image optimizer (/_next/image) returns
+    // "isn't a valid image" (400) for every image on this host -- raw
+    // files serve fine (200), only the optimizer step is broken there.
+    // Uploads are already compressed to WebP server-side at upload time
+    // (admin-media.ts), so skip the redundant/broken optimizer and serve
+    // files as-is rather than leave every image on the site broken.
+    unoptimized: true,
     // Modern formats first (spec §15, §43).
     formats: ["image/avif", "image/webp"],
     remotePatterns: [
