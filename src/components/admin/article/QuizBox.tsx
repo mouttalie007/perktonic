@@ -2,6 +2,7 @@
 
 import { useState, useTransition } from "react";
 import { saveQuizAction, generateQuizCodesAction, deleteQuizAction } from "@/app/actions/admin-quiz";
+import { buildQuizPrompt } from "@/lib/quiz-prompt";
 import { Card, Textarea, Button } from "../ui";
 
 interface ExistingQuestion {
@@ -12,6 +13,7 @@ interface ExistingQuestion {
 
 interface Props {
   articleId: string;
+  articleSlug: string;
   initialQuiz: { id: string; title: string; questions: ExistingQuestion[] } | null;
   initialCodeStats: { total: number; used: number; available: number } | null;
 }
@@ -42,15 +44,24 @@ function toPasteFormat(quiz: { title: string; questions: ExistingQuestion[] }): 
   return `Title: ${quiz.title}\n\n${blocks.join("\n\n")}`;
 }
 
-export function QuizBox({ articleId, initialQuiz, initialCodeStats }: Props) {
+export function QuizBox({ articleId, articleSlug, initialQuiz, initialCodeStats }: Props) {
   const [raw, setRaw] = useState(() => (initialQuiz ? toPasteFormat(initialQuiz) : ""));
   const [saveMsg, setSaveMsg] = useState<{ ok: boolean; text: string } | null>(null);
   const [quizId, setQuizId] = useState<string | null>(initialQuiz?.id ?? null);
   const [codeStats, setCodeStats] = useState(initialCodeStats);
   const [newCodes, setNewCodes] = useState<string[]>([]);
+  const [promptCopied, setPromptCopied] = useState(false);
   const [saving, startSaving] = useTransition();
   const [generating, startGenerating] = useTransition();
   const [deleting, startDeleting] = useTransition();
+
+  function copyPrompt() {
+    const articleUrl = `${window.location.origin}/story/${articleSlug}`;
+    navigator.clipboard.writeText(buildQuizPrompt(articleUrl)).then(() => {
+      setPromptCopied(true);
+      setTimeout(() => setPromptCopied(false), 2000);
+    });
+  }
 
   function handleSave() {
     startSaving(async () => {
@@ -100,6 +111,17 @@ export function QuizBox({ articleId, initialQuiz, initialCodeStats }: Props) {
           Paste a title and exactly 10 numbered questions, each with 3 options (A, B, C). Shown as a
           &quot;Test your knowledge&quot; button at the bottom of the article.
         </p>
+
+        <div className="border-line bg-surface mb-4 rounded-sm border p-3">
+          <p className="text-muted mb-2 text-xs">
+            Copies a ChatGPT prompt that already includes this article&apos;s live link — paste ChatGPT&apos;s
+            reply straight into the box below.
+          </p>
+          <Button type="button" variant="secondary" onClick={copyPrompt}>
+            {promptCopied ? "Copied!" : "Copy prompt"}
+          </Button>
+        </div>
+
         <Textarea
           rows={14}
           value={raw}

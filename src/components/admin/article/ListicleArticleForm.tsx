@@ -89,7 +89,12 @@ export function ListicleArticleForm({
         <SeoCard article={article} />
 
         {article && (
-          <QuizBox articleId={article.id} initialQuiz={initialQuiz ?? null} initialCodeStats={initialCodeStats ?? null} />
+          <QuizBox
+            articleId={article.id}
+            articleSlug={article.slug}
+            initialQuiz={initialQuiz ?? null}
+            initialCodeStats={initialCodeStats ?? null}
+          />
         )}
       </div>
 

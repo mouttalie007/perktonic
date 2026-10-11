@@ -233,7 +233,12 @@ export function StandardArticleForm({
         <SeoCard key={`seo-${importSeed}`} article={effectiveArticle} />
 
         {article && (
-          <QuizBox articleId={article.id} initialQuiz={initialQuiz ?? null} initialCodeStats={initialCodeStats ?? null} />
+          <QuizBox
+            articleId={article.id}
+            articleSlug={article.slug}
+            initialQuiz={initialQuiz ?? null}
+            initialCodeStats={initialCodeStats ?? null}
+          />
         )}
       </div>
 
