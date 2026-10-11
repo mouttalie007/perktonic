@@ -49,3 +49,46 @@ export async function deleteQuizAction(articleId: string): Promise<void> {
   revalidatePath(`/adminiyad/articles/${articleId}/edit`);
   if (article) revalidatePath(`/story/${article.slug}`);
 }
+
+export type LookupCodeResult =
+  | {
+      ok: true;
+      articleTitle: string;
+      articleSlug: string;
+      alreadyChecked: boolean;
+      /** When it was first checked -- null on this very first lookup. */
+      firstCheckedAt: Date | null;
+    }
+  | { ok: false; error: string };
+
+/**
+ * Looks a visitor-submitted code up: which article it's from, and whether
+ * it's already been checked before. Marks it checked on the first lookup
+ * only -- a second lookup reports alreadyChecked: true with the original
+ * checkedAt instead of silently repeating.
+ */
+export async function lookupQuizCodeAction(rawCode: string): Promise<LookupCodeResult> {
+  await requireUser("EDITOR");
+
+  const code = rawCode.trim().toUpperCase();
+  if (!code) return { ok: false, error: "Enter a code." };
+
+  const row = await prisma.quizCode.findUnique({
+    where: { code },
+    include: { quiz: { include: { article: { select: { title: true, slug: true } } } } },
+  });
+  if (!row) return { ok: false, error: `Code "${code}" was not found.` };
+
+  const alreadyChecked = row.isChecked;
+  if (!alreadyChecked) {
+    await prisma.quizCode.update({ where: { id: row.id }, data: { isChecked: true, checkedAt: new Date() } });
+  }
+
+  return {
+    ok: true,
+    articleTitle: row.quiz.article.title,
+    articleSlug: row.quiz.article.slug,
+    alreadyChecked,
+    firstCheckedAt: row.checkedAt,
+  };
+}

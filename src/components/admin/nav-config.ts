@@ -48,6 +48,7 @@ export const ADMIN_NAV: AdminNavGroup[] = [
       { label: "Newsletter", href: "/adminiyad/subscribers" as Route, minRole: "EDITOR" },
       { label: "Contact Messages", href: "/adminiyad/contact-messages" as Route, minRole: "EDITOR" },
       { label: "Comments", href: "/adminiyad/comments" as Route, minRole: "EDITOR" },
+      { label: "Quiz Codes", href: "/adminiyad/quiz-codes" as Route, minRole: "EDITOR" },
     ],
   },
   {
