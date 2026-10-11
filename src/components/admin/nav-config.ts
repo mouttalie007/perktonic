@@ -15,53 +15,53 @@ export interface AdminNavGroup {
 export const ADMIN_NAV: AdminNavGroup[] = [
   {
     title: "Overview",
-    items: [{ label: "Dashboard", href: "/admin" as Route }],
+    items: [{ label: "Dashboard", href: "/adminiyad" as Route }],
   },
   {
     title: "Content",
     items: [
-      { label: "Articles", href: "/admin/articles" as Route },
-      { label: "Categories", href: "/admin/categories" as Route },
-      { label: "Tags", href: "/admin/tags" as Route },
-      { label: "Authors", href: "/admin/authors" as Route },
-      { label: "Pages", href: "/admin/pages" as Route },
-      { label: "Media Library", href: "/admin/media" as Route },
+      { label: "Articles", href: "/adminiyad/articles" as Route },
+      { label: "Categories", href: "/adminiyad/categories" as Route },
+      { label: "Tags", href: "/adminiyad/tags" as Route },
+      { label: "Authors", href: "/adminiyad/authors" as Route },
+      { label: "Pages", href: "/adminiyad/pages" as Route },
+      { label: "Media Library", href: "/adminiyad/media" as Route },
     ],
   },
   {
     title: "Discovery",
     items: [
-      { label: "Trending", href: "/admin/trending" as Route },
-      { label: "Homepage", href: "/admin/homepage" as Route },
+      { label: "Trending", href: "/adminiyad/trending" as Route },
+      { label: "Homepage", href: "/adminiyad/homepage" as Route },
     ],
   },
   {
     title: "Monetization",
     items: [
-      { label: "Ad Units", href: "/admin/ads/units" as Route, minRole: "EDITOR" },
-      { label: "Ad Placements", href: "/admin/ads/placements" as Route, minRole: "EDITOR" },
+      { label: "Ad Units", href: "/adminiyad/ads/units" as Route, minRole: "EDITOR" },
+      { label: "Ad Placements", href: "/adminiyad/ads/placements" as Route, minRole: "EDITOR" },
     ],
   },
   {
     title: "Audience",
     items: [
-      { label: "Newsletter", href: "/admin/subscribers" as Route, minRole: "EDITOR" },
-      { label: "Contact Messages", href: "/admin/contact-messages" as Route, minRole: "EDITOR" },
-      { label: "Comments", href: "/admin/comments" as Route, minRole: "EDITOR" },
+      { label: "Newsletter", href: "/adminiyad/subscribers" as Route, minRole: "EDITOR" },
+      { label: "Contact Messages", href: "/adminiyad/contact-messages" as Route, minRole: "EDITOR" },
+      { label: "Comments", href: "/adminiyad/comments" as Route, minRole: "EDITOR" },
     ],
   },
   {
     title: "Site",
     items: [
-      { label: "Site Settings", href: "/admin/settings/site" as Route, minRole: "ADMIN" },
-      { label: "SEO Settings", href: "/admin/settings/seo" as Route, minRole: "ADMIN" },
-      { label: "Demo Engagement", href: "/admin/settings/demo-engagement" as Route, minRole: "ADMIN" },
-      { label: "Redirects", href: "/admin/redirects" as Route, minRole: "ADMIN" },
-      { label: "Users", href: "/admin/users" as Route, minRole: "ADMIN" },
+      { label: "Site Settings", href: "/adminiyad/settings/site" as Route, minRole: "ADMIN" },
+      { label: "SEO Settings", href: "/adminiyad/settings/seo" as Route, minRole: "ADMIN" },
+      { label: "Demo Engagement", href: "/adminiyad/settings/demo-engagement" as Route, minRole: "ADMIN" },
+      { label: "Redirects", href: "/adminiyad/redirects" as Route, minRole: "ADMIN" },
+      { label: "Users", href: "/adminiyad/users" as Route, minRole: "ADMIN" },
     ],
   },
   {
     title: "Account",
-    items: [{ label: "My Account", href: "/admin/account" as Route }],
+    items: [{ label: "My Account", href: "/adminiyad/account" as Route }],
   },
 ];

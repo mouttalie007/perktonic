@@ -12,7 +12,7 @@ export default async function PagesListPage() {
       <PageHeader
         title="Pages"
         description="Legal, trust and informational pages linked from the footer."
-        action={<LinkButton href="/admin/pages/new" variant="primary">New Page</LinkButton>}
+        action={<LinkButton href="/adminiyad/pages/new" variant="primary">New Page</LinkButton>}
       />
       <div className="border-line overflow-x-auto rounded-md border">
         <table className="w-full text-left text-sm">
@@ -37,7 +37,7 @@ export default async function PagesListPage() {
                 <td className="px-4 py-3">{p.showInFooter ? p.footerColumn || "yes" : "—"}</td>
                 <td className="px-4 py-3 text-right">
                   <div className="flex items-center justify-end gap-3">
-                    <Link href={`/admin/pages/${p.id}/edit`} className="text-accent-blue text-xs font-bold hover:underline">
+                    <Link href={`/adminiyad/pages/${p.id}/edit`} className="text-accent-blue text-xs font-bold hover:underline">
                       Edit
                     </Link>
                     <form action={deletePage}>

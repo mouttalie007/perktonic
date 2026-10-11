@@ -15,7 +15,7 @@ export default async function CategoriesPage() {
       <PageHeader
         title="Categories"
         description="Sections shown in navigation and used to file articles."
-        action={<LinkButton href="/admin/categories/new" variant="primary">New Category</LinkButton>}
+        action={<LinkButton href="/adminiyad/categories/new" variant="primary">New Category</LinkButton>}
       />
 
       <div className="border-line overflow-x-auto rounded-md border">
@@ -45,7 +45,7 @@ export default async function CategoriesPage() {
                 <td className="px-4 py-3">{c.order}</td>
                 <td className="px-4 py-3 text-right">
                   <div className="flex items-center justify-end gap-3">
-                    <Link href={`/admin/categories/${c.id}/edit`} className="text-accent-blue text-xs font-bold hover:underline">
+                    <Link href={`/adminiyad/categories/${c.id}/edit`} className="text-accent-blue text-xs font-bold hover:underline">
                       Edit
                     </Link>
                     <form action={deleteCategory}>

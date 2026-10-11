@@ -26,8 +26,8 @@ export async function createUser(formData: FormData) {
   await prisma.user.create({
     data: { ...v, passwordHash: await hashPassword(v.password) },
   });
-  revalidatePath("/admin/users");
-  redirect("/admin/users" as Route);
+  revalidatePath("/adminiyad/users");
+  redirect("/adminiyad/users" as Route);
 }
 
 export async function setUserActive(formData: FormData) {
@@ -36,7 +36,7 @@ export async function setUserActive(formData: FormData) {
   if (id === me.id) return; // can't deactivate yourself
   const isActive = formData.get("isActive") === "on";
   await prisma.user.update({ where: { id }, data: { isActive } });
-  revalidatePath("/admin/users");
+  revalidatePath("/adminiyad/users");
 }
 
 export async function deleteUser(formData: FormData) {
@@ -45,7 +45,7 @@ export async function deleteUser(formData: FormData) {
   if (id === me.id) return;
   await prisma.author.updateMany({ where: { userId: id }, data: { userId: null } });
   await prisma.user.delete({ where: { id } }).catch(() => {});
-  revalidatePath("/admin/users");
+  revalidatePath("/adminiyad/users");
 }
 
 const passwordSchema = z
@@ -88,5 +88,5 @@ export async function changePassword(
   });
   // Invalidate this session so the new password takes effect on next login.
   await destroySession();
-  redirect("/admin/login" as Route);
+  redirect("/adminiyad/login" as Route);
 }

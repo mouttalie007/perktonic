@@ -37,7 +37,7 @@ export default async function EditArticlePage({
         description={saved ? "Saved." : undefined}
         action={
           saved ? (
-            <LinkButton href="/admin/articles/new/standard">
+            <LinkButton href="/adminiyad/articles/new/standard">
               + Add another article
             </LinkButton>
           ) : undefined

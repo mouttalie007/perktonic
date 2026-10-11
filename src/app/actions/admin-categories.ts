@@ -43,8 +43,8 @@ export async function createCategory(formData: FormData) {
   await requireUser("EDITOR");
   const data = parse(formData);
   await prisma.category.create({ data });
-  revalidatePath("/admin/categories");
-  redirect("/admin/categories" as Route);
+  revalidatePath("/adminiyad/categories");
+  redirect("/adminiyad/categories" as Route);
 }
 
 export async function updateCategory(formData: FormData) {
@@ -52,8 +52,8 @@ export async function updateCategory(formData: FormData) {
   const id = String(formData.get("id"));
   const data = parse(formData);
   await prisma.category.update({ where: { id }, data });
-  revalidatePath("/admin/categories");
-  redirect("/admin/categories" as Route);
+  revalidatePath("/adminiyad/categories");
+  redirect("/adminiyad/categories" as Route);
 }
 
 export async function deleteCategory(formData: FormData) {
@@ -64,5 +64,5 @@ export async function deleteCategory(formData: FormData) {
     data: { categoryId: null },
   });
   await prisma.category.delete({ where: { id } });
-  revalidatePath("/admin/categories");
+  revalidatePath("/adminiyad/categories");
 }

@@ -239,7 +239,7 @@ export function StandardArticleForm({
         </Button>
         <PublishingCard article={article} defaultPublishedAt={defaultPublishedAt} />
         <TagsCard key={`tax-${importSeed}`} article={effectiveArticle} tags={tags} />
-        <LinkButton href="/admin/articles">Back to articles</LinkButton>
+        <LinkButton href="/adminiyad/articles">Back to articles</LinkButton>
       </div>
     </form>
   );

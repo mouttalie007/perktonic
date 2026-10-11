@@ -30,16 +30,16 @@ function parse(formData: FormData) {
 export async function createAuthor(formData: FormData) {
   await requireUser("EDITOR");
   await prisma.author.create({ data: parse(formData) });
-  revalidatePath("/admin/authors");
-  redirect("/admin/authors" as Route);
+  revalidatePath("/adminiyad/authors");
+  redirect("/adminiyad/authors" as Route);
 }
 
 export async function updateAuthor(formData: FormData) {
   await requireUser("EDITOR");
   const id = String(formData.get("id"));
   await prisma.author.update({ where: { id }, data: parse(formData) });
-  revalidatePath("/admin/authors");
-  redirect("/admin/authors" as Route);
+  revalidatePath("/adminiyad/authors");
+  redirect("/adminiyad/authors" as Route);
 }
 
 export async function deleteAuthor(formData: FormData) {
@@ -47,5 +47,5 @@ export async function deleteAuthor(formData: FormData) {
   const id = String(formData.get("id"));
   await prisma.article.updateMany({ where: { authorId: id }, data: { authorId: null } });
   await prisma.author.delete({ where: { id } });
-  revalidatePath("/admin/authors");
+  revalidatePath("/adminiyad/authors");
 }

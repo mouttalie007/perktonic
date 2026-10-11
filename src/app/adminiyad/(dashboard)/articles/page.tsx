@@ -41,8 +41,8 @@ export default async function ArticlesListPage({
         description="Standard articles and Top N lists."
         action={
           <div className="flex gap-2">
-            <LinkButton href="/admin/articles/new/standard" variant="primary">New Article</LinkButton>
-            <LinkButton href="/admin/articles/new/listicle">New Top N List</LinkButton>
+            <LinkButton href="/adminiyad/articles/new/standard" variant="primary">New Article</LinkButton>
+            <LinkButton href="/adminiyad/articles/new/listicle">New Top N List</LinkButton>
           </div>
         }
       />
@@ -98,7 +98,7 @@ export default async function ArticlesListPage({
                 <td className="px-4 py-3">{a.viewCount}</td>
                 <td className="px-4 py-3 text-right">
                   <div className="flex items-center justify-end gap-3">
-                    <Link href={`/admin/articles/${a.id}/edit` as Route} className="text-accent-blue text-xs font-bold hover:underline">
+                    <Link href={`/adminiyad/articles/${a.id}/edit` as Route} className="text-accent-blue text-xs font-bold hover:underline">
                       Edit
                     </Link>
                     <a

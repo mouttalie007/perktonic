@@ -95,7 +95,7 @@ export function ListicleArticleForm({
         </Button>
         <PublishingCard article={article} />
         <TagsCard article={article} tags={tags} />
-        <LinkButton href="/admin/articles">Back to articles</LinkButton>
+        <LinkButton href="/adminiyad/articles">Back to articles</LinkButton>
       </div>
     </form>
   );

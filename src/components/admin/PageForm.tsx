@@ -54,7 +54,7 @@ export function PageForm({
 
       <div className="flex gap-2">
         <Button type="submit">{page ? "Save changes" : "Create page"}</Button>
-        <LinkButton href="/admin/pages">Cancel</LinkButton>
+        <LinkButton href="/adminiyad/pages">Cancel</LinkButton>
       </div>
     </form>
   );

@@ -83,7 +83,7 @@ export async function getSessionUser(): Promise<SessionUser | null> {
 }
 
 /** Brute-force guard for the login form (spec §57, §88). */
-const loginLimiter = createRateLimiter(8, 15 * 60_000);
+const loginLimiter = createRateLimiter(5, 15 * 60_000);
 export const isLoginRateLimited = loginLimiter.isLimited;
 export const recordLoginAttempt = loginLimiter.record;
 export const clearLoginAttempts = loginLimiter.clear;

@@ -82,7 +82,7 @@ async function performUpload(
     },
   });
 
-  revalidatePath("/admin/media");
+  revalidatePath("/adminiyad/media");
   return {
     status: "success",
     media: { id: media.id, url: media.url, alt: media.alt, width: media.width, height: media.height },
@@ -140,7 +140,7 @@ export async function updateMediaMeta(formData: FormData) {
       caption: String(formData.get("caption") || "").trim() || null,
     },
   });
-  revalidatePath("/admin/media");
+  revalidatePath("/adminiyad/media");
 }
 
 export async function deleteMedia(formData: FormData) {
@@ -155,5 +155,5 @@ export async function deleteMedia(formData: FormData) {
       () => {},
     );
   }
-  revalidatePath("/admin/media");
+  revalidatePath("/adminiyad/media");
 }

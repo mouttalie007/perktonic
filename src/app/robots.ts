@@ -14,8 +14,10 @@ export default function robots(): MetadataRoute.Robots {
         userAgent: "*",
         allow: "/",
         disallow: [
-          "/admin",
-          "/admin/*",
+          // The admin path is intentionally NOT listed here -- its pages
+          // already carry a noindex meta tag (see admin layout/login), and
+          // naming it here would just advertise the hidden URL to anyone
+          // who reads robots.txt.
           "/api/private",
           "/api/private/*",
           "/internal",

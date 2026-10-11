@@ -21,8 +21,8 @@ export async function createTag(formData: FormData) {
     robotsIndex: formData.get("robotsIndex") === "on",
   });
   await prisma.tag.create({ data });
-  revalidatePath("/admin/tags");
-  redirect("/admin/tags" as Route);
+  revalidatePath("/adminiyad/tags");
+  redirect("/adminiyad/tags" as Route);
 }
 
 export async function updateTag(formData: FormData) {
@@ -34,13 +34,13 @@ export async function updateTag(formData: FormData) {
     robotsIndex: formData.get("robotsIndex") === "on",
   });
   await prisma.tag.update({ where: { id }, data });
-  revalidatePath("/admin/tags");
-  redirect("/admin/tags" as Route);
+  revalidatePath("/adminiyad/tags");
+  redirect("/adminiyad/tags" as Route);
 }
 
 export async function deleteTag(formData: FormData) {
   await requireUser("EDITOR");
   const id = String(formData.get("id"));
   await prisma.tag.delete({ where: { id } });
-  revalidatePath("/admin/tags");
+  revalidatePath("/adminiyad/tags");
 }

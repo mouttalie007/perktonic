@@ -47,7 +47,7 @@ export function AdUnitForm({
 
       <div className="flex gap-2">
         <Button type="submit">{unit ? "Save changes" : "Create ad unit"}</Button>
-        <LinkButton href="/admin/ads/units">Cancel</LinkButton>
+        <LinkButton href="/adminiyad/ads/units">Cancel</LinkButton>
       </div>
     </form>
   );

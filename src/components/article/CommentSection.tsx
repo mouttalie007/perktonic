@@ -6,7 +6,7 @@ import { formatRelativeTime } from "@/lib/format";
 /**
  * Public comment thread (homepage redesign, 2026-09-12). Only APPROVED
  * comments render — new submissions land PENDING and need an editor's nod
- * in /admin/comments before they're visible here.
+ * in /adminiyad/comments before they're visible here.
  */
 export async function CommentSection({
   articleId,

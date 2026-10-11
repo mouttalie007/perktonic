@@ -7,7 +7,7 @@ export const metadata: Metadata = { title: "Sign in — PerkTonic Admin", robots
 
 export default async function LoginPage() {
   const user = await getSessionUser();
-  if (user) redirect("/admin");
+  if (user) redirect("/adminiyad");
 
   return (
     <div className="bg-surface flex min-h-screen items-center justify-center px-4">

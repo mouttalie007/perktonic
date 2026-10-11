@@ -21,7 +21,7 @@ export async function createRedirect(formData: FormData) {
     enabled: formData.get("enabled") === "on",
   });
   await prisma.redirect.create({ data });
-  revalidatePath("/admin/redirects");
+  revalidatePath("/adminiyad/redirects");
 }
 
 export async function toggleRedirect(formData: FormData) {
@@ -29,12 +29,12 @@ export async function toggleRedirect(formData: FormData) {
   const id = String(formData.get("id"));
   const enabled = formData.get("enabled") === "on";
   await prisma.redirect.update({ where: { id }, data: { enabled } });
-  revalidatePath("/admin/redirects");
+  revalidatePath("/adminiyad/redirects");
 }
 
 export async function deleteRedirect(formData: FormData) {
   await requireUser("ADMIN");
   const id = String(formData.get("id"));
   await prisma.redirect.delete({ where: { id } });
-  revalidatePath("/admin/redirects");
+  revalidatePath("/adminiyad/redirects");
 }

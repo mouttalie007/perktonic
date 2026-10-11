@@ -15,7 +15,7 @@ export default async function AdUnitsPage() {
       <PageHeader
         title="Ad Units"
         description="Named blocks of ad markup you assign to placements."
-        action={<LinkButton href="/admin/ads/units/new" variant="primary">New Ad Unit</LinkButton>}
+        action={<LinkButton href="/adminiyad/ads/units/new" variant="primary">New Ad Unit</LinkButton>}
       />
       <div className="border-line overflow-x-auto rounded-md border">
         <table className="w-full text-left text-sm">
@@ -40,7 +40,7 @@ export default async function AdUnitsPage() {
                 <td className="px-4 py-3">{u._count.placements} placement(s)</td>
                 <td className="px-4 py-3 text-right">
                   <div className="flex items-center justify-end gap-3">
-                    <Link href={`/admin/ads/units/${u.id}/edit`} className="text-accent-blue text-xs font-bold hover:underline">
+                    <Link href={`/adminiyad/ads/units/${u.id}/edit`} className="text-accent-blue text-xs font-bold hover:underline">
                       Edit
                     </Link>
                     <form action={deleteAdUnit}>
@@ -56,7 +56,7 @@ export default async function AdUnitsPage() {
       </div>
       <p className="text-muted mt-4 text-xs">
         Publisher/account IDs come from environment variables, never typed here. Map units to
-        template slots on the <Link href="/admin/ads/placements" className="text-accent-blue hover:underline">Ad Placements</Link> page.
+        template slots on the <Link href="/adminiyad/ads/placements" className="text-accent-blue hover:underline">Ad Placements</Link> page.
       </p>
     </div>
   );

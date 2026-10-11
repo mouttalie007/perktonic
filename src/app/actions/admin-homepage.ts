@@ -16,6 +16,6 @@ export async function setFeatured(formData: FormData) {
       manualPriority: priorityRaw ? Number(priorityRaw) : null,
     },
   });
-  revalidatePath("/admin/homepage");
+  revalidatePath("/adminiyad/homepage");
   revalidatePath("/");
 }

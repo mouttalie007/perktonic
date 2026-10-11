@@ -9,12 +9,12 @@ export async function setContactMessageStatus(formData: FormData) {
   const id = String(formData.get("id"));
   const status = String(formData.get("status"));
   await prisma.contactMessage.update({ where: { id }, data: { status } });
-  revalidatePath("/admin/contact-messages");
+  revalidatePath("/adminiyad/contact-messages");
 }
 
 export async function deleteContactMessage(formData: FormData) {
   await requireUser("EDITOR");
   const id = String(formData.get("id"));
   await prisma.contactMessage.delete({ where: { id } }).catch(() => {});
-  revalidatePath("/admin/contact-messages");
+  revalidatePath("/adminiyad/contact-messages");
 }

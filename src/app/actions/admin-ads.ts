@@ -43,18 +43,18 @@ function parseUnit(formData: FormData) {
 export async function createAdUnit(formData: FormData) {
   await requireUser("EDITOR");
   await prisma.adUnit.create({ data: parseUnit(formData) });
-  revalidatePath("/admin/ads/units");
-  revalidatePath("/admin/ads/placements");
-  redirect("/admin/ads/units" as Route);
+  revalidatePath("/adminiyad/ads/units");
+  revalidatePath("/adminiyad/ads/placements");
+  redirect("/adminiyad/ads/units" as Route);
 }
 
 export async function updateAdUnit(formData: FormData) {
   await requireUser("EDITOR");
   const id = String(formData.get("id"));
   await prisma.adUnit.update({ where: { id }, data: parseUnit(formData) });
-  revalidatePath("/admin/ads/units");
-  revalidatePath("/admin/ads/placements");
-  redirect("/admin/ads/units" as Route);
+  revalidatePath("/adminiyad/ads/units");
+  revalidatePath("/adminiyad/ads/placements");
+  redirect("/adminiyad/ads/units" as Route);
 }
 
 export async function deleteAdUnit(formData: FormData) {
@@ -62,8 +62,8 @@ export async function deleteAdUnit(formData: FormData) {
   const id = String(formData.get("id"));
   await prisma.adPlacement.updateMany({ where: { adUnitId: id }, data: { adUnitId: null } });
   await prisma.adUnit.delete({ where: { id } });
-  revalidatePath("/admin/ads/units");
-  revalidatePath("/admin/ads/placements");
+  revalidatePath("/adminiyad/ads/units");
+  revalidatePath("/adminiyad/ads/placements");
 }
 
 const placementSchema = z.object({
@@ -94,5 +94,5 @@ export async function updateAdPlacement(formData: FormData) {
       maxInjections: v.maxInjections ? Number(v.maxInjections) : null,
     },
   });
-  revalidatePath("/admin/ads/placements");
+  revalidatePath("/adminiyad/ads/placements");
 }

@@ -6,7 +6,7 @@ export default function NewArticleTypePage() {
     <div>
       <PageHeader title="New Article" description="Choose a format." />
       <div className="grid max-w-2xl gap-4 sm:grid-cols-2">
-        <Link href="/admin/articles/new/standard">
+        <Link href="/adminiyad/articles/new/standard">
           <Card className="hover:shadow-[var(--shadow-raised)] h-full transition-shadow">
             <h2 className="font-bold">Standard Article</h2>
             <p className="text-muted mt-1 text-sm">
@@ -14,7 +14,7 @@ export default function NewArticleTypePage() {
             </p>
           </Card>
         </Link>
-        <Link href="/admin/articles/new/listicle">
+        <Link href="/adminiyad/articles/new/listicle">
           <Card className="hover:shadow-[var(--shadow-raised)] h-full transition-shadow">
             <h2 className="font-bold">Top N List</h2>
             <p className="text-muted mt-1 text-sm">

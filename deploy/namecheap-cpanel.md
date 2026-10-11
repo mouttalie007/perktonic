@@ -149,8 +149,8 @@ the VPS.
 Same checklist as the VPS doc's "Post-deploy smoke test":
 
 - Homepage loads, no console errors
-- `/admin/login` reachable, log in works
-- Submit the contact form, confirm it lands in `/admin/contact-messages`
+- `/adminiyad/login` reachable, log in works
+- Submit the contact form, confirm it lands in `/adminiyad/contact-messages`
 - `curl -sI https://<domain>/ | grep -i content-security-policy` — header
   present
 - Upload a featured image from the admin, confirm it actually renders (this

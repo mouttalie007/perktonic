@@ -16,7 +16,7 @@ export default async function AuthorsPage() {
       <PageHeader
         title="Authors"
         description="The publication's byline roster."
-        action={<LinkButton href="/admin/authors/new" variant="primary">New Author</LinkButton>}
+        action={<LinkButton href="/adminiyad/authors/new" variant="primary">New Author</LinkButton>}
       />
       <div className="border-line overflow-x-auto rounded-md border">
         <table className="w-full text-left text-sm">
@@ -44,7 +44,7 @@ export default async function AuthorsPage() {
                 <td className="px-4 py-3">{a._count.articles}</td>
                 <td className="px-4 py-3 text-right">
                   <div className="flex items-center justify-end gap-3">
-                    <Link href={`/admin/authors/${a.id}/edit`} className="text-accent-blue text-xs font-bold hover:underline">
+                    <Link href={`/adminiyad/authors/${a.id}/edit`} className="text-accent-blue text-xs font-bold hover:underline">
                       Edit
                     </Link>
                     <form action={deleteAuthor}>

@@ -15,7 +15,7 @@
  * `markersToPlaceholderNodes` (2026-10-09, replacing an earlier text-
  * highlight-only version — selecting exact highlighted text to paste over
  * turned out to be too fiddly in practice) turns each one into a real
- * `imagePrompt` node (src/components/admin/image-prompt-node.tsx) before
+ * `imagePrompt` node (src/components/adminiyad/image-prompt-node.tsx) before
  * the editor ever parses the HTML: a dedicated click-then-Ctrl+V drop zone,
  * same gesture as every other image field in this form. Pasting an image
  * into it deletes the node and inserts a real `<img>` in its place — there

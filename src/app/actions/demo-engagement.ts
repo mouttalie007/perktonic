@@ -13,19 +13,19 @@ export async function saveDemoCommentPool(formData: FormData) {
     update: { demoCommentPool: pool },
     create: { id: "singleton", demoCommentPool: pool },
   });
-  revalidatePath("/admin/settings/demo-engagement");
+  revalidatePath("/adminiyad/settings/demo-engagement");
 }
 
 export async function applyDemoEngagementNow() {
   await requireUser("ADMIN");
   const count = await applyDemoEngagementToAllMissing();
-  revalidatePath("/admin/settings/demo-engagement");
+  revalidatePath("/adminiyad/settings/demo-engagement");
   return { count };
 }
 
 export async function clearDemoEngagementNow() {
   await requireUser("ADMIN");
   const result = await clearAllDemoEngagement();
-  revalidatePath("/admin/settings/demo-engagement");
+  revalidatePath("/adminiyad/settings/demo-engagement");
   return result;
 }

@@ -31,7 +31,7 @@ export function AuthorForm({
       </Card>
       <div className="flex gap-2">
         <Button type="submit">{author ? "Save changes" : "Create author"}</Button>
-        <LinkButton href="/admin/authors">Cancel</LinkButton>
+        <LinkButton href="/adminiyad/authors">Cancel</LinkButton>
       </div>
     </form>
   );

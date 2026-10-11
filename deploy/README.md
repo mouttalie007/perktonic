@@ -95,7 +95,7 @@ npm run build
 
 `db:seed:prod` printed the generated admin password to the terminal
 **exactly once** — already captured and relayed to the user directly
-(not written to any file on either machine). Change it via `/admin` → My
+(not written to any file on either machine). Change it via `/adminiyad` → My
 Account as soon as convenient.
 
 ## 5. systemd — done
@@ -126,7 +126,7 @@ the new site respond correctly after the reload.
 
 - `http://109.205.179.106/` → 200, real production CSP header present (no
   `unsafe-eval` — that's `next dev`-only)
-- `/admin/login` → logged in successfully with the generated credentials
+- `/adminiyad/login` → logged in successfully with the generated credentials
 - `dimabac-live`, `livekit`, `nginx`, `postgresql`, `viraltrendly` — all
   `active`; `https://live.dimabac.com/` still 200 throughout
 - axe a11y audit CLEAN, responsive audit ALL CLEAN 320-1440, against the
@@ -177,10 +177,10 @@ public IP, not a compromise — don't chase it.
 ## Post-deploy smoke test (repeat after any real content/config change)
 
 - Homepage loads, no console errors, no mixed-content warnings once on TLS
-- `/admin/login` reachable, log in works
+- `/adminiyad/login` reachable, log in works
 - Submit the contact form, react to an article, submit a comment — confirm
-  each lands correctly in the admin (`/admin/contact-messages`,
-  `/admin/comments`)
+  each lands correctly in the admin (`/adminiyad/contact-messages`,
+  `/adminiyad/comments`)
 - `curl -sI <url> | grep -i content-security-policy` — header present, no
   `unsafe-eval`
 - `npm run audit` / `audit:a11y` / `audit:perf` against the real URL

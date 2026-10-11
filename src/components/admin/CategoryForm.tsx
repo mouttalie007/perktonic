@@ -52,7 +52,7 @@ export function CategoryForm({
 
       <div className="flex gap-2">
         <Button type="submit">{category ? "Save changes" : "Create category"}</Button>
-        <LinkButton href="/admin/categories">Cancel</LinkButton>
+        <LinkButton href="/adminiyad/categories">Cancel</LinkButton>
       </div>
     </form>
   );

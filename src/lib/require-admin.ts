@@ -7,7 +7,7 @@ import type { Role } from "@prisma/client";
 /** Call at the top of an admin page/layout. Redirects to login if needed. */
 export async function requireUser(minRole: Role = "AUTHOR"): Promise<SessionUser> {
   const user = await getSessionUser();
-  if (!user) redirect("/admin/login" as Route);
-  if (!hasRole(user.role, minRole)) redirect("/admin" as Route);
+  if (!user) redirect("/adminiyad/login" as Route);
+  if (!hasRole(user.role, minRole)) redirect("/adminiyad" as Route);
   return user;
 }

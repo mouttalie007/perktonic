@@ -15,12 +15,12 @@ export default async function AdminHome() {
     ]);
 
   const stats = [
-    { label: "Published articles", value: published, href: "/admin/articles?status=PUBLISHED" },
-    { label: "Drafts", value: drafts, href: "/admin/articles?status=DRAFT" },
-    { label: "Scheduled", value: scheduled, href: "/admin/articles?status=SCHEDULED" },
-    { label: "Categories", value: categories, href: "/admin/categories" },
-    { label: "Newsletter subscribers", value: subscribers, href: "/admin/subscribers" },
-    { label: "Media assets", value: mediaCount, href: "/admin/media" },
+    { label: "Published articles", value: published, href: "/adminiyad/articles?status=PUBLISHED" },
+    { label: "Drafts", value: drafts, href: "/adminiyad/articles?status=DRAFT" },
+    { label: "Scheduled", value: scheduled, href: "/adminiyad/articles?status=SCHEDULED" },
+    { label: "Categories", value: categories, href: "/adminiyad/categories" },
+    { label: "Newsletter subscribers", value: subscribers, href: "/adminiyad/subscribers" },
+    { label: "Media assets", value: mediaCount, href: "/adminiyad/media" },
   ];
 
   return (
@@ -46,13 +46,13 @@ export default async function AdminHome() {
           <h2 className="mb-3 font-bold">Write something new</h2>
           <div className="flex flex-wrap gap-2">
             <Link
-              href={"/admin/articles/new/standard" as Route}
+              href={"/adminiyad/articles/new/standard" as Route}
               className="bg-ink hover:bg-ink-deep rounded-sm px-4 py-2 text-sm font-bold text-white transition-colors"
             >
               New Article
             </Link>
             <Link
-              href={"/admin/articles/new/listicle" as Route}
+              href={"/adminiyad/articles/new/listicle" as Route}
               className="border-line hover:bg-surface rounded-sm border px-4 py-2 text-sm font-bold transition-colors"
             >
               New Top N List
@@ -62,13 +62,13 @@ export default async function AdminHome() {
         <Card>
           <h2 className="mb-3 font-bold">Manage</h2>
           <div className="flex flex-wrap gap-2">
-            <Link href="/admin/categories" className="border-line hover:bg-surface rounded-sm border px-4 py-2 text-sm font-bold transition-colors">
+            <Link href="/adminiyad/categories" className="border-line hover:bg-surface rounded-sm border px-4 py-2 text-sm font-bold transition-colors">
               Categories
             </Link>
-            <Link href={"/admin/ads/units" as Route} className="border-line hover:bg-surface rounded-sm border px-4 py-2 text-sm font-bold transition-colors">
+            <Link href={"/adminiyad/ads/units" as Route} className="border-line hover:bg-surface rounded-sm border px-4 py-2 text-sm font-bold transition-colors">
               Ad Units
             </Link>
-            <Link href={"/admin/settings/site" as Route} className="border-line hover:bg-surface rounded-sm border px-4 py-2 text-sm font-bold transition-colors">
+            <Link href={"/adminiyad/settings/site" as Route} className="border-line hover:bg-surface rounded-sm border px-4 py-2 text-sm font-bold transition-colors">
               Site Settings
             </Link>
           </div>

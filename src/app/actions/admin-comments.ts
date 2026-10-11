@@ -15,7 +15,7 @@ export async function setCommentStatus(formData: FormData) {
   // look up which article it belonged to).
   const paths = await commentService.publicPathsFor(id);
   await commentService.setStatus(id, status);
-  revalidatePath("/admin/comments");
+  revalidatePath("/adminiyad/comments");
   // The story page is statically generated — approving/un-approving a
   // comment there does nothing publicly until its cache is invalidated.
   for (const p of paths) revalidatePath(p);
@@ -26,6 +26,6 @@ export async function deleteComment(formData: FormData) {
   const id = String(formData.get("id"));
   const paths = await commentService.publicPathsFor(id);
   await commentService.remove(id);
-  revalidatePath("/admin/comments");
+  revalidatePath("/adminiyad/comments");
   for (const p of paths) revalidatePath(p);
 }

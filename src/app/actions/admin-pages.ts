@@ -36,21 +36,21 @@ function parse(formData: FormData) {
 export async function createPage(formData: FormData) {
   await requireUser("EDITOR");
   await prisma.page.create({ data: parse(formData) });
-  revalidatePath("/admin/pages");
-  redirect("/admin/pages" as Route);
+  revalidatePath("/adminiyad/pages");
+  redirect("/adminiyad/pages" as Route);
 }
 
 export async function updatePage(formData: FormData) {
   await requireUser("EDITOR");
   const id = String(formData.get("id"));
   await prisma.page.update({ where: { id }, data: parse(formData) });
-  revalidatePath("/admin/pages");
-  redirect("/admin/pages" as Route);
+  revalidatePath("/adminiyad/pages");
+  redirect("/adminiyad/pages" as Route);
 }
 
 export async function deletePage(formData: FormData) {
   await requireUser("EDITOR");
   const id = String(formData.get("id"));
   await prisma.page.delete({ where: { id } });
-  revalidatePath("/admin/pages");
+  revalidatePath("/adminiyad/pages");
 }

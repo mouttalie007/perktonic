@@ -460,7 +460,7 @@ async function main() {
       console.log("  ADMIN LOGIN — shown once, save it now:");
       console.log(`    Email:    ${ADMIN_EMAIL}`);
       console.log(`    Password: ${password}`);
-      console.log("  Change it immediately: /admin -> My Account.");
+      console.log("  Change it immediately: /adminiyad -> My Account.");
       console.log("=".repeat(64) + "\n");
     } else {
       console.log(`  created (${ADMIN_EMAIL} / PerkTonic#2026 — change this)`);

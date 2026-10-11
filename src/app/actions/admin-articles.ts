@@ -176,9 +176,9 @@ export async function saveStandardArticle(
       });
   }
 
-  revalidatePath("/admin/articles");
+  revalidatePath("/adminiyad/articles");
   revalidatePath(`/story/${v.slug}`);
-  redirect(`/admin/articles/${articleId}/edit?saved=1` as Route);
+  redirect(`/adminiyad/articles/${articleId}/edit?saved=1` as Route);
 }
 
 // ---------------------------------------------------------------------------
@@ -260,9 +260,9 @@ export async function saveListicleArticle(
     });
   }
 
-  revalidatePath("/admin/articles");
+  revalidatePath("/adminiyad/articles");
   revalidatePath(`/story/${v.slug}`);
-  redirect(`/admin/articles/${articleId}/edit?saved=1` as Route);
+  redirect(`/adminiyad/articles/${articleId}/edit?saved=1` as Route);
 }
 
 // ---------------------------------------------------------------------------
@@ -273,5 +273,5 @@ export async function deleteArticle(formData: FormData) {
   await requireUser("EDITOR");
   const id = String(formData.get("id"));
   await prisma.article.delete({ where: { id } }).catch(() => {});
-  revalidatePath("/admin/articles");
+  revalidatePath("/adminiyad/articles");
 }

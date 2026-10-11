@@ -50,10 +50,10 @@ export async function loginAction(
 
   clearLoginAttempts(email);
   await createSession(user.id);
-  redirect("/admin" as Route);
+  redirect("/adminiyad" as Route);
 }
 
 export async function logoutAction(): Promise<void> {
   await destroySession();
-  redirect("/admin/login" as Route);
+  redirect("/adminiyad/login" as Route);
 }

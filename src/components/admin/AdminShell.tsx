@@ -25,7 +25,7 @@ export function AdminShell({
     <div className="flex min-h-screen">
       {/* Desktop sidebar */}
       <aside className="bg-ink-deep hidden w-64 shrink-0 flex-col p-4 text-white lg:flex">
-        <Link href="/admin" className="mb-6 block px-3 text-lg font-extrabold">
+        <Link href="/adminiyad" className="mb-6 block px-3 text-lg font-extrabold">
           Perk<span className="text-brand">Tonic</span>
           <span className="text-white/50"> Admin</span>
         </Link>

@@ -24,8 +24,8 @@ export function AdminSidebar({ role }: { role: Role }) {
             <ul className="space-y-0.5">
               {items.map((item) => {
                 const active =
-                  item.href === ("/admin" as typeof item.href)
-                    ? pathname === "/admin"
+                  item.href === ("/adminiyad" as typeof item.href)
+                    ? pathname === "/adminiyad"
                     : pathname.startsWith(item.href);
                 return (
                   <li key={item.href}>

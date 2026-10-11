@@ -16,6 +16,6 @@ export async function setTrending(formData: FormData) {
       manualPriority: priorityRaw ? Number(priorityRaw) : null,
     },
   });
-  revalidatePath("/admin/trending");
+  revalidatePath("/adminiyad/trending");
   revalidatePath("/");
 }

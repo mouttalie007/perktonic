@@ -29,7 +29,7 @@ export async function updateSiteSettings(formData: FormData) {
     create: { id: "singleton" },
   });
   revalidatePath("/", "layout");
-  revalidatePath("/admin/settings/site");
+  revalidatePath("/adminiyad/settings/site");
 }
 
 export async function updateSeoSettings(formData: FormData) {
@@ -56,5 +56,5 @@ export async function updateSeoSettings(formData: FormData) {
     create: { id: "singleton" },
   });
   revalidatePath("/", "layout");
-  revalidatePath("/admin/settings/seo");
+  revalidatePath("/adminiyad/settings/seo");
 }

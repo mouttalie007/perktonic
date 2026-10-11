@@ -29,7 +29,7 @@ export default async function CommentsPage() {
                   <p className="font-bold">{c.name}</p>
                   <p className="text-muted text-xs">
                     on{" "}
-                    <Link href={`/admin/articles` as Route} className="text-accent-blue hover:underline">
+                    <Link href={`/adminiyad/articles` as Route} className="text-accent-blue hover:underline">
                       {c.article.title}
                     </Link>{" "}
                     · {formatDate(c.createdAt)}
