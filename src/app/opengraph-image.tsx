@@ -28,22 +28,21 @@ export default function OgImage() {
             fontFamily: "system-ui, sans-serif",
           }}
         >
-          Viral
-          <span style={{ color: "#FFD400" }}>Trendly</span>
+          Perk
+          <span style={{ color: "#FFD400" }}>Tonic</span>
           .com
         </div>
         <div
           style={{
             display: "flex",
             marginTop: 26,
-            fontSize: 26,
-            fontWeight: 700,
-            letterSpacing: 8,
+            fontSize: 28,
+            fontWeight: 600,
             color: "rgba(255,255,255,0.55)",
             fontFamily: "system-ui, sans-serif",
           }}
         >
-          TREND TODAY. TALK TOMORROW.
+          Find the good stuff before everyone else does.
         </div>
       </div>
     ),

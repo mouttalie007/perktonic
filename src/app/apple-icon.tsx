@@ -10,21 +10,23 @@ export default function AppleIcon() {
         style={{
           width: "100%",
           height: "100%",
+          boxSizing: "border-box",
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          background: "#111111",
+          background: "linear-gradient(135deg, #1A1511 0%, #0A0A0A 100%)",
+          border: "5px solid #FFD400",
         }}
       >
         <span
           style={{
             color: "#FFD400",
-            fontSize: 108,
+            fontSize: 100,
             fontWeight: 800,
             fontFamily: "system-ui, sans-serif",
           }}
         >
-          V
+          P
         </span>
       </div>
     ),
