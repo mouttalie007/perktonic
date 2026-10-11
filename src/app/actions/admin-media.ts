@@ -19,6 +19,7 @@ const MAX_BYTES = 12 * 1024 * 1024; // 12MB — pre-compression ceiling
 const MAX_WIDTH = 2000;
 const OG_WIDTH = 1200;
 const OG_HEIGHT = 630; // 1.91:1 — the aspect ratio social platforms expect
+const RESPONSIVE_WIDTHS = [640, 1080]; // must match src/lib/image-loader.ts's thresholds
 
 export type UploadState = { status: "idle" | "error" | "success"; message?: string };
 export type UploadResult = {
@@ -61,6 +62,20 @@ async function buildOgVariant(buffer: Buffer): Promise<Buffer> {
     .toBuffer();
 }
 
+/**
+ * A narrower-width WebP copy for small viewports (spec: PageSpeed flagged
+ * every image serving full size to mobile). `withoutEnlargement` means a
+ * source already narrower than `targetWidth` is written unchanged, so the
+ * file is guaranteed to exist for the loader to reference either way.
+ */
+async function buildWidthVariant(buffer: Buffer, targetWidth: number): Promise<Buffer> {
+  return sharp(buffer)
+    .rotate()
+    .resize({ width: targetWidth, withoutEnlargement: true })
+    .webp({ quality: 82 })
+    .toBuffer();
+}
+
 /** Shared core — writes to public/uploads, compresses, records a Media row. */
 async function performUpload(
   file: File,
@@ -87,6 +102,18 @@ async function performUpload(
     const ogKey = `${randomUUID()}-og.webp`;
     await writeFile(path.join(dir, ogKey), ogBuffer);
     ogUrl = `/uploads/${ogKey}`;
+  }
+
+  // Responsive width variants -- GIFs stay untouched (ext !== ".webp"); the
+  // loader only ever looks for a "-640"/"-1080" sibling of a .webp file.
+  if (ext === ".webp") {
+    const baseKey = key.slice(0, -".webp".length);
+    for (const targetWidth of RESPONSIVE_WIDTHS) {
+      const variantBuffer = await buildWidthVariant(buffer, targetWidth).catch(() => null);
+      if (variantBuffer) {
+        await writeFile(path.join(dir, `${baseKey}-${targetWidth}.webp`), variantBuffer);
+      }
+    }
   }
 
   const alt = meta.alt?.trim() || null;
@@ -182,6 +209,14 @@ export async function deleteMedia(formData: FormData) {
   }
   if (media.provider === "local" && media.ogUrl) {
     await unlink(path.join(process.cwd(), "public", media.ogUrl)).catch(() => {});
+  }
+  if (media.provider === "local" && media.storageKey?.endsWith(".webp")) {
+    const baseKey = media.storageKey.slice(0, -".webp".length);
+    for (const targetWidth of RESPONSIVE_WIDTHS) {
+      await unlink(path.join(process.cwd(), "public", "uploads", `${baseKey}-${targetWidth}.webp`)).catch(
+        () => {},
+      );
+    }
   }
   revalidatePath("/adminiyad/media");
 }

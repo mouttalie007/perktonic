@@ -78,17 +78,31 @@ const nextConfig: NextConfig = {
   },
 
   async headers() {
-    return [{ source: "/:path*", headers: SECURITY_HEADERS }];
+    return [
+      { source: "/:path*", headers: SECURITY_HEADERS },
+      {
+        // Upload filenames are randomUUID-based and never reused/overwritten
+        // (admin-media.ts) -- a given URL's content never changes, so it's
+        // safe to cache for a year and skip revalidation entirely.
+        source: "/uploads/:path*",
+        headers: [
+          { key: "Cache-Control", value: "public, max-age=31536000, immutable" },
+        ],
+      },
+    ];
   },
 
   images: {
     // Next's built-in on-the-fly image optimizer (/_next/image) returns
     // "isn't a valid image" (400) for every image on this host -- raw
-    // files serve fine (200), only the optimizer step is broken there.
-    // Uploads are already compressed to WebP server-side at upload time
-    // (admin-media.ts), so skip the redundant/broken optimizer and serve
-    // files as-is rather than leave every image on the site broken.
-    unoptimized: true,
+    // files serve fine (200), only the optimizer step is broken there. A
+    // custom loader (src/lib/image-loader.ts) replaces it entirely: no
+    // request ever goes through /_next/image, and it still serves properly
+    // sized variants (pre-generated at upload time) instead of giving every
+    // viewport the same full-size image, which plain `unoptimized: true`
+    // would do.
+    loader: "custom",
+    loaderFile: "./src/lib/image-loader.ts",
     // Modern formats first (spec §15, §43).
     formats: ["image/avif", "image/webp"],
     remotePatterns: [

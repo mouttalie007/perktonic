@@ -26,6 +26,7 @@ jobs:
             npx prisma migrate deploy
             npm run db:import-prompts
             npx tsx prisma/backfill-og-variants.ts || echo "og-variant backfill failed, continuing deploy"
+            npx tsx prisma/backfill-width-variants.ts || echo "width-variant backfill failed, continuing deploy"
             npm run build
             mkdir -p tmp
             touch tmp/restart.txt
