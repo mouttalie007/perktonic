@@ -26,6 +26,13 @@ jobs:
             echo "--- biggest dirs ---"; du -sh .next node_modules public/uploads "$HOME/nodevenv" "$HOME/.git" .git 2>/dev/null || true
             git gc --prune=now -q 2>/dev/null || true
             git pull origin main
+            # AUTH_SECRET encrypts the saved Claude API key; generate it once on the server (never in the repo).
+            if ! grep -qE '^AUTH_SECRET="?[^"[:space:]]' .env; then
+              sed -i '/^AUTH_SECRET=/d' .env
+              echo >> .env
+              echo "AUTH_SECRET=\"$(openssl rand -base64 32)\"" >> .env
+              echo "AUTH_SECRET was missing: generated a new one"
+            fi
             npm install
             npx prisma generate
             npx prisma migrate deploy
