@@ -21,6 +21,7 @@
     "db:seed": "prisma db seed",
     "db:seed:prod": "prisma db seed -- --production",
     "db:import-prompts": "node scripts/import-prompt-queue.mjs",
+    "db:import-briefs": "node scripts/import-article-briefs.mjs",
     "db:reset": "prisma migrate reset --force",
     "db:studio": "prisma studio",
     "audit": "node scripts/responsive-audit.mjs",
@@ -31,6 +32,7 @@
     "seed": "node --import tsx prisma/seed.ts"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.133.0",
     "@prisma/client": "^6.19.3",
     "@tailwindcss/postcss": "^4",
     "@tiptap/extension-image": "^3.31.3",

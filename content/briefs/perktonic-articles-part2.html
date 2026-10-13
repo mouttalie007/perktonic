@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>PerkTonic Content Command Center</title>
+<style>
+:root{--bg:#f4f5f8;--card:#ffffff;--ink:#14171c;--mute:#5b6472;--line:#e1e5ec;--brand:#6c4cf5;--brand-soft:#ede9fe;--ok:#14803c;--ok-bg:#e6f6ec;--ok-line:#8fd3a8;--warn:#9a5b00;--warn-bg:#fff3dc;--code:#0f1220;--code-ink:#dfe5f5}
+@media(prefers-color-scheme:dark){:root{--bg:#0e1015;--card:#171a22;--ink:#eceff5;--mute:#9aa4b4;--line:#2a2f3b;--brand:#a597ff;--brand-soft:#241f4f;--ok:#6ee7a0;--ok-bg:#0f2a1b;--ok-line:#1f6b3f;--warn:#fbbf24;--warn-bg:#2b2210;--code:#0a0c12;--code-ink:#d5dcf0}}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
+.wrap{max-width:980px;margin:0 auto;padding:0 18px 80px}
+header.hero{padding:40px 0 18px}
+header.hero h1{margin:0 0 6px;font-size:clamp(26px,4vw,38px);line-height:1.15;letter-spacing:-.02em}
+header.hero p{margin:0;color:var(--mute);max-width:720px}
+.bar{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--bg) 92%,transparent);backdrop-filter:blur(8px);border-bottom:1px solid var(--line);padding:12px 0}
+.bar .row{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+.progress{flex:1;min-width:200px}
+.progress .label{font-size:13px;color:var(--mute);margin-bottom:4px;display:flex;justify-content:space-between}
+.track{height:8px;background:var(--line);border-radius:99px;overflow:hidden}
+.fill{height:100%;width:0;background:linear-gradient(90deg,var(--brand),var(--ok));transition:width .4s}
+.seg{display:flex;border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.seg button{border:0;background:var(--card);color:var(--ink);padding:7px 12px;font:inherit;font-size:13px;cursor:pointer}
+.seg button.on{background:var(--brand);color:#fff}
+button.btn{border:1px solid var(--line);background:var(--card);color:var(--ink);padding:8px 14px;border-radius:10px;font:inherit;font-size:14px;cursor:pointer;transition:.15s}
+button.btn:hover{border-color:var(--brand)}
+button.primary{background:var(--brand);border-color:var(--brand);color:#fff;font-weight:600}
+button.primary:hover{filter:brightness(1.08)}
+button.ghost{background:transparent}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:6px 20px;margin:18px 0}
+.panel summary{cursor:pointer;font-weight:700;padding:14px 0;font-size:17px}
+.panel .inner{padding:0 0 16px;color:var(--ink)}
+.panel ol,.panel ul{padding-left:20px;margin:8px 0}
+.panel li{margin:6px 0}
+.kbd{font-family:ui-monospace,Menlo,Consolas,monospace;background:var(--brand-soft);padding:1px 6px;border-radius:6px;font-size:13px}
+.cat{margin-top:46px}
+.cat-head{border-bottom:2px solid var(--ink);padding-bottom:10px;margin-bottom:6px;display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 14px}
+.cat-head h2{margin:0;font-size:24px;letter-spacing:-.01em}
+.cat-head p{margin:0;color:var(--mute);font-size:14px;flex:1;min-width:220px}
+.cat-count{font-size:13px;font-weight:700;color:var(--brand)}
+.card{background:var(--card);border:1px solid var(--line);border-left:7px solid var(--brand);border-radius:16px;padding:22px 24px;margin:22px 0;transition:background .3s,border-color .3s,box-shadow .3s;box-shadow:0 1px 0 rgba(0,0,0,.02)}
+.card.done{background:var(--ok-bg);border-color:var(--ok-line);border-left-color:var(--ok)}
+.top{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:8px}
+.num{font-weight:800;font-size:13px;background:var(--brand-soft);color:var(--brand);padding:3px 10px;border-radius:99px}
+.card.done .num{background:var(--ok);color:#fff}
+.pill{font-size:12px;font-weight:700;padding:3px 10px;border-radius:99px;border:1px solid var(--line);color:var(--mute)}
+.card.done .pill{background:var(--ok);border-color:var(--ok);color:#fff}
+.type{font-size:12px;color:var(--mute);text-transform:uppercase;letter-spacing:.06em}
+.card h3{margin:2px 0 10px;font-size:22px;line-height:1.25;letter-spacing:-.01em}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0}
+.chip{font-size:12.5px;padding:3px 10px;border-radius:99px;background:var(--bg);border:1px solid var(--line);color:var(--mute)}
+.chip.pk{background:var(--brand);border-color:var(--brand);color:#fff;font-weight:700}
+.card.done .chip.pk{background:var(--ok);border-color:var(--ok)}
+.sum{margin:10px 0;font-size:15.5px}
+.meta{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:8px 18px;font-size:14px;color:var(--mute);margin:12px 0}
+.meta b{color:var(--ink)}
+.flags{display:flex;gap:8px;flex-wrap:wrap;margin:8px 0}
+.flag{font-size:12.5px;background:var(--warn-bg);color:var(--warn);padding:4px 10px;border-radius:8px;font-weight:600}
+.shotbox{border:1px dashed var(--warn);background:var(--warn-bg);border-radius:12px;padding:10px 14px;margin:12px 0;font-size:13.5px;color:var(--ink)}.shotbox ul{margin:6px 0 0;padding-left:18px}
+.coverbox{display:flex;gap:14px;align-items:center;justify-content:space-between;flex-wrap:wrap;border:1px dashed var(--brand);border-radius:12px;padding:12px 14px;margin:12px 0;font-size:14px}.coverbox .scene{color:var(--mute);font-size:13.5px}
+.btn.img{border-color:var(--brand);color:var(--brand)}.btn.img.on{background:var(--ok-bg);border-color:var(--ok);color:var(--ok)}
+.chk{font-size:13px;color:var(--mute);display:flex;gap:6px;align-items:center;cursor:pointer}
+.notes{display:block;margin:12px 0;font-size:14px;color:var(--mute)}.notes textarea{width:100%;margin-top:6px;padding:10px;border-radius:10px;border:1px solid var(--line);background:var(--bg);color:var(--ink);font:inherit;font-size:14px}
+.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
+pre.prompt{display:none;margin:14px 0 0;background:var(--code);color:var(--code-ink);padding:16px;border-radius:12px;max-height:420px;overflow:auto;white-space:pre-wrap;font:12.5px/1.55 ui-monospace,Menlo,Consolas,monospace}
+pre.prompt.open{display:block}
+.toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%) translateY(20px);background:#111;color:#fff;padding:10px 18px;border-radius:12px;opacity:0;pointer-events:none;transition:.25s;z-index:50;font-size:14px}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+footer{margin-top:60px;color:var(--mute);font-size:13px;text-align:center}
+@media(max-width:560px){.card{padding:18px 16px}.card h3{font-size:19px}}
+</style>
+</head>
+<body>
+<div class="bar"><div class="wrap"><div class="row">
+  <div class="progress"><div class="label"><span id="plabel">0 of 0 done</span><span id="ppct">0%</span></div><div class="track"><div class="fill" id="pfill"></div></div></div>
+  <div class="seg" id="filter"><button data-f="all" class="on">All</button><button data-f="todo">To do</button><button data-f="done">Done</button></div>
+  <label class="chk"><input type="checkbox" id="fence"> Wrap reply in a code block</label>
+  <button class="btn" id="copyEd">Copy editorial line</button>
+  <button class="btn ghost" id="resetAll">Reset</button>
+</div></div></div>
+
+<div class="wrap">
+<header class="hero">
+  <h1>PerkTonic Content Command Center</h1>
+  <p>40 unique article briefs (articles 1-20 are the previous file's 13-32 renumbered, 21-40 are new), each with a full writing prompt (article brief, editorial line, hook rules, advanced SEO and technical spec, research-backed external links, and a strict output format). Click <b>Copy full prompt</b> on a card, paste it into your AI writer, and the card turns green so you always know what you've already worked on.</p>
+</header>
+
+<details class="panel" open><summary>How to use this file</summary><div class="inner"><ol>
+<li>Pick a card. Click <span class="kbd">Copy full prompt</span>. Everything for that article is now on your clipboard: brief, keywords, voice, structure, SEO spec, output format.</li>
+<li>Paste it into an AI writer that can <b>browse the web</b>: the prompt makes it research and add 3-6 real external links. Review the draft like an editor, and open every external link before publishing.</li>
+<li>There is no word target: the writer sets the length by the topic, with no padding and no thin sections (a soft sanity floor of about 700 words applies for AdSense quality).</li>
+<li>The card turns green and is remembered in this browser. Use <span class="kbd">Mark as not done</span> to undo, or <span class="kbd">Reset</span> to clear everything.</li>
+<li>The AI replies in a fixed, publish-ready format: <span class="kbd">Title</span>, <span class="kbd">Slug</span>, <span class="kbd">Meta Description</span>, <span class="kbd">Keywords</span>, <span class="kbd">Category</span>, <span class="kbd">Author</span> (the last two are pre-filled for each article by this file), a <span class="kbd">---</span> line, then the HTML body with <span class="kbd">[IMAGE: ...]</span> tags where each AI-generated image goes.</li>
+<li>Cards marked <b>First-hand testing required</b> have a notes box. Paste your real test notes there before copying. If it stays empty, the AI is told not to claim any personal testing and to write a research-based version.</li>
+<li>Each card has a <b>Cover image</b> box with its own scene and a <span class="kbd">Copy cover image prompt</span> button: a magazine-style, non-AI-looking photo prompt for the featured image shown at the top of the article and in lists (3:2, centre-safe for square thumbnails).</li>
+<li>Two image tags: <span class="kbd">[IMAGE: ...]</span> is an AI photo prompt written for ChatGPT (3:2 landscape); <span class="kbd">[IMAGE: SCREENSHOT: ...]</span> is a note for you to capture by hand. The card lists the screenshot candidates in advance.</li>
+<li>If a ChatGPT image still looks polished, reply with: <i>Make it more candid: flatter light, tighter crop, add everyday clutter, less colour grading.</i></li>
+<li>If your chat app swallows the HTML tags and shows only the header lines, tick <span class="kbd">Wrap reply in a code block</span> at the top before copying the prompt.</li>
+<li>Keyword demand is not measured here. Check volume and difficulty for each primary keyword in Google Keyword Planner, Semrush or Ahrefs and adjust before you write.</li>
+</ol></div></details>
+
+<details class="panel"><summary>Expected AI output format (every prompt ends with this)</summary><div class="inner"><pre id="fmtView" style="white-space:pre-wrap;font:13px/1.6 ui-monospace,Menlo,Consolas,monospace;margin:0"></pre></div></details>
+
+<details class="panel"><summary>The PerkTonic editorial line (included in every prompt)</summary><div class="inner"><pre id="edView" style="white-space:pre-wrap;font:14px/1.6 inherit;margin:0"></pre></div></details>
+
+<main id="list"></main>
+<footer>PerkTonic.com · Content Command Center · Progress is stored locally in this browser.</footer>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+/* ---------- CATEGORIES ---------- */
+var CATS=[
+ {key:"fs",name:"Free Samples & Products",slug:"/free-samples/",author:"Mia Reynolds",desc:"Legit freebies, product testing and scam filters."},
+ {key:"is",name:"Internet Secrets & AI Tools",slug:"/internet-secrets-ai-tools/",author:"Alex Carter",desc:"Hidden features, free AI tools and genuinely useful websites."},
+ {key:"rt",name:"Rewards, Trials & Digital Perks",slug:"/rewards-trials-perks/",author:"Daniel Brooks",desc:"Gift cards, student offers, trials and perks worth claiming."},
+ {key:"ms",name:"Money-Saving Guides",slug:"/save-money/",author:"Alex Carter",desc:"Discounts, price history, coupons and smart buying habits."}
+];
+
+/* ---------- ARTICLES (40) ---------- */
+var A=[{"id":1,"cover":"A desk split between clutter and calm: on the left a pile of sticky notes and an old calculator, on the right a lone laptop with a notebook being slid toward it by a hand. Overcast window light from the right, muted tan and slate.","shots":["Your own subscription or billing page before and after the swap (blur what you want)","The usage-limit page of one free tool"],"cat":"is","type":"comparison","title":"I Replaced 5 Paid Apps With Free AI Tools. Here's What Actually Worked","pk":"free ai tools to replace paid apps","sk":["free ai alternatives","best free ai apps","ai tools for productivity","save money with ai"],"intent":"Commercial investigation with a personal-experience angle.","summary":"A first-person test: five paid apps swapped for free AI tools over a set period, with what worked, what broke and what it saved.","angle":"Requires the author's real test notes. Every claim backed by a screenshot or a number from the author's own usage.","hook":"Open with the exact monthly total you were paying and the moment you decided to test it.","rel":["p9","p12",10],"first":true,"tsens":true},
+{"id":2,"cover":"Close view of the top-right corner of a laptop screen, a small round button glowing softly and unreadable, a hand with a mug at the edge, rain on the window behind. Cold blue daylight, grey tones.","shots":["Chrome with the Gemini button and side panel open","The page that states which features are free or paid"],"cat":"is","type":"guide","title":"Gemini Is Already Inside Your Chrome: 7 Things to Try (and What Costs Extra)","pk":"gemini in chrome","sk":["chrome gemini features","how to use gemini in chrome","chrome ai features","gemini chrome side panel"],"intent":"Informational and news-adjacent. Rising demand.","summary":"A practical walkthrough of what Gemini in Chrome can do today, which features are free, and which ones, like agentic browsing, sit behind a paid plan.","angle":"Free-versus-paid label on every feature, with dates, since availability varies by country, device and plan.","hook":"Open with the small icon in the corner of your browser that most people have been ignoring.","rel":["p8","p9",3],"tsens":true},
+{"id":3,"cover":"Wired earbuds lying on a thick stack of printed pages with yellow highlighter streaks and a paperclip, a phone leaning on the stack with a faint blurred glow. Evening, one warm lamp, long shadows across the paper, amber and paper-white.","shots":["NotebookLM with a notebook created from a PDF","The Audio Overview option and its result screen"],"cat":"is","type":"guide","title":"Turn Any PDF Into a Podcast With This Free Google Tool","pk":"notebooklm","sk":["notebooklm audio overview","how to use notebooklm","turn pdf into podcast","google notebooklm free"],"intent":"Informational and how-to. Strong shareability.","summary":"Shows how to turn documents into audio summaries and study guides with NotebookLM, plus the limits and privacy points readers should know before uploading anything.","angle":"Step by step with a real document, an honest note on checking AI summaries for errors, and a privacy warning about what not to upload.","hook":"Open with the 80-page PDF you were never going to read, and what happened when you didn't have to.","rel":["p9",2,5],"tsens":true},
+{"id":4,"cover":"A hand sliding a plain blank white card out of a worn leather wallet at a cafe counter, a till and a tip jar blurred behind. Warm indoor tungsten light, brown and cream, card slightly bent.","shots":["A reward app's redemption screen showing the minimum payout, account info blurred"],"cat":"rt","type":"guide","title":"How to Get Free Gift Cards Legitimately (What Actually Works)","pk":"how to get free gift cards","sk":["free gift cards legit","earn gift cards online","gift card reward apps","free gift card apps"],"intent":"Informational with high scam risk. Trust is everything.","summary":"An honest look at the programs that really pay in gift cards, how long it takes, what the minimum payout is, and why most 'instant free gift card' offers are scams.","angle":"A time-per-dollar reality check so readers decide with open eyes. Never promise outcomes; describe typical results.","hook":"Open with the 'claim your free gift card' pop-up everyone has seen, then explain what is actually behind it.","rel":[7,"p3",11],"tsens":true},
+{"id":5,"cover":"A backpack slumped on a library desk with a laptop open beside it (screen facing away), a lanyard hanging from the strap, highlighters and a crushed drink can. Tall window daylight, cool white and green.","shots":["A student-verification step with personal data blurred","An official offer page showing eligibility and deadline"],"cat":"rt","type":"list","title":"10 Student Perks and Free Software Offers Worth Claiming","pk":"free student software","sk":["student discounts","free software for students","student perks","github student developer pack"],"intent":"Commercial and informational. Seasonal peaks in back-to-school periods.","summary":"A shortlist of student perks that are genuinely valuable, with eligibility, how to verify, and the date each offer ends, from software suites to cloud storage.","angle":"Each perk lists value, eligibility proof and expiry, plus a 'claim before you graduate' timeline.","hook":"Open with the email address you lose the day you graduate and everything attached to it.","rel":[9,16,6],"tsens":true},
+{"id":6,"cover":"A kitchen wall calendar with one date circled hard in red pen and a sticky note beside it, a hand holding the pen, a phone face-down on the counter below. Morning light slanting across the wall, white with one red accent.","shots":["A trial sign-up page showing whether a card is required","The account page where the trial end date appears"],"cat":"rt","type":"list","title":"Free Trials Worth Knowing About","pk":"best free trials","sk":["free trial no credit card","free trial subscriptions worth it","best free trial offers","free trials 2026"],"intent":"Commercial investigation.","summary":"Which free trials are generous and which are bait, sorted by whether they require a card, how long they last and what happens afterward.","angle":"A 'trial scorecard' for each offer: length, card required, how easy cancellation is, what you keep afterward.","hook":"Open with the trial you forgot to cancel and the charge that arrived like a bad surprise party.","rel":[8,10,5],"tsens":true},
+{"id":7,"cover":"A hand holding a phone near a supermarket checkout belt, groceries blurred, a receipt curling out of the till. Fluorescent light, greens and whites, slightly motion-blurred.","shots":["The payout or withdrawal screen showing the minimum threshold in one or two apps"],"cat":"rt","type":"comparison","title":"Cashback and Rewards Apps Compared","pk":"best cashback apps","sk":["cash back apps that pay","cashback vs rewards","best cashback websites","are cashback apps legit"],"intent":"Commercial investigation. Affiliate-heavy, so transparency is critical.","summary":"Compares major cashback and rewards apps on payout thresholds, speed, categories and fine print, so readers can pick one and stack it correctly.","angle":"A comparison table with payout minimums and real timelines. Affiliate disclosure sits above the table, and the verdict names a winner per type of shopper.","hook":"Open with the cashback balance stuck at $9.40 because the minimum is $10.","rel":[4,18,13],"tsens":true},
+{"id":8,"cover":"A person in bed at night seen from the shoulder down, thumb on a phone whose glow is the only light across the duvet, a charging cable and a glass on the nightstand. Dim, blue screen light on grey blankets.","shots":["The subscription-management screen of an app store with the cancel button marked","A virtual-card setup page"],"cat":"rt","type":"guide","title":"Free Trial or Trap? How to Cancel Before You Get Charged","pk":"how to cancel a free trial","sk":["cancel free trial before charged","free trial auto renew","avoid free trial charges","virtual card for free trial"],"intent":"Informational and urgent. Readers often search right after a charge.","summary":"A step-by-step system to try free trials without paying by accident: calendar reminders, virtual cards, and the cancellation routes that actually work.","angle":"A 'trial survival kit' readers can set up in ten minutes, with exact steps and a script for stubborn services.","hook":"Open with the charge notification that arrives the day after the trial ends.","rel":[6,10,4]},
+{"id":9,"cover":"A student seen from behind walking down an autumn campus path with a laptop under one arm and a backpack, fallen leaves, blurred brick buildings, slight motion blur. Low overcast light, rust and grey.","shots":["Google's official student offer page, cropped to eligibility, deadline and the price after the free period","The checkout screen showing the renewal terms"],"cat":"rt","type":"news","title":"Google Is Giving Students a Free Year of AI Pro. Here's the Catch","pk":"google ai pro free for students","sk":["gemini free for students","google ai pro student offer","free year of google ai pro","how to claim google ai pro student"],"intent":"News and informational. Time-boxed offer with a clear deadline.","summary":"Explains who qualifies for Google's free student AI plan, how to claim it, the payment-method requirement and auto-renewal, and the sign-up deadline.","angle":"Lead with the catch in the first screen (card required, renews automatically after the free period) and include a cancel-reminder step. Verify eligibility, countries and deadline on Google's official page before publishing.","hook":"Open with a free year of premium AI, then the one line of fine print that decides whether it stays free.","rel":[5,3,8],"tsens":true},
+{"id":10,"cover":"A kitchen table covered with printed bank statements and a highlighter, a mug and a phone, one yellow-highlighted line unreadable, seen from directly above. Cold north-window light, white paper on dark wood.","shots":["The subscriptions list in your phone's store settings","A bank statement with merchant names highlighted, amounts and account numbers blurred"],"cat":"rt","type":"guide","title":"The Subscriptions You Forgot Are Draining You: How to Find Every One","pk":"how to find hidden subscriptions","sk":["cancel unwanted subscriptions","subscription audit","find recurring charges","stop recurring payments"],"intent":"Informational with strong emotional pull.","summary":"A 20-minute audit method to find forgotten subscriptions in bank statements, app stores and email receipts, and cancel them without the runaround.","angle":"A repeatable audit with a simple tracking template and a 'cancel script' for services that make leaving hard.","hook":"Open with the charge you stared at for a full minute, trying to remember what it was.","rel":[8,6,11]},
+{"id":11,"cover":"A wallet lying open on a table beside house keys and a phone, three blank cards peeking out of the slots. Close angle, late-afternoon light through blinds casting stripes, warm brown and steel.","shots":["A phone-plan or card perks page showing an unclaimed benefit"],"cat":"rt","type":"list","title":"8 Free Perks Hiding in Accounts You Already Have","pk":"free perks you already have","sk":["credit card perks you're not using","free benefits with phone plan","amazon prime benefits you don't use","bank account perks"],"intent":"Informational and discovery.","summary":"Eight everyday accounts (cards, phone plans, memberships, employers) that carry perks most people never claim, with where to look and what to ask.","angle":"A 'perk audit' checklist worded as 'check whether your plan includes' because terms vary by provider and country.","hook":"Open with the benefit you've technically been paying for all along.","rel":[10,4,7],"tsens":true},
+{"id":12,"cover":"A hand holding a phone and a small paper shopping bag on a shopping street, shopfronts with blurred sale posters behind, passers-by out of focus. Bright midday sun with hard shadows.","shots":["A newsletter or cart-reminder discount email example","A retailer's student or ID-verified discount page"],"cat":"ms","type":"guide","title":"How to Find Hidden Discounts Online","pk":"how to find hidden discounts online","sk":["online discount codes","how to get discounts online","secret discounts","promo code tricks"],"intent":"Informational. Broad, high-volume, evergreen.","summary":"A practical routine for finding discounts most shoppers miss: checkout timing, newsletters, cart reminders, retailer programs and ID-verified offers.","angle":"A repeatable routine rather than a list, with honest savings ranges instead of dramatic promises.","hook":"Open with two people buying the same item on the same day and paying different prices.","rel":[14,16,18]},
+{"id":13,"cover":"A glass jar of coins and loose notes on a kitchen table next to an open laptop, the jar off-centre with its lid ajar, toast crumbs beside it. Soft side window light, yellow and wood tones.","shots":["The home page of each site showing its savings feature, cropped"],"cat":"ms","type":"list","title":"7 Websites That Can Save You Real Money (With Realistic Numbers)","pk":"websites that save you money","sk":["best money saving websites","websites to save money","save money online","money saving tools"],"intent":"Commercial investigation. Evergreen and shareable.","summary":"Seven sites and tools that help you pay less, each tied to a specific situation with an honest estimate of what you might save.","angle":"Realistic ranges and a 'who this isn't for' note. No invented totals.","hook":"Open with the purchase you made last month that one of these sites would have made cheaper.","rel":[14,15,12]},
+{"id":14,"cover":"A desk with clipped paper coupon scraps and scissors, one slip pinched between two fingers, a laptop glowing out of focus behind. Near-overhead angle, warm lamp light, red and cream paper.","shots":["The extension permissions prompt in the browser store","The extension popup at checkout showing the codes it tried"],"cat":"ms","type":"comparison","title":"Browser Extensions That Hunt Coupons While You Sleep","pk":"best coupon browser extensions","sk":["honey alternative","coupon finder extension","automatic coupon codes","capital one shopping"],"intent":"Commercial investigation. Affiliate-heavy.","summary":"Compares coupon and price-tracking extensions on what they find, what data they collect and when they quietly do nothing.","angle":"Privacy-first review: the permissions each extension asks for, plus a clear affiliate-commission disclosure.","hook":"Open with the checkout where the extension tried eleven codes and saved you exactly nothing.","rel":[15,18,12],"tsens":true},
+{"id":15,"cover":"A hand holding a phone up in front of a shop shelf of blurred price tags, as if scanning one. Reportage style, harsh overhead store light, slightly tilted horizon.","shots":["A price-history chart for one product with the fake-discount stretch circled","The price-tracking switch in Google Shopping"],"cat":"ms","type":"guide","title":"Is That 'Sale' Real? How to Check Price History Before You Buy","pk":"price history checker","sk":["how to check price history","amazon price history","is this a real discount","price tracker"],"intent":"Informational and transactional. Strong during sale seasons.","summary":"A quick way to tell a real discount from a fake one using price history tools, plus how to set alerts so you buy at the low point.","angle":"A 10-second test on a real product with the author's own screenshots, before and after.","hook":"Open with the 'was $149, now $99' tag on a product that has always cost $99.","rel":[19,17,20]},
+{"id":16,"cover":"A lanyard holding two plain ID cards and a laptop on a table, the cards' printed details blurred and unreadable, a coffee ring on the table. Natural daylight from the left, grey-green tones.","shots":["A discount verification page with personal data blurred","An official offers listing"],"cat":"ms","type":"list","title":"Student, Teacher & Military Discounts Most People Never Ask For","pk":"student discounts","sk":["teacher discounts","military discounts","id.me discounts","discounts for students online"],"intent":"Commercial and informational. Evergreen with seasonal peaks.","summary":"Where verified discounts exist, how to prove eligibility, and which stores offer them, organised by category so readers can scan.","angle":"Eligibility and verification method for each. Date-stamped because programs change often.","hook":"Open with the discount that was available the whole time and only cost one question.","rel":[5,12,13],"tsens":true},
+{"id":17,"cover":"A paper receipt pinched between two fingers in front of a blurred shop entrance, the receipt curling in a light wind. Overcast daylight, muted grey-blue.","shots":["A store's official price-adjustment policy page, cropped to the time window","An order confirmation next to the new lower price"],"cat":"ms","type":"guide","title":"The Price Adjustment Trick Most Stores Won't Advertise","pk":"price adjustment policy","sk":["price match guarantee","get refund when price drops","price adjustment after purchase","price matching stores"],"intent":"Informational. Readers are often mid-purchase or just after buying.","summary":"Explains how price adjustment and price-match policies work, how to claim money back after a price drop, and how to find each store's window.","angle":"A short script for customer service and a checklist of what to keep (receipt, screenshots, dates). Policies differ by store and country, so state that clearly.","hook":"Open with the price drop that happened two days after you paid full price, and the fact that it might not be too late.","rel":[15,19,12],"tsens":true},
+{"id":18,"cover":"Top-down on a table: a smartphone, a plain blank debit-style card, a torn paper slip and a coffee, arranged a bit untidily with the card half over the phone. Soft window light, mid-grey table.","shots":["A checkout page with the coupon field and cashback portal active, personal data blurred"],"cat":"ms","type":"guide","title":"Never Pay Full Price Again: The Coupon + Cashback + Card Stacking Method","pk":"how to stack coupons and cashback","sk":["coupon stacking","cashback and coupons together","how to stack discounts","save money shopping online"],"intent":"Informational and transactional.","summary":"A step-by-step order of operations to combine coupon codes, cashback portals and card rewards on one purchase, plus the cases where stacking is blocked.","angle":"A worked example with the real order of steps and a clear section on when stacking is not allowed.","hook":"Open with a single purchase and three different savings layered on top of each other.","rel":[14,7,12]},
+{"id":19,"cover":"Two phones lying side by side on a desk with glowing abstract line shapes on their screens (unreadable), the edge of a laptop and a pen, a coffee ring on the wood. Low angle, cool light.","shots":["The same product's chart in each of the three tools, shown side by side"],"cat":"ms","type":"comparison","title":"Keepa vs CamelCamelCamel vs Google: Which Price Tracker Wins?","pk":"keepa vs camelcamelcamel","sk":["best price tracker","amazon price tracker","google shopping price tracking","price drop alerts"],"intent":"Commercial investigation. Comparison intent, strong conversion.","summary":"A head-to-head of three price trackers on history depth, alerts, ease of use and stores covered, ending with a clear pick for each type of shopper.","angle":"The same product tracked in all three tools with results shown side by side. Requires the author's real test.","hook":"Open with three tools showing three slightly different stories about the same price.","rel":[15,17,14],"first":true,"tsens":true},
+{"id":20,"cover":"A laptop on a bed with a half-filled online cart on its screen (unreadable) and a hand holding a mug, a bedside clock glowing in the background. Mixed warm lamp and blue screen light, a mood of hesitation.","shots":["A wishlist or price-alert setup screen"],"cat":"ms","type":"guide","title":"The 48-Hour Rule: Why Waiting Saves More Than Any Coupon","pk":"how to stop impulse buying online","sk":["impulse buying tips","48 hour rule","wait before you buy","how to save money shopping"],"intent":"Informational and behavioural. Shareable and opinionated.","summary":"A simple waiting rule for online purchases, how to set it up with wishlists and alerts, and the psychology behind why it works.","angle":"A personal, opinionated take with a one-week experiment readers can run themselves.","hook":"Open with the thing in your cart right now that you will not remember buying in a month.","rel":[12,18,15]},
+{"id":21,"cover":"Low view of a steel dog bowl on a kitchen floor with a few brown kibble pieces scattered beside it and a small plain paper bag folded shut, a dog's paw entering the frame from the right. Flat morning light from a back door, grey tiles and tan tones.","shots":["A brand's official sample-request form, cropped to the fields it asks for","A pet store loyalty-program page showing a free-bag or birthday reward and its conditions"],"cat":"fs","type":"list","title":"Free Dog and Cat Food Samples: Which Brands Really Send Them","pk":"free dog food samples","sk":["free cat food samples","free pet food samples by mail","pet food trial bag","free pet food coupons"],"intent":"Commercial investigation. The reader wants to try a food before buying a 30-pound bag, and wants to know which offers are real.","summary":"A realistic map of how pet owners actually get free or nearly free pet food samples: brand request forms, store loyalty rewards, vet clinics, shelters and local pet food pantries, with the honest note that many brands have stopped mailing free bags.","angle":"Separates truly free samples from 'pay a small delivery fee' offers and survey-for-sample traps, and gives a three-route plan (brand, store, vet) with what each one realistically hands over. Includes a safety note on switching foods gradually and asking a vet about special diets.","hook":"Open with the 30-pound bag you bought on faith and the dog who sniffed it once and walked away.","rel":["p1","p4","p3"],"tsens":true},
+{"id":22,"cover":"A bathroom counter seen from above with a few plain unlabeled tubes and a cotton pad smudged with beige foundation, one wrist held out with a dab of cream on it, the mirror edge cutting off the frame. Cool white bathroom light, pale pinks and greys.","shots":["A beauty retailer's rewards or sample-selection page at checkout, cropped to the sample picker","A brand's official sample-request page, personal data blurred"],"cat":"fs","type":"list","title":"Free Beauty Samples: Where to Ask, What to Say, What's a Trap","pk":"free beauty samples","sk":["free makeup samples","free skincare samples by mail","free perfume samples","free samples at the counter"],"intent":"Commercial investigation with a high scam risk. The reader wants real samples without handing over card details.","summary":"Where beauty samples actually come from: store counters, order add-ons, loyalty rewards and brand request pages. Includes what to say at the counter and the signs of 'free trial' skincare offers that quietly start a subscription.","angle":"Leads with the trap (free sample plus shipping fee plus auto-renewing subscription) before the list of routes that don't need a card. Realistic expectations: deluxe minis are small, selections rotate and policies differ by store and country.","hook":"Open with the minis you collected 'to try later' that expired in a drawer, then the routes that make samples worth taking.","rel":["p1","p6","p3"],"tsens":true},
+{"id":23,"cover":"A cardboard box on a front-door step holding a lamp, a few paperback books and a coiled extension cord, a hand setting a small paper note on top, a doormat and a bit of street behind. Overcast afternoon light, brown and grey, slightly top-down.","shots":["The Buy Nothing app or a local group's rules page, cropped to the give, ask and thank rules","An example 'gift' post and an 'ask' post with names and faces blurred"],"cat":"fs","type":"guide","title":"Buy Nothing Groups: How to Get Free Stuff From Neighbors (and What to Say)","pk":"buy nothing group","sk":["buy nothing app","freecycle","free stuff near me","how to join a buy nothing group","give away items for free"],"intent":"Informational and how-to. The reader wants to know how it works, whether it is safe, and how to get picked.","summary":"How hyperlocal gift groups work, the difference between Facebook groups and the app, how to write an 'ask' that gets a yes, and basic safety for porch pickups.","angle":"Etiquette-first and practical: the rules every group shares (no buying, selling or swapping), message templates that sound human, and a safety checklist for pickups. Honest about the catch: results depend on how active your local group is.","hook":"Open with the stroller your neighbor was about to put out with the trash and the five-minute message that would have saved you a few hundred.","rel":["p1","p2",25]},
+{"id":24,"cover":"A changing-table shelf with a stack of folded cloth squares and a plain cardboard box, a hand holding a small unlabeled tube, a soft toy lying on its side, the edge of a crib rail at the left. Warm nursery lamp light, cream and sage.","shots":["A hospital, brand or pediatric-office sign-up page for baby samples, cropped to the data it requests, personal data blurred"],"cat":"fs","type":"list","title":"Free Baby Stuff: What New Parents Can Really Get (and What to Skip)","pk":"free baby samples","sk":["free baby stuff by mail","free diaper samples","free baby box","baby freebies no credit card"],"intent":"Informational with strong emotional pull. Parents want real help with costs and want to avoid data-harvesting forms.","summary":"A grounded list of where new and expecting parents can find legitimate free baby products, from hospital and pediatric offices to brand programs and community groups, and which sign-ups mostly trade your data for coupons.","angle":"Honest about the trade: a due date and an address are valuable to marketers, so every offer gets a 'what you give up' line. A short safety note: ask your pediatrician before changing formula or feeding products. General information only, not medical advice.","hook":"Open with the newborn who goes through diapers faster than your budget does.","rel":["p1","p7",23],"tsens":true},
+{"id":25,"cover":"Hands pressing seeds into a shallow tray of dark soil on a windowsill, a few small paper envelopes and a plastic spoon beside it, a half-peeled label on a pot, houseplant leaves at the frame edge. Bright cool kitchen-window light, green and brown.","shots":["A public library's seed library catalogue or checkout page, cropped"],"cat":"fs","type":"list","title":"Free Seeds and Plants: How to Start a Garden for Almost Nothing","pk":"free seeds","sk":["free garden seeds","seed library","free plants","seed swap near me","free seeds by mail"],"intent":"Informational and seasonal. The reader wants to start a garden without spending much.","summary":"Where free seeds, seedlings and cuttings really come from: library seed libraries, seed swaps, neighbor groups, community gardens and a few brand giveaways, plus what to be careful about.","angle":"A season-by-season plan (what to ask for and when) and honest caveats: invasive plants, local rules on shipping seeds, and why you should avoid mystery seeds that arrive unrequested.","hook":"Open with the packet of seeds that costs a few dollars and the neighbor's windowsill that has fifty seedlings too many.","rel":[23,21,"p4"]},
+{"id":26,"cover":"A phone held in one hand over a cluttered cafe table, the screen out of focus with a coloured outline glowing around something unreadable, a half-eaten pastry and a notebook beside it. Mid-morning window light, warm wood and grey tones, frame slightly tilted.","shots":["Circle to Search activated on a real screen with the outline mid-gesture","The settings path that turns it on, cropped with the click path highlighted"],"cat":"is","type":"list","title":"Circle to Search: 9 Things It Does That Most People Never Try","pk":"circle to search","sk":["how to use circle to search","circle to search not working","circle to search translate","google lens vs circle to search","circle to search iphone"],"intent":"Informational. Rising demand and high curiosity; readers want concrete uses, not a feature announcement.","summary":"Nine practical uses of Circle to Search, from identifying a product in a video to translating a menu or copying text from an image, each with the gesture and what to expect.","angle":"Every trick has the exact gesture, a device-and-availability label and a 'when it fails' note. Explains how it differs from Google Lens, and is dated and re-verified because supported devices and features change often.","hook":"Open with the screenshot, switch app, paste routine you have repeated a thousand times and the single gesture that replaces it.","rel":["p8",2,"p11"],"tsens":true},
+{"id":27,"cover":"A laptop open on a desk beside a mug and a stack of unopened envelopes with address windows, the screen showing only a soft white glow, a hand holding a pen over one envelope. Late-evening single lamp, amber on grey.","shots":["The 'Results about you' page in a Google Account, personal data blurred","The 'Remove result' menu next to a search result"],"cat":"is","type":"guide","title":"Google Can Hide Your Phone Number From Search. Here's the Free Tool","pk":"results about you google","sk":["remove personal info from google","remove phone number from google search","remove address from google","google remove result about you"],"intent":"Informational and protective. The reader just found their own address or number in search and wants it gone.","summary":"A 15-minute walkthrough of Google's free 'Results about you' tool: turning on monitoring, requesting removals and what to do about the sites that still hold the data.","angle":"Honest about the limit: removing a result from Google does not delete the page, and data brokers can republish. Pairs the tool with a short routine for the source sites. Verified against Google's own help pages.","hook":"Open with typing your own name into Google and finding an address you never published.","rel":["p8","p10",28],"tsens":true},
+{"id":28,"cover":"Close view of a hand holding a credit card above an open laptop keyboard, the card hovering uncertainly, the screen turned slightly away and showing a pale glowing page, a pen and a torn envelope nearby. Cool north-window light, white and slate.","shots":["Google's Safe Browsing site-status checker with a result","A WHOIS lookup showing a domain registration date","A VirusTotal URL scan result page"],"cat":"is","type":"list","title":"Is This Website Legit? 6 Free Checks That Take Under a Minute","pk":"is this website legit","sk":["how to check if a website is safe","website scam checker","is this online store real","google safe browsing check","whois lookup"],"intent":"Informational and urgent. The reader is about to enter card details on an unfamiliar site.","summary":"Six free checks to run before you pay on a site you don't know, from Google's Safe Browsing status page and domain age to lookalike addresses and return policies, each with what the result does and does not prove.","angle":"Debunks the padlock myth (scam sites use HTTPS too) and gives a clear order of operations plus a 'no check is proof' honesty line. Never recommends a paid service.","hook":"Open with the 70%-off sneaker store that looked flawless and had exactly one thing wrong: everything.","rel":["p3",27,"p10"],"tsens":true},
+{"id":29,"cover":"A bin of old VHS tapes and dusty CD cases in a thrift shop, a hand pulling one out, a dim fluorescent tube overhead and a price sticker curling. Greenish indoor light, faded plastic colours, slightly tilted.","shots":["The Wayback Machine calendar view of one page across several years","The Save Page Now box with a result"],"cat":"is","type":"guide","title":"The Wayback Machine Is a Free Time Machine. Here's What to Do With It","pk":"wayback machine","sk":["how to use wayback machine","view old website versions","archive a web page","find deleted web page","save page now"],"intent":"Informational and how-to. The reader hit a dead link or needs proof of what a page once said.","summary":"Five practical uses of the Internet Archive's Wayback Machine, from reviving a dead link to checking an old policy or price, plus how to save a page yourself before it changes.","angle":"Task-based, not feature-based: each use is a real situation with steps. Honest limits: not every page is captured, some sites block archiving, and saved copies are not legal proof by themselves.","hook":"Open with the page that was there yesterday and the 404 that replaced it today.","rel":["p10",15,"p11"]},
+{"id":30,"cover":"A phone propped against a coffee cup beside scattered notebooks, a hand writing on a legal pad, a lanyard lying next to it, the phone's screen out of focus. Soft overcast office light, grey and blue.","shots":["The free-plan limits page of two tools, cropped to the minutes cap","A transcript result with the export options shown"],"cat":"is","type":"list","title":"Free AI Transcription: 7 Tools, and Exactly Where 'Free' Ends","pk":"free ai transcription","sk":["free audio to text","transcribe voice memo free","free meeting transcription","whisper transcription","otter ai free limits"],"intent":"Commercial investigation. The reader has an interview, lecture or meeting recording and wants text without paying.","summary":"Seven free transcription tools with their real free limits (minutes, file length, exports) and a verdict on which fits meetings, interviews or long recordings.","angle":"Every tool gets a 'where free ends' line and a privacy note about what not to upload. Dated because free tiers change often; free here means a current free plan, not a one-time trial.","hook":"Open with the hour-long interview you were about to retype by hand.","rel":["p9",3,"p12"],"tsens":true},
+{"id":31,"cover":"A living-room sofa with a remote on the armrest and a throw blanket, a large TV on the left edge only glowing with an out-of-focus colourful frame, a bowl of popcorn tipped on the cushion. Dim evening room, blue TV glow against warm lamp.","shots":["The home screen of two free streaming apps showing the ad load or catalogue categories"],"cat":"rt","type":"comparison","title":"Free Legal Streaming: Tubi vs The Roku Channel vs Pluto TV","pk":"free streaming services","sk":["tubi vs pluto tv","roku channel free","free movies online legal","best free streaming apps","ad supported streaming"],"intent":"Commercial investigation. The reader is tired of subscriptions and wants a legal free option.","summary":"A head-to-head of the biggest free ad-supported streaming services: what's on them, how many ads you sit through, whether you need an account or device, and who each one suits.","angle":"Names the real price of free (ads, data, rotating catalogue) and keeps clear of piracy sites. Ends with a 'Choose X if' verdict per type of viewer and a note on the live-channel versus on-demand difference.","hook":"Open with the Sunday you paid for four subscriptions and still scrolled for twenty minutes.","rel":[6,"p12",8],"tsens":true},
+{"id":32,"cover":"A stack of three library books and a pair of wired earbuds on a bus seat, a worn library card sticking out of a phone case, rainy window behind. Overcast grey light, muted teal and tan.","shots":["The Libby app's add-a-library screen and a borrow or hold screen","A library's help page explaining its hoopla monthly limit"],"cat":"rt","type":"guide","title":"Your Library Card Is a Streaming Service: Free Audiobooks, Ebooks and Movies","pk":"free audiobooks library","sk":["libby app how to use","hoopla vs libby","borrow ebooks free","free audiobooks with library card","library digital card"],"intent":"Informational and how-to. The reader wants audiobooks and ebooks without paying per title.","summary":"How to get a library card online, set up Libby and hoopla, skip waitlists where you can, and understand why borrowing limits and holds differ from library to library.","angle":"Explains the two lending models (Libby holds versus hoopla instant checkouts with monthly limits and library budget caps) so readers stop being surprised. Includes a 'which app first' routine.","hook":"Open with the audiobook credit you spent last month on a book your library would have lent you for free.","rel":["p10",31,11],"tsens":true},
+{"id":33,"cover":"A phone leaning on a laptop at a messy desk, a hand ticking items on a paper list, a small alarm clock with an unreadable face beside it, a half-eaten sandwich. Mixed warm lamp and screen light, tight crop.","shots":["The payout or minimum-withdrawal page of one survey site","A screen-out message partway through a survey, personal data blurred"],"cat":"rt","type":"list","title":"Paid Survey Sites: The Real Hourly Rate After Screen-Outs","pk":"paid survey sites","sk":["do survey sites really pay","legit survey sites","survey junkie vs prolific","survey scams","get paid to take surveys"],"intent":"Commercial investigation with high scam risk. The reader wants a straight answer on whether it is worth the time.","summary":"What survey sites realistically pay once you count screen-outs and minimum payouts, how to work out your own hourly rate, which kinds of sites are legitimate, and the red flags of survey scams.","angle":"Shows the formula (payout divided by total minutes including disqualifications) so readers can judge for themselves, cites published earnings ranges with their source, and never promises income. Includes how to report a scam to the FTC.","hook":"Open with the 22-minute survey that screened you out at minute 21.","rel":[4,7,"p3"],"tsens":true},
+{"id":34,"cover":"A small external hard drive and a USB stick on a cluttered desk next to a phone lying face down, a tangled charging cable and a sticky note, laptop corner out of focus. Cool daylight, silver and black, shallow focus on the drive.","shots":["A Google account storage page showing the shared quota split across services, personal data blurred","The free-plan page of two other cloud storage providers"],"cat":"rt","type":"comparison","title":"Free Cloud Storage Compared: 5GB, 15GB or 20GB, Which Is Enough?","pk":"free cloud storage","sk":["best free cloud storage","mega vs google drive","free storage for photos","google drive storage full","icloud storage full"],"intent":"Commercial investigation. The reader hit a 'storage full' warning and wants a free fix before paying.","summary":"A comparison of the main free cloud storage plans: how much you really get, what is shared across services, who can read your files and when free stops being enough.","angle":"Highlights the shared-quota gotcha (mail, photos and drive often draw from one pot), adds a privacy line for each service and finishes with a 'Choose X if' list. Verified plan sizes with a date stamp.","hook":"Open with the 'storage almost full' banner that arrives at the worst possible moment.","rel":["p12",27,3],"tsens":true},
+{"id":35,"cover":"A notebook with handwritten bullet points beside a laptop showing a pale video-player shape, a mug and a pair of headphones hanging on a chair back, early morning light across a desk. Soft blue-white light.","shots":["A course page showing audit versus paid certificate options","A financial-aid application page, cropped"],"cat":"rt","type":"guide","title":"Free Online Courses With Certificates: What's Free, What Costs $49","pk":"free online courses with certificates","sk":["coursera audit free","edx free certificate","google career certificates free","coursera financial aid","harvard cs50 free"],"intent":"Informational and commercial investigation. The reader sees 'free' in the headline and fears the fine print.","summary":"A plain explanation of what is truly free (audit access, some self-paced providers) and what costs money (verified certificates), plus how financial aid works and whether the certificate is worth it.","angle":"Leads with the catch (audit mode usually has no certificate or graded work) and gives a decision rule: take it free to learn, pay only if an employer needs the credential. Prices dated and checked on official pages.","hook":"Open with the course page that says 'Free' in bold and '$49 a month' in small grey text.","rel":[5,"p9",30],"tsens":true},
+{"id":36,"cover":"A pile of old envelopes and a faded bank passbook on a kitchen table, one hand sliding a letter out, a pair of reading glasses and a calculator beside them. Late-afternoon light through blinds, beige and grey.","shots":["The unclaimed.org state-picker page","MissingMoney.com results page, personal data blurred"],"cat":"ms","type":"guide","title":"Is a State Holding Your Money? Check Unclaimed Property for Free","pk":"how to find unclaimed money","sk":["unclaimed property search","missingmoney.com legit","unclaimed.org","how to claim unclaimed property","unclaimed money scam"],"intent":"Informational with strong curiosity and scam risk. The reader wants the official route and wants to avoid paying a 'finder'.","summary":"A step-by-step search of official state unclaimed-property records and the free multi-state tool most states support, plus how claims work and why you should never pay to search.","angle":"Official routes only, with a name-and-address checklist (maiden names, old cities, businesses) and a clear scam section. Honest note: processing times and rules differ by state, and amounts are often small.","hook":"Open with a state treasurer's website, a name you forgot you once used, and a payment you didn't know existed.","rel":[10,12,16]},
+{"id":37,"cover":"A router with blinking lights on a shelf above a tangle of cables, a hand holding a phone to the ear at the edge of the frame, a paper bill folded on the shelf. Dim hallway light, grey and green LEDs, off-centre.","shots":["Your own bill showing the promo end date, account numbers blurred","A competitor's new-customer offer page, cropped"],"cat":"ms","type":"guide","title":"The 15-Minute Call That Can Cut Your Internet Bill (Scripts Included)","pk":"how to lower internet bill","sk":["negotiate internet bill","retention department","internet promo expired","how to lower cable bill","cancel to get a better rate"],"intent":"Informational and urgent. The reader just saw a higher bill after a promotion ended.","summary":"A prep-call-follow-up routine for negotiating your internet bill: what to look up first, how to reach the retention team, a short script, and what to do if the provider won't budge.","angle":"Honest about outcomes: results vary by provider and area, so the article gives a method and a fallback (downgrade, switch, ask about low-income programs) instead of promising a number. Asks for written confirmation of any new rate.","hook":"Open with the promo that quietly expired and the bill that jumped without a single email.","rel":[10,12,11],"tsens":true},
+{"id":38,"cover":"A laptop with fingerprint smudges and a small scratch on the lid lying open on a table beside its box and a charger still in plastic, a hand holding a small flashlight pointed at the keyboard. Cool daylight, silver and cardboard-brown.","shots":["A manufacturer's refurbished store product page showing the warranty line","A marketplace listing showing the condition grade and return window"],"cat":"ms","type":"comparison","title":"Refurbished vs Used vs Open-Box: When Second-Hand Tech Is Smart","pk":"is refurbished worth it","sk":["certified refurbished vs used","amazon renewed vs apple refurbished","open box electronics","refurbished laptop warranty","refurbished iphone"],"intent":"Commercial investigation. The reader wants to save on a laptop or phone without buying a lemon.","summary":"What 'refurbished', 'renewed', 'used' and 'open-box' really mean, how warranties and return windows differ by seller, and which kinds of products are safest to buy this way.","angle":"A warranty-first comparison with one H3 per option and a short checklist (battery, return window, who fixed it, parts used). Ends with 'Choose X if' guidance. Warranty terms dated and verified on seller pages.","hook":"Open with the laptop that was 40% cheaper and the one question that decides whether it was a bargain.","rel":[19,15,13],"tsens":true},
+{"id":39,"cover":"A plain brown paper bag on a shop counter with a crumpled receipt, a baguette end and a tomato peeking from the top, a hand reaching for the handle, a closing sign out of focus. Flat late-evening light through shop glass, warm brown.","shots":["The app's store listing with a pickup window and bag description","A pickup confirmation screen"],"cat":"ms","type":"guide","title":"Too Good To Go Surprise Bags: Real Bargain or Lottery Ticket?","pk":"too good to go app","sk":["too good to go review","is too good to go legit","too good to go whole foods","surprise bag","food waste app"],"intent":"Commercial investigation. The reader has seen the app everywhere and wants to know if it saves money.","summary":"How surprise bags work, what they typically cost compared with retail value, how pickup windows and availability behave, and who should skip them (allergies, fixed schedules).","angle":"A verdict-first review with real trade-offs: you pick the category but not the contents, bags sell out, pickup windows are tight. Honest on the saving claims (stores set the value) and on allergy risks. Verified against the app and official partner announcements.","hook":"Open with a paper bag you reserved without knowing what was inside, and the pickup window that shuts in an hour.","rel":[12,13,20],"tsens":true},
+{"id":40,"cover":"A pair of laptops side by side on a desk, one with a plain browser window and one with a dark private-window shape, both screens out of focus, a hand pointing a pen between them, a coffee ring on the wood. Neutral overhead light, grey and white.","shots":["The same search in a normal window and a private window, side by side","A price-alert setup in a flight or shopping tool"],"cat":"ms","type":"guide","title":"Does Incognito Mode Lower Prices? What Really Changes What You Pay","pk":"does incognito mode lower prices","sk":["incognito flights cheaper myth","dynamic pricing","clear cookies lower price","price discrimination online","surveillance pricing"],"intent":"Informational and myth-busting. High search volume from people who heard the trick from a friend.","summary":"Tests the claim that private browsing, cleared cookies or a different device get you a lower price, explains what actually moves prices (demand, timing, sometimes logged-in status) and what to do instead.","angle":"Evidence over folklore: cites published tests and company statements, separates dynamic pricing from personalised pricing, and ends with a price-alert routine. States clearly where evidence is mixed rather than declaring a flat verdict.","hook":"Open with the friend who swears the library-computer trick saved them a fortune.","rel":[15,17,19],"tsens":true}];
+
+/* Already-published articles 1-12 of the previous file (used only for internal links) */
+var PUB={"p1":{"title":"10 Legit Ways to Get Free Samples (No Surveys, No Credit Card)","pk":"free samples by mail"},"p2":{"title":"How to Get Free Products to Review","pk":"how to get free products to review"},"p3":{"title":"The 6 Red Flags That Reveal a Fake Freebie Before You Click","pk":"fake free offers"},"p4":{"title":"7 Free Sample Programs That Still Work in 2026 (and the Ones That Don't)","pk":"free sample boxes"},"p5":{"title":"How to Become a Product Tester: What Brands Really Look For","pk":"how to become a product tester"},"p6":{"title":"Why Companies Give Away Free Stuff (and How to Get on Their List)","pk":"why do companies give free samples"},"p7":{"title":"Birthday Freebies Hiding in Your Inbox: Which Ones Are Worth the Signup","pk":"birthday freebies"},"p8":{"title":"15 Hidden Google & Chrome Features Most People Never Use","pk":"hidden google features"},"p9":{"title":"9 Free AI Tools That Feel Like Paid Software","pk":"free ai tools"},"p10":{"title":"12 Surprisingly Useful Websites You Haven't Heard Of","pk":"useful websites"},"p11":{"title":"Google Search Operators That Make You Look Like a Hacker (All Legal)","pk":"google search operators"},"p12":{"title":"Free Alternatives to Expensive Software","pk":"free alternatives to paid software"}};
+
+/* ---------- SHARED TEXT BLOCKS ---------- */
+var EDITORIAL=[
+"PERKTONIC EDITORIAL LINE (non-negotiable)",
+"",
+"1. WHO WE ARE. PerkTonic is the friend who always knows the good stuff online: legit freebies, free AI tools, hidden features, real deals. Skeptical, generous, funny, useful. We test before we recommend, and we say so when we haven't.",
+"2. VOICE. Write like a sharp human columnist, not a company. Combine the punch of magazine writing with plain-spoken ease. First person ('I', 'we') is welcome when it is true. Have opinions and state them: say what you would pick and why. A dry joke or self-aware aside every few paragraphs is good; a joke in every paragraph is a tic. Never punch down and never mock the reader.",
+"3. RHYTHM. Vary sentence length on purpose. Short, punchy lines after long ones. One-sentence paragraphs for emphasis, used sparingly. Always use contractions. Prefer the active voice. Concrete nouns and numbers beat adjectives.",
+"4. BANNED LANGUAGE. No wooden or corporate phrasing: 'In today's digital age', 'in the ever-evolving landscape', 'it is important to note', 'delve', 'unlock', 'game-changer', 'revolutionize', 'seamless', 'leverage', 'robust', 'navigate the world of', 'look no further', 'without further ado', 'in conclusion', 'a testament to', 'whether you're a X or a Y' openers, 'Let's dive in'. No stacked rhetorical questions. No intros that define the keyword. No emoji spam. Exclamation marks are rare and earned.",
+"5. WOODEN VS HUMAN. Wooden: 'It is recommended that users verify their eligibility prior to enrollment.' Human: 'Check you qualify first. Nothing kills a good mood like a rejection email.'",
+"6. HONESTY RULES. Every claim must survive a fact-check. Name the catch (card required, auto-renewal, minimum payout, country limits) before the reader has to find it. Never promise outcomes ('you will get'); describe what usually happens. NEVER invent experience, quotes, statistics, prices, dates or screenshots. If you cannot verify something, leave it out or tell the reader to confirm it on the official page. Personal experience may only come from the author's notes supplied in the brief.",
+"7. READER RESPECT. Answer first, story second. Give the quick answer early, then earn the scroll. Assume smart, busy, slightly skeptical readers. Explain jargon in half a sentence.",
+"8. OPINION WITH EVIDENCE. Opinions are welcome only when backed by a reason or a test. Use recurring labels so the voice is recognisable: 'My pick:', 'Skip this if:', 'The catch:'.",
+"9. THE STANDARD. Write something a reader would forward to a friend and an editor at a major online magazine would be proud to publish."
+].join("\n");
+
+var HOOKS=[
+"HOOK RULES (headline and introduction)",
+"HEADLINE: Privately weigh 5 options, each built on a different formula, then output only the single strongest one. Formulas: (a) number + payoff + honest qualifier; (b) curiosity gap with a specific payoff ('The X trick most stores won't advertise'); (c) contrarian or myth-busting; (d) time-bound or news hook; (e) 'the catch' reveal. Rules: the promise must be paid off in the first 20% of the article; specific beats vague; concrete nouns beat abstractions; no lies, no bait-and-switch; the primary keyword appears naturally, ideally near the start; aim for 60 characters or fewer (70 at most).",
+"INTRODUCTION (short and fast: one or two tight <p>, a few sentences in total): 1) a hook line: a vivid scene, a verifiable surprising fact or a sharp opinion; 2) the relatable frustration or stakes; 3) the specific promise: what the reader will be able to do after reading; 4) a credibility line about how the information was checked, only if true. Put the primary keyword in the first 100 words without forcing it. No throat-clearing, no definition openers, no stacked questions.",
+"SPEED: within the first screen the reader must know what they will get and why it is worth their time. Lead with the answer or the surprise, never with background."
+].join("\n");
+
+var TECH=[
+"ADVANCED SEO AND TECHNICAL SPECIFICATION (applies to the body and the metadata)",
+"SERP FIT: Match the dominant search intent in the brief. Beat page one by adding something it lacks (fresher facts, honest limits, a clearer verdict, a sharper angle), not by being longer for its own sake.",
+"ON-PAGE: The headline is supplied separately as the Title, so the body contains NO H1. Use as many H2s as the topic genuinely needs; every H2 must carry new, useful information, and never split a topic into extra headings just to have more. H3s only inside an H2. Write H2s as natural questions or scannable promises where they map to People Also Ask. Primary keyword in: the Title, the first 100 words of the body, at least one H2, the Meta Description, the Slug and the closing section. Keep density natural (roughly 0.5-1%); use synonyms, related entities and semantic variants instead of repetition. Never keyword-stuff.",
+"SNIPPET TARGETING: Right after the introduction add a 'Quick answer' of 40-55 words that answers the core query directly, written as <p><strong>Quick answer:</strong> ...</p>. Use <ol> for steps and <ul> for sets so search engines can lift them. No tables: express comparisons as one H3 per option followed by a short <ul> of criteria, then close with a 'Choose X if...' <ul>.",
+"FAQ: End the body with an H2 'Frequently asked questions' holding only real follow-up questions the article has not already answered (typically 3-5; skip any that would repeat the body), each as an H3 followed by a short <p> answer of 30-60 words.",
+"READABILITY: Target Flesch Reading Ease 60-70 (grade 7-8). Average sentence 14-18 words with deliberate variation. Paragraphs of 1-3 sentences. A new subheading whenever the topic turns. Use <strong> only for genuinely key phrases.",
+"INTERNAL LINKS: 3-5 contextual internal links written as <a href=\"/slug/\">descriptive anchor</a>, using the related articles listed in the brief (and the category hub), never 'click here'.",
+"EXTERNAL LINKS (research-backed, a must): include 3-6 external links inside the body, each placed in the sentence that makes the claim and each pointing to a page you OPENED during research that directly supports that claim: official provider or program pages, government or regulator pages, original studies or documentation, and respected publications. Use descriptive anchor text naming the source or the fact (never 'click here' or a bare URL), written as <a href=\"https://...\" target=\"_blank\" rel=\"noopener noreferrer\">. Never invent, guess or reconstruct a URL from memory. Never link to content-farm listicles, affiliate roundups, scraped or low-authority pages, or pages that merely repeat the same claim. One link per source domain at most, never the same page twice, none inside the Quick answer, and no separate 'Sources' list (links stay inline). If you include any affiliate-style link, mark it rel=\"sponsored nofollow noopener\" and disclose it in an italic <p> near the top.",
+"AD-FRIENDLY STRUCTURE: Short paragraphs and clear H2 breaks give ad slots natural gaps (after the introduction, mid-article, before the FAQ). Do not add ad code or placeholders.",
+"E-E-A-T: Show expertise through specifics (limits, costs, steps, edge cases), name official sources in the text, and be explicit about conditions. Use first person only for opinions and for experience the brief explicitly supplies. Never fake testing.",
+"FRESHNESS: For time-sensitive topics, describe conditions as 'at the time of writing' only if you verified them; otherwise avoid hard prices, dates and eligibility numbers and tell the reader to confirm on the official page. Add a dated 'Last checked' line only if you really verified the facts.",
+"TOPICAL CLUSTER: Treat this article as part of its category cluster. Link up to the hub and sideways to the related articles, and avoid overlapping with sibling articles' primary keywords."
+].join("\n");
+
+var GATES=[
+"QUALITY AND SAFETY GATES (AdSense and reader trust)",
+"- Original wording only; paraphrase sources fully and quote at most a short phrase.",
+"- No invented statistics, prices, quotes, dates, testimonials or personal experiences. If you cannot verify a fact, leave it out or tell the reader to confirm it on the official page.",
+"- No 'free money', 'guaranteed', 'get rich' or similar claims. Always show conditions, limits and costs.",
+"- No instructions for scams, hacking, piracy or bypassing paywalls. Offers must be legitimate and checkable on the official source.",
+"- Disclose affiliate-style links near the top whenever you include any.",
+"- General information only; no personalised financial, legal or medical advice.",
+"- The article must fully deliver what the headline promises.",
+"- Every external link must be real, opened during research and relevant to the sentence it sits in. A missing link is better than a guessed one.",
+"- No meta commentary inside the article (no 'as an AI', no 'this article will', no notes to the editor)."
+].join("\n");
+
+var LENGTH=[
+"LENGTH AND TIGHTNESS (fast, shareable, no padding)",
+"- Do not aim for a word count. The topic sets the length: cover everything this reader needs to act on the headline's promise, then stop. Tight and complete beats long.",
+"- If the headline promises a number of items or steps, deliver exactly that number, each one tight.",
+"- Cut on sight: restating the headline, defining the obvious, warm-up sentences, 'in this article', recaps of what you just said, the same advice rephrased, generic filler tips, and list items added only to reach a number.",
+"- Every paragraph must earn its place with at least one of: a concrete fact, a step, an example, a number, a caveat or a real opinion. If a sentence does none of these, delete it.",
+"- Never thin: Google and AdSense reward complete, original, genuinely helpful pages. The reader must finish without needing another page to do what the headline promised. Include the catch, the limits, one or two edge cases and what to do if it goes wrong.",
+"- Sanity check, not a target: a finished body under roughly 700 words usually means something useful is missing (a step, a catch, an example, a source). Add that, never filler. If the body feels long for its promise, cut it instead of defending it."
+].join("\n");
+
+var RESULT=[
+"THE RESULT I WANT",
+"A publish-ready article that: answers the search intent within the first screen; reads like a human columnist, not an AI; opens with an irresistible but honest headline and hook; is easy to scan (a new subheading whenever the topic turns, short paragraphs, no padding, lists where they help); delivers the unique angle from the brief; has natural, accurate on-page SEO; and can be pasted straight into the WordPress HTML editor, with the image tags marking exactly where each AI-generated image goes.",
+"Run this self-check silently before replying and fix any failure; never print it: the reply starts with 'Title:'; the six header lines (Title, Slug, Meta Description, Keywords, Category, Author) and the '---' line are present, with Category and Author copied exactly from the format block; there is no H1, table, div, span or inline style in the body; the body is a complete, fully written article (never an outline or placeholder) with no padding, no recap and no thin sections; the primary keyword is in the Title, the Slug, the Meta Description, the first 100 words and an H2; the Meta Description is one sentence under 160 characters; image tags appear only where a visual genuinely helps (typically 3-5), each on its own line between block elements; no two photo tags repeat the same object, setting or shot; screenshot tags begin with 'SCREENSHOT:' and read as steps for the author; 3-6 external links sit inline in the body, each opened during research and relevant to its sentence; there are no markers, notes or placeholders left in the text."
+].join("\n");
+
+var AUTHORS={
+ "Alex Carter":"Alex Carter covers Internet Secrets & AI Tools and Money-Saving Guides: free AI tools, hidden internet tricks, and the coupon and price-tracking tools that actually save money. Curious, practical, always hunting for what is free and genuinely useful.",
+ "Mia Reynolds":"Mia Reynolds covers Free Samples & Products: free samples and product-testing programs. She reads the fine print before writing a word and flags anything that smells like a scam.",
+ "Daniel Brooks":"Daniel Brooks covers Rewards, Trials & Digital Perks: the fine print behind rewards, gift cards and free trials, including cancellation steps, eligibility rules and the exact date a 'free' trial turns into a charge."
+};
+
+var OUTPUT_TEMPLATE=[
+"Title: <the final headline>",
+"Slug: <a short, lowercase, hyphenated URL slug>",
+"Meta Description: <one natural sentence, under 160 characters>",
+"Keywords: <3-6 comma-separated keywords/phrases, most important first>",
+"Category: <Free Samples & Products | Internet Secrets & AI Tools | Rewards, Trials & Digital Perks | Money-Saving Guides>",
+"Author: <Alex Carter | Mia Reynolds | Daniel Brooks>",
+"---",
+"<the complete article body, clean semantic HTML — H2/H3 only, no H1, no tables, no divs>",
+"",
+"[IMAGE: a detailed description of the image needed, for an AI image generator]",
+"[IMAGE: SCREENSHOT: exact page or app, state to capture, crop and highlight, data to blur]"
+].join("\n");
+
+var wrapFence=false;
+var IMGLOOK="a candid documentary photograph taken on an ordinary day: natural light exactly as it would really be (overcast daylight, a window, one lamp, a phone flash), imperfect off-centre framing with one element cut by the edge, ordinary clutter in the background, true-to-life muted colours and visible texture; no golden-hour glow, no cinematic colour grading, no heavy background blur, no polished stock-photo look.";
+
+function buildOutput(a){
+  var c=catOf(a.cat), th=TYPEHINT[a.type];
+  var tpl=[
+   "Title: <the final headline>",
+   "Slug: <a short, lowercase, hyphenated URL slug>",
+   "Meta Description: <one natural sentence, under 160 characters>",
+   "Keywords: <3-6 comma-separated keywords/phrases, most important first>",
+   "Category: "+c.name,
+   "Author: "+c.author,
+   "---",
+   "<the complete article body, clean semantic HTML — H2/H3 only, no H1, no tables, no divs>",
+   "",
+   "[IMAGE: a detailed description of the image needed, for an AI image generator]",
+   "[IMAGE: SCREENSHOT: exact page or app, state to capture, crop and highlight, data to blur]"
+  ].join("\n");
+  var L=[];
+  L.push("OUTPUT FORMAT (follow EXACTLY; your entire reply must be this and nothing else)");
+  L.push("THE ARTICLE BODY IS THE MAIN DELIVERABLE. The six header lines are only metadata. A reply that contains the header lines and image tags but not the full written article is a failed reply. The body must be a complete, fully written article: exactly as long as the topic needs, with no padding and no thin sections (see LENGTH AND TIGHTNESS).");
+  L.push("");
+  L.push(tpl);
+  L.push("");
+  L.push("BODY SKELETON (shows the shape only; write the real article and never print these placeholders)");
+  L.push("<p>Hook paragraph...</p>");
+  L.push("<p>Promise and credibility paragraph...</p>");
+  L.push("<p><strong>Quick answer:</strong> 40-55 word direct answer...</p>");
+  L.push("[IMAGE: hero image description]");
+  L.push("<h2>First section heading</h2>");
+  L.push("<p>...</p>");
+  L.push("<h3>Sub-point</h3>");
+  L.push("<ul><li>...</li></ul>");
+  L.push("[IMAGE: second image description]");
+  L.push("<h2>More sections...</h2>");
+  L.push("<h2>My take and next step</h2>");
+  L.push("<p>...</p>");
+  L.push("<h2>Frequently asked questions</h2>");
+  L.push("<h3>Question?</h3>");
+  L.push("<p>Answer.</p>");
+  L.push("");
+  L.push("FORMAT RULES");
+  if(wrapFence){
+    L.push("- Wrap your ENTIRE reply in ONE fenced code block (three backticks, language html) so the raw HTML tags survive. Inside the block the first line is 'Title:'. Put nothing outside the block: no preamble, no notes, no sign-off.");
+  }else{
+    L.push("- Your reply starts with the characters 'Title:'. No preamble, no code fences, no notes, no explanations, no sign-off.");
+  }
+  L.push("- Do not output research notes, verification logs, JSON-LD, schema, checklists or alternative headlines.");
+  L.push("- Title: one final headline in plain text, no quotes, no markdown, no trailing period. Keep the primary keyword. Honest and specific.");
+  L.push("- Slug: 3-6 words, lowercase ASCII letters and digits separated by single hyphens, no stop-word padding, no year unless essential, includes the primary keyword.");
+  L.push("- Meta Description: one natural sentence, 120-159 characters, with the primary keyword, a concrete benefit and a soft call to action. No quotes, no emoji, no trailing ellipsis.");
+  L.push("- Keywords: 3-6 comma-separated phrases, lowercase, primary keyword first, then secondary and semantic phrases from the brief.");
+  L.push("- Category and Author are already decided: copy the two lines above EXACTLY as written ('Category: "+c.name+"' and 'Author: "+c.author+"'). Do not change, translate or reformat them, and do not mention them in the body.");
+  L.push("- Each header line is on its own line. Separator: a line containing only ---, then the body immediately.");
+  L.push("- Body: clean semantic HTML using only these tags: <h2>, <h3>, <p>, <ul>, <ol>, <li>, <strong>, <em>, <a>, <blockquote>. H2/H3 only, no H1, no H4+, no tables, no div, span, img, figure, class, id or inline style, no emoji. Write & as &amp;. Structure: introduction, Quick answer, body sections (with a clearly labelled 'The catch' wherever conditions or limits exist), a closing H2 with your honest opinion and one next step, then the FAQ H2.");
+  L.push("- IMAGES: place image tags automatically inside the body. Each image is ONE line that starts with [IMAGE: and ends with ], on its own line between two block elements (after a closing </p>, </ul> or </ol>), never inside a tag. There are two kinds: a normal AI photo tag, [IMAGE: ...], and a screenshot tag whose text starts with SCREENSHOT:, written [IMAGE: SCREENSHOT: ...]. Put the first image right after the Quick answer (hero image), then add one roughly every two sections only where a visual genuinely helps; typically 3-5 images in total, fewer for a short article. The image tags sit BETWEEN written paragraphs; they never replace them.");
+  L.push("- AI PHOTO TAGS (written for ChatGPT image generation, so use plain natural sentences, no keyword lists and no negative-prompt block): 25-60 words describing ONE concrete, candid moment tied to the paragraph just above it: who or what, doing what, where, the time of day and light, and the camera distance. Look to request in every photo tag: "+IMGLOOK+" End with: Wide 3:2 landscape, no text, no logos. Never request brand logos, real interface screenshots, real public figures or copyrighted characters; screens must be turned away, dim or out of focus. Avoid objects that look like something else: never show small flat square foil packets or sachets; prefer kraft envelopes, padded mailers, cardboard boxes, glass jars, plain tubes, tea bags, coins, paper and everyday household items.");
+  L.push("- VARIETY (important): no two images in the same article may share the same main object, setting, camera distance or colour palette. Rotate the shot type: one wide scene with a person seen from behind or cropped (no face), one medium shot of hands doing the thing, one close detail of a single object, and use a different room, time of day and light for each. Do not make every image about the main product; picture the situation around it. Never use a brand colour as an accent; let each scene keep its natural colours.");
+  L.push("- SCREENSHOT TAGS: when a paragraph points the reader at a real on-screen thing (a tool interface, a menu path, a settings page, a search results page, a price-history chart, a sign-up or checkout page), use [IMAGE: SCREENSHOT: ...] instead of an AI photo. The text after SCREENSHOT: is an instruction for the author, who will capture it by hand, so write it as clear steps, not as an image-generation prompt: (1) the exact official page or app, with its URL only if you are certain of it; (2) the exact state to capture: which tab, menu, search query or setting; (3) desktop or mobile; (4) the crop and what to mark with a box or arrow; (5) which personal data to blur. Use the screenshot candidates in the brief where they fit, and at most 3 screenshots per article. Never use an AI image to fake an interface, dashboard, result or receipt. Write the surrounding paragraph so it still reads correctly if the interface looks slightly different, and never present a screenshot as proof of the author's own results unless the author's notes supply them.");
+  L.push("");
+  L.push("Reply now with the finished, fully written article in this exact format. Do not ask questions; make sensible assumptions silently.");
+  return L.join("\n");
+}
+
+function buildCover(a){
+  return [
+"Create a photo for the top of a PerkTonic article titled \""+a.title+"\". It is also the thumbnail in article lists.",
+"",
+"Scene: "+a.cover,
+"",
+"Look: "+IMGLOOK,
+"People: no faces. Show hands, a person from behind, or a softly out-of-focus figure. Natural hands with five fingers.",
+"Objects: no logos or readable text anywhere. For packaging use plain kraft paper, cardboard, glass jars or plain tubes, never small flat square foil packets. Screens are turned away, dim or out of focus. Everything sits the way it would really sit: nothing floating, nothing standing without support.",
+"Colour: keep the natural colours of the scene; do not add any brand colour accent.",
+"Format: wide 3:2 landscape (1536x1024). Keep the main subject near the centre so a square crop also works.",
+"Avoid: glossy AI polish, symmetrical arrangement, plastic-looking surfaces, extra fingers, warped or gibberish text."
+  ].join("\n");
+}
+
+var TYPEHINT={
+ list:{txt:"LIST POST. Each item gets: a bold name, a one-line verdict, what it is, how to use or claim it, 'The catch', and who it is for. Keep items parallel in structure and tight. Lead with the two strongest items."},
+ guide:{txt:"HOW-TO GUIDE. Use numbered steps, state the time required and what is needed up front, add the common mistakes and what to do when it fails. Keep every step short and actionable."},
+ comparison:{txt:"COMPARISON. Give the verdict first, then one H3 per option with a short <ul> of the criteria (no tables), and close with a 'Choose X if...' <ul>."},
+ news:{txt:"FRESH-OFFER EXPLAINER. Lead with what changed and the deadline, then who qualifies, how to claim, the catch, how to cancel, and what happens afterwards."}
+};
+
+/* ---------- HELPERS ---------- */
+function esc(s){return String(s).replace(/[&<>"]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]});}
+function byId(i){if(typeof i==="string")return PUB[i]||null;for(var k=0;k<A.length;k++){if(A[k].id===i)return A[k];}return null;}
+function catOf(k){for(var i=0;i<CATS.length;i++){if(CATS[i].key===k)return CATS[i];}return null;}
+function slugify(s){return s.toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-+|-+$/g,"");}
+
+function buildPrompt(a,notes){
+  var c=catOf(a.cat), th=TYPEHINT[a.type];
+  var today=new Date().toISOString().slice(0,10);
+  var rel=a.rel.map(function(i){var r=byId(i);return r?("- \""+r.title+"\" -> /"+slugify(r.pk)+"/ (anchor idea: "+r.pk+")"):"";}).filter(Boolean).join("\n");
+  var L=[];
+  L.push("ROLE");
+  L.push("Your deliverable is the complete, fully written article (length set by the topic: complete, never padded, never thin) plus its metadata lines, in the exact format at the end of this prompt. You are a senior feature writer and SEO editor for PerkTonic.com. Write ONE article that can compete with the top Google results and with major online magazines: Wirecutter-level rigour, Wired/The Verge-level voice, NerdWallet-level clarity. Write entirely in English for a US/UK audience.");
+  L.push("");
+  L.push("ARTICLE BRIEF");
+  L.push("- Current date: "+today);
+  L.push("- Working title (you may sharpen it; keep the primary keyword and an honest promise): "+a.title);
+  L.push("- Category (fixed): "+c.name+" (hub: "+c.slug+")");
+  L.push("- Byline author (fixed): "+c.author+". Beat: "+AUTHORS[c.author]+" Write in a voice that fits this beat. Any first-person claim of personal testing must come only from the author's notes below; never invent it.");
+  L.push("- Primary keyword: "+a.pk);
+  L.push("- Secondary keywords and entities: "+a.sk.join("; "));
+  L.push("- Search intent: "+a.intent);
+  L.push("- Description of the article: "+a.summary);
+  L.push("- Unique angle (what must make this better than page one): "+a.angle);
+  L.push("- Hook seed for the introduction: "+a.hook);
+  L.push("- Format: "+th.txt);
+  L.push("- Length: no word target. Let the topic decide (see LENGTH AND TIGHTNESS). Deliver exactly what the headline promises, no more.");
+  if(a.shots&&a.shots.length){
+    L.push("- Screenshot candidates (real captures the author will take by hand; use a SCREENSHOT tag where one fits the text, skip any that do not help the reader):");
+    a.shots.forEach(function(s){L.push("  * "+s);});
+  }else{
+    L.push("- Screenshots: none planned. Use a SCREENSHOT tag only if a paragraph truly points at a real on-screen item.");
+  }
+  L.push("- Suggested slug: "+slugify(a.pk)+" (adjust if a shorter, cleaner slug works better)");
+  L.push("- Related articles to link naturally (internal links):");
+  L.push(rel);
+  if(a.first){
+    if(notes&&notes.trim()){
+      L.push("- AUTHOR'S FIRST-HAND NOTES (real, supplied by the author; the ONLY source of personal experience; do not embellish or add anything beyond them):");
+      L.push(notes.trim());
+    }else{
+      L.push("- FIRST-HAND REQUIREMENT NOT MET: the author supplied no real test notes. Do NOT claim any personal testing, numbers or results. Rewrite the headline into an honest research-based version (drop 'I tested' or 'I replaced' wording) and write the article as a researched guide.");
+    }
+  }
+  if(a.tsens){
+    L.push("- TIME-SENSITIVE: offers, prices, eligibility and dates change. Follow the FRESHNESS rule strictly.");
+  }
+  L.push("");
+  L.push("STEP 0: RESEARCH (do this first; silent, never printed)");
+  L.push("Use your web search and browsing tool before writing. 1) Search the primary keyword, open the top 5 results, and note their H2s, what they all repeat and what they miss. 2) Collect People Also Ask questions. 3) Find 3-6 authoritative external sources for the specific claims you will make (official provider or program pages, government or regulator sites, original documentation or studies, established publications). OPEN each page and confirm that it loads, is current and really supports the point you will link it to. 4) Verify every offer, price, date and eligibility rule on the official source. If you cannot browse, do not mention it in the output: rely only on facts you are certain of, follow the FRESHNESS rule, and link only to official pages you are certain exist.");
+  L.push("");
+  L.push(EDITORIAL);
+  L.push("");
+  L.push(HOOKS);
+  L.push("");
+  L.push(LENGTH);
+  L.push("");
+  L.push(TECH);
+  L.push("");
+  L.push(GATES);
+  L.push("");
+  L.push(RESULT);
+  L.push("");
+  L.push(buildOutput(a));
+  return L.join("\n");
+}
+
+/* ---------- STATE ---------- */
+var KEY="perktonic_done_v3", done={}, filter="all";
+try{done=JSON.parse(localStorage.getItem(KEY)||"{}")||{};}catch(e){done={};}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(done));}catch(e){}}
+var imgDone={};try{imgDone=JSON.parse(localStorage.getItem("perktonic_img_v2")||"{}")||{};}catch(e){imgDone={};}
+function saveImg(){try{localStorage.setItem("perktonic_img_v2",JSON.stringify(imgDone));}catch(e){}}
+
+function toast(m){var t=document.getElementById("toast");t.textContent=m;t.classList.add("show");clearTimeout(toast._t);toast._t=setTimeout(function(){t.classList.remove("show");},1900);}
+
+function copyText(t){
+  function fallback(){
+    return new Promise(function(res){
+      var ta=document.createElement("textarea");ta.value=t;ta.style.position="fixed";ta.style.opacity="0";document.body.appendChild(ta);ta.select();
+      var ok=false;try{ok=document.execCommand("copy");}catch(e){}
+      document.body.removeChild(ta);res(ok);
+    });
+  }
+  if(navigator.clipboard&&window.isSecureContext){return navigator.clipboard.writeText(t).then(function(){return true;}).catch(fallback);}
+  return fallback();
+}
+
+/* ---------- RENDER ---------- */
+var TYPELABEL={list:"List post",guide:"How-to guide",comparison:"Comparison",news:"Offer explainer"};
+function card(a){
+  var el=document.createElement("article");
+  el.className="card"+(done[a.id]?" done":"");
+  el.id="a"+a.id;el.dataset.id=a.id;
+  var chips='<span class="chip pk">'+esc(a.pk)+'</span>'+a.sk.map(function(s){return '<span class="chip">'+esc(s)+'</span>';}).join("");
+  var flags="";
+  if(a.first)flags+='<span class="flag">First-hand testing required</span>';
+  if(a.tsens)flags+='<span class="flag">Time-sensitive: re-verify before publishing</span>';
+  el.innerHTML=
+   '<div class="top"><span class="num">#'+String(a.id).padStart(2,"0")+'</span><span class="type">'+TYPELABEL[a.type]+' · By '+catOf(a.cat).author+'</span><span class="pill">'+(done[a.id]?"Done - prompt copied":"To do")+'</span></div>'+
+   '<h3>'+esc(a.title)+'</h3>'+
+   '<div class="chips">'+chips+'</div>'+
+   '<p class="sum">'+esc(a.summary)+'</p>'+
+   '<div class="meta"><div><b>Search intent:</b> '+esc(a.intent)+'</div><div><b>Angle:</b> '+esc(a.angle)+'</div><div><b>Hook seed:</b> '+esc(a.hook)+'</div><div><b>Length:</b> set by the topic (no word target)</div></div>'+
+   (flags?'<div class="flags">'+flags+'</div>':"")+
+   (a.first?'<label class="notes"><b>Your real first-hand notes</b> (needed for this article; leave empty to get a research-based version)<textarea rows="4" placeholder="What you tested, for how long, the results, costs, what broke..."></textarea></label>':"")+
+   '<div class="coverbox"><div><b>Cover image</b> (top of the article and list thumbnail)<br><span class="scene">'+esc(a.cover)+'</span></div><button class="btn img'+(imgDone[a.id]?" on":"")+'" data-act="cover">'+(imgDone[a.id]?"Cover prompt copied":"Copy cover image prompt")+'</button></div>'+
+   (a.shots&&a.shots.length?'<div class="shotbox"><b>Screenshots to capture yourself</b> (the AI marks them as <span class="kbd">[IMAGE: SCREENSHOT: ...]</span>)<ul>'+a.shots.map(function(s){return '<li>'+esc(s)+'</li>';}).join('')+'</ul></div>':'')+
+   '<div class="actions"><button class="btn primary" data-act="copy">Copy full prompt</button><button class="btn" data-act="view">Preview prompt</button><button class="btn ghost" data-act="undo">Mark as not done</button></div>'+
+   '<pre class="prompt"></pre>';
+  function getNotes(){var t=el.querySelector("textarea");return t?t.value:"";}
+  el.querySelector('[data-act="copy"]').onclick=function(){
+    var text=buildPrompt(a,getNotes());
+    copyText(text).then(function(ok){
+      if(ok){done[a.id]=1;save();el.classList.add("done");el.querySelector(".pill").textContent="Done - prompt copied";update();toast("Prompt #"+a.id+" copied. Card marked as done.");}
+      else{toast("Copy blocked by the browser. Use Preview and copy manually.");el.querySelector("pre").textContent=text;el.querySelector("pre").classList.add("open");}
+    });
+  };
+  el.querySelector('[data-act="view"]').onclick=function(){
+    var pre=el.querySelector("pre");
+    pre.textContent=buildPrompt(a,getNotes());
+    pre.classList.toggle("open");
+  };
+  el.querySelector('[data-act="cover"]').onclick=function(){
+    var btn=this;
+    copyText(buildCover(a)).then(function(ok){
+      if(ok){imgDone[a.id]=1;saveImg();btn.classList.add("on");btn.textContent="Cover prompt copied";toast("Cover image prompt #"+a.id+" copied.");}
+      else{toast("Copy blocked by the browser.");}
+    });
+  };
+  el.querySelector('[data-act="undo"]').onclick=function(){
+    delete done[a.id];save();el.classList.remove("done");el.querySelector(".pill").textContent="To do";update();
+  };
+  return el;
+}
+
+function render(){
+  var root=document.getElementById("list");root.innerHTML="";
+  CATS.forEach(function(c){
+    var items=A.filter(function(a){return a.cat===c.key;});
+    var sec=document.createElement("section");sec.className="cat";
+    sec.innerHTML='<div class="cat-head"><h2>'+esc(c.name)+'</h2><p>'+esc(c.desc)+'</p><span class="cat-count" data-cc="'+c.key+'"></span></div>';
+    items.forEach(function(a){sec.appendChild(card(a));});
+    root.appendChild(sec);
+  });
+  update();
+}
+
+function update(){
+  var total=A.length,n=0;
+  A.forEach(function(a){if(done[a.id])n++;});
+  var pct=Math.round(n/total*100);
+  document.getElementById("plabel").textContent=n+" of "+total+" done";
+  document.getElementById("ppct").textContent=pct+"%";
+  document.getElementById("pfill").style.width=pct+"%";
+  CATS.forEach(function(c){
+    var items=A.filter(function(a){return a.cat===c.key;}),d=items.filter(function(a){return done[a.id];}).length;
+    var el=document.querySelector('[data-cc="'+c.key+'"]');if(el)el.textContent=d+"/"+items.length+" done";
+  });
+  var cards=document.querySelectorAll(".card");
+  for(var i=0;i<cards.length;i++){
+    var isDone=cards[i].classList.contains("done");
+    cards[i].style.display=(filter==="all"||(filter==="done"&&isDone)||(filter==="todo"&&!isDone))?"":"none";
+  }
+}
+
+document.getElementById("edView").textContent=EDITORIAL+"\n\n"+HOOKS;
+document.getElementById("fmtView").textContent=OUTPUT_TEMPLATE;
+document.getElementById("filter").onclick=function(e){
+  var b=e.target.closest("button");if(!b)return;
+  filter=b.dataset.f;
+  Array.prototype.forEach.call(this.children,function(x){x.classList.toggle("on",x===b);});
+  update();
+};
+document.getElementById("fence").onchange=function(){wrapFence=this.checked;toast(wrapFence?"Prompts will ask the AI to wrap its reply in a code block.":"Code block wrapping off.");};
+document.getElementById("copyEd").onclick=function(){
+  copyText(EDITORIAL+"\n\n"+HOOKS+"\n\n"+TECH+"\n\n"+GATES).then(function(ok){toast(ok?"Editorial line + SEO spec copied.":"Copy blocked by the browser.");});
+};
+document.getElementById("resetAll").onclick=function(){
+  if(confirm("Clear all 'done' marks?")){done={};save();imgDone={};saveImg();render();}
+};
+render();
+</script>
+</body>
+</html>

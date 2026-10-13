@@ -333,6 +333,9 @@ body {
   }
   .article-prose img {
     border-radius: var(--radius-sm);
+    /* Body images are bare <img> tags between paragraphs (editor- or API-
+       inserted); without this they sit flush against the text. */
+    margin-block: 1.75rem;
   }
   .article-prose figcaption {
     margin-top: 0.5rem;

@@ -176,6 +176,7 @@ model Article {
   listicleItems ListicleItem[]
   reactions     ArticleReaction[]
   quiz          Quiz?
+  brief         ArticleBrief?
   comments      Comment[]
 
   status       ContentStatus @default(DRAFT)
@@ -185,12 +186,12 @@ model Article {
   readingTime Int @default(0) // minutes
   viewCount   Int @default(0)
 
-  isFeatured    Boolean @default(false)
-  isTrending    Boolean @default(false)
-  isBreaking    Boolean @default(false)
-  trendingRank  Int?
-  trendingScore Float?
-  manualPriority Int?   // admin override for trending ordering (spec §61)
+  isFeatured     Boolean @default(false)
+  isTrending     Boolean @default(false)
+  isBreaking     Boolean @default(false)
+  trendingRank   Int?
+  trendingScore  Float?
+  manualPriority Int? // admin override for trending ordering (spec §61)
 
   // SEO (configurable separately from the visible title/excerpt)
   seoTitle        String?
@@ -234,8 +235,8 @@ model ListicleItem {
   imageAlt String?
 
   description String // item body — min length enforced in the app layer
-  credit     String?
-  sourceUrl  String?
+  credit      String?
+  sourceUrl   String?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -340,6 +341,12 @@ model SiteSettings {
   // comment per line. Cleared along with the demo Comment/ArticleReaction
   // rows by the "Clear demo engagement" button once real traffic exists.
   demoCommentPool String?
+
+  // Claude API key for the "API Articles" workflow (2026-10-13). Stored
+  // AES-256-GCM encrypted (key derived from AUTH_SECRET) by
+  // src/lib/ai-article/api-key.ts -- never plaintext, never sent to the
+  // client. Null = fall back to the ANTHROPIC_API_KEY env var.
+  anthropicApiKeyEnc String?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -557,7 +564,7 @@ model Comment {
 /// the resulting article is actually saved — never at copy time, so an
 /// abandoned draft doesn't burn a topic.
 model PromptQueueItem {
-  id         String  @id @default(cuid())
+  id         String @id @default(cuid())
   writerSlug String // matches Author.slug (alex-carter | mia-reynolds | daniel-brooks)
   writerName String // denormalized for display without a join
   category   String // resolved to a real Category.name at import time
@@ -634,4 +641,47 @@ model QuizCode {
 
   @@index([quizId])
   @@map("quiz_codes")
+}
+
+// ----------------------------------------------------------------------------
+// API Articles (2026-10-13): articles written by the Claude API from briefs
+// ----------------------------------------------------------------------------
+
+/// One article brief (imported from a "Content Command Center" HTML file by
+/// scripts/import-article-briefs.mjs) and the state of its Claude-API run.
+/// Generation produces a DRAFT Article (articleId); `imageSlots` is the
+/// ordered image to-do list for the admin's paste-images popup: slot 0 is the
+/// featured/cover image, then one slot per [IMAGE: ...] tag in the body.
+model ArticleBrief {
+  id          String @id @default(cuid())
+  source      String // brief file, e.g. "part2"
+  briefNo     Int // number inside that file (1-40)
+  title       String
+  categoryKey String // fs | is | rt | ms (the file's own keys)
+  data        Json // pk, sk[], intent, summary, angle, hook, type, rel[], shots[], cover, first?, tsens?
+
+  notes String? // the author's real first-hand notes (briefs flagged `first`)
+
+  status String  @default("PENDING") // PENDING | GENERATING | DRAFTED | PUBLISHED | FAILED
+  error  String?
+
+  coverPrompt String?
+  /// [{ kind: "cover"|"photo"|"screenshot", prompt, alt, mediaId|null, url|null }]
+  imageSlots  Json?
+
+  inputTokens  Int?
+  outputTokens Int?
+  webSearches  Int?
+  startedAt    DateTime?
+  finishedAt   DateTime?
+
+  articleId String?  @unique
+  article   Article? @relation(fields: [articleId], references: [id], onDelete: SetNull)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([source, briefNo])
+  @@index([status])
+  @@map("article_briefs")
 }

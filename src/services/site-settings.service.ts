@@ -11,7 +11,15 @@ const SINGLETON_ID = "singleton";
  * Wrapped in React `cache()` so repeated calls within one request hit the DB once.
  */
 
-const DEFAULT_SITE: SiteSettings = {
+/**
+ * What the rest of the app may see. The encrypted Claude API key column is
+ * omitted from every read here (it's only ever touched by
+ * src/lib/ai-article/api-key.ts), so it can't leak through a settings object
+ * that later gets passed to a component or serialised into a response.
+ */
+type PublicSiteSettings = Omit<SiteSettings, "anthropicApiKeyEnc">;
+
+const DEFAULT_SITE: PublicSiteSettings = {
   id: SINGLETON_ID,
   siteName: "PerkTonic.com",
   siteUrl: "https://perktonic.com",
@@ -55,9 +63,10 @@ const DEFAULT_SEO: SeoSettings = {
 };
 
 export const siteSettingsService = {
-  getSiteSettings: cache(async (): Promise<SiteSettings> => {
+  getSiteSettings: cache(async (): Promise<PublicSiteSettings> => {
     const row = await prisma.siteSettings.findUnique({
       where: { id: SINGLETON_ID },
+      omit: { anthropicApiKeyEnc: true },
     });
     return row ?? DEFAULT_SITE;
   }),

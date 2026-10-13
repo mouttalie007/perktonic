@@ -21,6 +21,7 @@ export const ADMIN_NAV: AdminNavGroup[] = [
     title: "Content",
     items: [
       { label: "Articles", href: "/adminiyad/articles" as Route },
+      { label: "API Articles", href: "/adminiyad/ai-articles" as Route, minRole: "EDITOR" },
       { label: "Categories", href: "/adminiyad/categories" as Route },
       { label: "Tags", href: "/adminiyad/tags" as Route },
       { label: "Authors", href: "/adminiyad/authors" as Route },
@@ -57,6 +58,7 @@ export const ADMIN_NAV: AdminNavGroup[] = [
       { label: "Site Settings", href: "/adminiyad/settings/site" as Route, minRole: "ADMIN" },
       { label: "SEO Settings", href: "/adminiyad/settings/seo" as Route, minRole: "ADMIN" },
       { label: "Demo Engagement", href: "/adminiyad/settings/demo-engagement" as Route, minRole: "ADMIN" },
+      { label: "AI Articles", href: "/adminiyad/settings/ai" as Route, minRole: "ADMIN" },
       { label: "Redirects", href: "/adminiyad/redirects" as Route, minRole: "ADMIN" },
       { label: "Users", href: "/adminiyad/users" as Route, minRole: "ADMIN" },
     ],
