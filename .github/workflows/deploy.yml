@@ -20,6 +20,11 @@ jobs:
             set -e
             source "$HOME/nodevenv/perktonic-app/22/bin/activate"
             cd "$HOME/perktonic-app"
+            # Shared hosting has a disk quota: drop regenerable caches first so the pull/install/build can write.
+            echo "--- disk before cleanup ---"; du -sh "$HOME" 2>/dev/null || true; quota -s 2>/dev/null || true
+            rm -rf .next/cache "$HOME/.npm/_cacache" "$HOME/.npm/_logs" "$HOME/.cache" 2>/dev/null || true
+            echo "--- biggest dirs ---"; du -sh .next node_modules public/uploads "$HOME/nodevenv" "$HOME/.git" .git 2>/dev/null || true
+            git gc --prune=now -q 2>/dev/null || true
             git pull origin main
             npm install
             npx prisma generate
