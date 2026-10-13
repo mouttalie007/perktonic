@@ -24,7 +24,10 @@ export interface BriefData {
 export type BriefCategoryKey = "fs" | "is" | "rt" | "ms";
 
 /** The brief file's category keys -> the site's real category + byline author. */
-export const BRIEF_CATEGORIES: Record<BriefCategoryKey, { name: string; author: string }> = {
+export const BRIEF_CATEGORIES: Record<
+  BriefCategoryKey,
+  { name: string; author: string }
+> = {
   fs: { name: "Free Samples & Products", author: "Mia Reynolds" },
   is: { name: "Internet Secrets & AI Tools", author: "Alex Carter" },
   rt: { name: "Rewards, Trials & Digital Perks", author: "Daniel Brooks" },

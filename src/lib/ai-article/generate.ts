@@ -1,10 +1,20 @@
 import Anthropic from "@anthropic-ai/sdk";
-import { Prisma } from "@prisma/client";
+import { Prisma, type ArticleBrief } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { readingTimeMinutes } from "@/lib/reading-time";
 import { getAnthropicApiKey } from "./api-key";
-import { asBriefData, BRIEF_CATEGORIES, briefSlug, type BriefData } from "./briefs";
-import { buildCoverPrompt, buildSystemPrompt, buildUserPrompt } from "./prompt";
+import {
+  asBriefData,
+  BRIEF_CATEGORIES,
+  briefSlug,
+  type BriefData,
+} from "./briefs";
+import {
+  buildChatPrompt,
+  buildCoverPrompt,
+  buildSystemPrompt,
+  buildUserPrompt,
+} from "./prompt";
 import { GenerationParseError, parseGeneratedArticle } from "./parse";
 import { fallbackAlt, type ImageSlot } from "./slots";
 
@@ -31,38 +41,59 @@ export interface ModelResult {
  * `fallbacks: "default"` lets the API re-run the request on another model
  * if the first one declines it (opt-in, same call, no extra code here).
  */
-export async function callClaudeForArticle(apiKey: string, system: string, user: string): Promise<ModelResult> {
-  const client = new Anthropic({ apiKey, maxRetries: 3, timeout: REQUEST_TIMEOUT_MS });
+export async function callClaudeForArticle(
+  apiKey: string,
+  system: string,
+  user: string,
+  signal?: AbortSignal,
+): Promise<ModelResult> {
+  const client = new Anthropic({
+    apiKey,
+    maxRetries: 3,
+    timeout: REQUEST_TIMEOUT_MS,
+  });
 
   const tools: Anthropic.Beta.BetaToolUnion[] = [
     { type: "web_search_20260209", name: "web_search", max_uses: 10 },
     // max_content_tokens caps what ONE fetched page can add to the context --
     // an uncapped fetch of a long page is what made the first test run cost
     // ~$1.3 (half a million input tokens across the continuation turns).
-    { type: "web_fetch_20260209", name: "web_fetch", max_uses: 8, max_content_tokens: 25_000 },
+    {
+      type: "web_fetch_20260209",
+      name: "web_fetch",
+      max_uses: 8,
+      max_content_tokens: 25_000,
+    },
   ];
 
-  let messages: Anthropic.Beta.BetaMessageParam[] = [{ role: "user", content: user }];
+  let messages: Anthropic.Beta.BetaMessageParam[] = [
+    { role: "user", content: user },
+  ];
   const turnTexts: string[] = [];
   let inputTokens = 0;
   let outputTokens = 0;
   let webSearches = 0;
 
   for (let turn = 0; turn <= MAX_CONTINUATIONS; turn++) {
-    const stream = client.beta.messages.stream({
-      model: AI_MODEL,
-      max_tokens: MAX_TOKENS,
-      betas: ["server-side-fallback-2026-07-01"],
-      fallbacks: "default",
-      // Auto-caches the growing prefix, so each pause_turn continuation
-      // re-reads the research so far at the cache-read price, not full price.
-      cache_control: { type: "ephemeral" },
-      thinking: { type: "adaptive" },
-      output_config: { effort: "high" },
-      system: [{ type: "text", text: system, cache_control: { type: "ephemeral" } }],
-      tools,
-      messages,
-    });
+    const stream = client.beta.messages.stream(
+      {
+        model: AI_MODEL,
+        max_tokens: MAX_TOKENS,
+        betas: ["server-side-fallback-2026-07-01"],
+        fallbacks: "default",
+        // Auto-caches the growing prefix, so each pause_turn continuation
+        // re-reads the research so far at the cache-read price, not full price.
+        cache_control: { type: "ephemeral" },
+        thinking: { type: "adaptive" },
+        output_config: { effort: "high" },
+        system: [
+          { type: "text", text: system, cache_control: { type: "ephemeral" } },
+        ],
+        tools,
+        messages,
+      },
+      signal ? { signal } : undefined,
+    );
     const msg = await stream.finalMessage();
 
     // "Billable-equivalent" input tokens: cache writes cost 1.25x, cache reads 0.1x.
@@ -86,15 +117,21 @@ export async function callClaudeForArticle(apiKey: string, system: string, user:
       continue;
     }
     if (msg.stop_reason === "refusal") {
-      throw new Error("The model declined to write this article (safety refusal).");
+      throw new Error(
+        "The model declined to write this article (safety refusal).",
+      );
     }
     if (msg.stop_reason === "max_tokens") {
-      throw new Error("The model ran out of output tokens before finishing the article.");
+      throw new Error(
+        "The model ran out of output tokens before finishing the article.",
+      );
     }
     break;
   }
 
-  const text = [...turnTexts].reverse().find((t) => /^\s*Title:/im.test(t)) ?? turnTexts.join("\n");
+  const text =
+    [...turnTexts].reverse().find((t) => /^\s*Title:/im.test(t)) ??
+    turnTexts.join("\n");
   return { text, inputTokens, outputTokens, webSearches };
 }
 
@@ -123,9 +160,15 @@ async function loadSiteContext(): Promise<SiteContext> {
   for (const b of allBriefs) knownSlugs.add(briefSlug(asBriefData(b.data).pk));
 
   return {
-    catByName: new Map(categories.map((c) => [c.name, { id: c.id, slug: c.slug }])),
+    catByName: new Map(
+      categories.map((c) => [c.name, { id: c.id, slug: c.slug }]),
+    ),
     authorByName: new Map(authors.map((a) => [a.name, a.id])),
-    liveArticles: live.map((a) => ({ title: a.title, slug: a.slug, category: a.category?.name ?? null })),
+    liveArticles: live.map((a) => ({
+      title: a.title,
+      slug: a.slug,
+      category: a.category?.name ?? null,
+    })),
     knownSlugs,
     categorySlugs: new Set(categories.map((c) => c.slug)),
   };
@@ -138,128 +181,258 @@ function shortError(e: unknown): string {
   return (e instanceof Error ? e.message : String(e)).slice(0, 500);
 }
 
-/** Runs one brief end to end. Never throws: failures are recorded on the brief. */
-export async function generateBrief(briefId: string): Promise<void> {
-  const brief = await prisma.articleBrief.findUnique({ where: { id: briefId } });
+/** The per-article user message (brief + site context), shared by the API and the copy-paste workflow. */
+function userPromptFor(
+  brief: ArticleBrief,
+  site: SiteContext,
+): { data: BriefData; user: string; slug: string; dbCatId: string } {
+  const data: BriefData = asBriefData(brief.data);
+  const cat = BRIEF_CATEGORIES[data.cat];
+  const dbCat = site.catByName.get(cat.name);
+  if (!dbCat)
+    throw new Error(
+      `The category "${cat.name}" does not exist in the database.`,
+    );
+  const slug = briefSlug(data.pk);
+
+  const liveSlugs = new Set(site.liveArticles.map((a) => a.slug));
+  const user = buildUserPrompt(data, {
+    today: new Date().toISOString().slice(0, 10),
+    categoryHubUrl: `/category/${dbCat.slug}`,
+    slug,
+    related: (data.relResolved ?? []).map((r) => ({
+      title: r.title,
+      pk: r.pk,
+      url: `/story/${briefSlug(r.pk)}`,
+      live: liveSlugs.has(briefSlug(r.pk)),
+    })),
+    liveArticles: site.liveArticles
+      .filter((a) => a.slug !== slug)
+      .map((a) => ({
+        title: a.title,
+        url: `/story/${a.slug}`,
+        category: a.category,
+      })),
+    notes: brief.notes,
+  });
+  return { data, user, slug, dbCatId: dbCat.id };
+}
+
+interface Usage {
+  inputTokens: number;
+  outputTokens: number;
+  webSearches: number;
+}
+
+/**
+ * Parses a finished reply (from the API or pasted from claude.ai) and writes
+ * the DRAFT article + the image slots + marks the brief DRAFTED. Throws on an
+ * unusable reply; the callers record that on the brief or return it.
+ */
+async function persistDraft(
+  brief: ArticleBrief,
+  rawText: string,
+  usage: Usage | null,
+): Promise<{ title: string; warnings: string[] }> {
+  const site = await loadSiteContext();
+  const { data, slug, dbCatId } = userPromptFor(brief, site);
+  const cat = BRIEF_CATEGORIES[data.cat];
+
+  const parsed = parseGeneratedArticle(rawText, {
+    isKnownInternal: (href) => {
+      const path = href.split(/[?#]/)[0].replace(/\/+$/, "") || "/";
+      if (path === "/") return true;
+      if (path.startsWith("/story/"))
+        return site.knownSlugs.has(path.slice("/story/".length));
+      if (path.startsWith("/category/"))
+        return site.categorySlugs.has(path.slice("/category/".length));
+      return false;
+    },
+  });
+
+  // Category + author are fixed by the brief, whatever the model wrote.
+  const authorId = site.authorByName.get(cat.author) ?? null;
+
+  const existing = await prisma.article.findUnique({
+    where: { slug },
+    select: { id: true },
+  });
+  if (existing && existing.id !== brief.articleId) {
+    throw new Error(
+      `An article with the slug "${slug}" already exists, so this brief can't create its draft.`,
+    );
+  }
+
+  const articleData = {
+    type: "STANDARD" as const,
+    title: parsed.title,
+    slug,
+    excerpt: parsed.metaDescription || null,
+    metaDescription: parsed.metaDescription || null,
+    content: parsed.bodyHtml,
+    readingTime: readingTimeMinutes(parsed.bodyHtml),
+    status: "DRAFT" as const,
+    publishedAt: null,
+    categoryId: dbCatId,
+    authorId,
+    featuredImageId: null,
+  } satisfies Partial<Prisma.ArticleUncheckedCreateInput>;
+
+  const article = brief.articleId
+    ? await prisma.article.update({
+        where: { id: brief.articleId },
+        data: articleData,
+      })
+    : await prisma.article.create({ data: articleData });
+
+  const slots: ImageSlot[] = [
+    {
+      kind: "cover",
+      prompt: buildCoverPrompt(data, parsed.title),
+      alt: parsed.coverAlt || `${data.pk}`,
+      mediaId: null,
+      url: null,
+    },
+    ...parsed.markers.map((m, i): ImageSlot => ({
+      kind: m.kind,
+      prompt: m.prompt,
+      alt: parsed.alts[i] || fallbackAlt(m.prompt, m.kind, data.pk),
+      mediaId: null,
+      url: null,
+    })),
+  ];
+
+  await prisma.articleBrief.update({
+    where: { id: brief.id },
+    data: {
+      status: "DRAFTED",
+      title: parsed.title,
+      articleId: article.id,
+      coverPrompt: slots[0].prompt,
+      imageSlots: slots as unknown as Prisma.InputJsonValue,
+      error: parsed.warnings.length ? parsed.warnings.join(" | ") : null,
+      inputTokens: usage?.inputTokens ?? null,
+      outputTokens: usage?.outputTokens ?? null,
+      webSearches: usage?.webSearches ?? null,
+      finishedAt: new Date(),
+    },
+  });
+  return { title: parsed.title, warnings: parsed.warnings };
+}
+
+/** Runs one brief end to end through the API. Never throws: failures are recorded on the brief. */
+export async function generateBrief(
+  briefId: string,
+  signal?: AbortSignal,
+): Promise<void> {
+  const brief = await prisma.articleBrief.findUnique({
+    where: { id: briefId },
+  });
   if (!brief || brief.status === "PUBLISHED") return;
 
   await prisma.articleBrief.update({
     where: { id: briefId },
-    data: { status: "GENERATING", error: null, startedAt: new Date(), finishedAt: null },
+    data: {
+      status: "GENERATING",
+      error: null,
+      startedAt: new Date(),
+      finishedAt: null,
+    },
   });
 
   try {
     const { key } = await getAnthropicApiKey();
-    if (!key) throw new Error("No Claude API key is configured. Add one in Settings → AI Articles.");
+    if (!key)
+      throw new Error(
+        "No Claude API key is configured. Add one in Settings → AI Articles.",
+      );
 
-    const data: BriefData = asBriefData(brief.data);
-    const cat = BRIEF_CATEGORIES[data.cat];
     const site = await loadSiteContext();
-    const dbCat = site.catByName.get(cat.name);
-    if (!dbCat) throw new Error(`The category "${cat.name}" does not exist in the database.`);
-    const slug = briefSlug(data.pk);
-
-    const liveSlugs = new Set(site.liveArticles.map((a) => a.slug));
-    const user = buildUserPrompt(data, {
-      today: new Date().toISOString().slice(0, 10),
-      categoryHubUrl: `/category/${dbCat.slug}`,
-      slug,
-      related: (data.relResolved ?? []).map((r) => ({
-        title: r.title,
-        pk: r.pk,
-        url: `/story/${briefSlug(r.pk)}`,
-        live: liveSlugs.has(briefSlug(r.pk)),
-      })),
-      liveArticles: site.liveArticles
-        .filter((a) => a.slug !== slug)
-        .map((a) => ({ title: a.title, url: `/story/${a.slug}`, category: a.category })),
-      notes: brief.notes,
-    });
-
-    const result = await callClaudeForArticle(key, buildSystemPrompt(), user);
-
-    const parsed = parseGeneratedArticle(result.text, {
-      isKnownInternal: (href) => {
-        const path = href.split(/[?#]/)[0].replace(/\/+$/, "") || "/";
-        if (path === "/") return true;
-        if (path.startsWith("/story/")) return site.knownSlugs.has(path.slice("/story/".length));
-        if (path.startsWith("/category/")) return site.categorySlugs.has(path.slice("/category/".length));
-        return false;
-      },
-    });
-
-    // Category + author are fixed by the brief, whatever the model wrote.
-    const authorId = site.authorByName.get(cat.author) ?? null;
-
-    const existing = await prisma.article.findUnique({ where: { slug }, select: { id: true } });
-    if (existing && existing.id !== brief.articleId) {
-      throw new Error(`An article with the slug "${slug}" already exists, so this brief can't create its draft.`);
-    }
-
-    const articleData = {
-      type: "STANDARD" as const,
-      title: parsed.title,
-      slug,
-      excerpt: parsed.metaDescription || null,
-      metaDescription: parsed.metaDescription || null,
-      content: parsed.bodyHtml,
-      readingTime: readingTimeMinutes(parsed.bodyHtml),
-      status: "DRAFT" as const,
-      publishedAt: null,
-      categoryId: dbCat.id,
-      authorId,
-      featuredImageId: null,
-    } satisfies Partial<Prisma.ArticleUncheckedCreateInput>;
-
-    const article = brief.articleId
-      ? await prisma.article.update({ where: { id: brief.articleId }, data: articleData })
-      : await prisma.article.create({ data: articleData });
-
-    const slots: ImageSlot[] = [
-      {
-        kind: "cover",
-        prompt: buildCoverPrompt(data, parsed.title),
-        alt: parsed.coverAlt || `${data.pk}`,
-        mediaId: null,
-        url: null,
-      },
-      ...parsed.markers.map((m, i): ImageSlot => ({
-        kind: m.kind,
-        prompt: m.prompt,
-        alt: parsed.alts[i] || fallbackAlt(m.prompt, m.kind, data.pk),
-        mediaId: null,
-        url: null,
-      })),
-    ];
-
-    await prisma.articleBrief.update({
-      where: { id: briefId },
-      data: {
-        status: "DRAFTED",
-        title: parsed.title,
-        articleId: article.id,
-        coverPrompt: slots[0].prompt,
-        imageSlots: slots as unknown as Prisma.InputJsonValue,
-        error: parsed.warnings.length ? parsed.warnings.join(" | ") : null,
-        inputTokens: result.inputTokens,
-        outputTokens: result.outputTokens,
-        webSearches: result.webSearches,
-        finishedAt: new Date(),
-      },
+    const { user } = userPromptFor(brief, site);
+    const result = await callClaudeForArticle(
+      key,
+      buildSystemPrompt(),
+      user,
+      signal,
+    );
+    await persistDraft(brief, result.text, {
+      inputTokens: result.inputTokens,
+      outputTokens: result.outputTokens,
+      webSearches: result.webSearches,
     });
   } catch (e) {
     await prisma.articleBrief.update({
       where: { id: briefId },
       data: {
         status: "FAILED",
-        error: e instanceof GenerationParseError ? `Unusable reply: ${e.message}` : shortError(e),
+        error: signal?.aborted
+          ? "Stopped by you."
+          : e instanceof GenerationParseError
+            ? `Unusable reply: ${e.message}`
+            : shortError(e),
         finishedAt: new Date(),
       },
     });
   }
 }
 
-export function estimateCostUsd(b: { inputTokens: number | null; outputTokens: number | null; webSearches: number | null }): number | null {
+// ---------------------------------------------------------------------------
+// Copy-and-paste workflow (claude.ai in the browser): no API key, no API cost.
+// ---------------------------------------------------------------------------
+
+/** The full prompt to paste into a claude.ai chat for this brief. */
+export async function getChatPromptForBrief(
+  briefId: string,
+  notes?: string | null,
+): Promise<string | null> {
+  let brief = await prisma.articleBrief.findUnique({ where: { id: briefId } });
+  if (!brief) return null;
+  if (notes !== undefined && notes !== null && brief.status !== "PUBLISHED") {
+    brief = await prisma.articleBrief.update({
+      where: { id: briefId },
+      data: { notes: notes.trim() || null },
+    });
+  }
+  const site = await loadSiteContext();
+  const { user } = userPromptFor(brief, site);
+  return buildChatPrompt(user);
+}
+
+export type ImportResult =
+  | { ok: true; title: string; warnings: string[] }
+  | { ok: false; error: string };
+
+/** Turns the reply pasted from claude.ai into the draft article. */
+export async function importPastedArticle(
+  briefId: string,
+  raw: string,
+): Promise<ImportResult> {
+  const brief = await prisma.articleBrief.findUnique({
+    where: { id: briefId },
+  });
+  if (!brief) return { ok: false, error: "Article not found." };
+  if (brief.status === "PUBLISHED")
+    return {
+      ok: false,
+      error:
+        "This article is already published. Edit it from the Articles page.",
+    };
+  if (!raw.trim()) return { ok: false, error: "Paste Claude's reply first." };
+  try {
+    const res = await persistDraft(brief, raw, null);
+    return { ok: true, ...res };
+  } catch (e) {
+    if (e instanceof GenerationParseError)
+      return { ok: false, error: e.message };
+    return { ok: false, error: shortError(e) };
+  }
+}
+
+export function estimateCostUsd(b: {
+  inputTokens: number | null;
+  outputTokens: number | null;
+  webSearches: number | null;
+}): number | null {
   if (b.inputTokens == null || b.outputTokens == null) return null;
   return (
     (b.inputTokens / 1e6) * PRICE_PER_MTOK.input +

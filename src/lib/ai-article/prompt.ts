@@ -109,6 +109,51 @@ export function buildSystemPrompt(): string {
   ].join("\n\n");
 }
 
+const CHAT_DELIVERY = join([
+  "DELIVERY RULES FOR THIS CHAT (these override every earlier line about code fences, 'no preamble' or how the reply starts)",
+  "- Do the research first with web search (open the pages, don't rely on memory), think carefully, and verify every claim exactly as the QUALITY PROTOCOL says. Do this silently: show no research notes.",
+  "- Then put your COMPLETE final answer, and nothing else, inside ONE single code block (three backticks, the word text, a new line, the answer, a new line, three backticks) so I can copy it with one click. The first line INSIDE the block is 'Title:'. Write nothing before or after the code block.",
+  "- Never split the answer over several code blocks and never use three backticks inside it. If the article is long, it still goes completely into that one block: the whole article, the image tags and the ---ALTS--- lines.",
+  "- Do not ask me questions; make sensible assumptions silently.",
+]);
+
+/**
+ * The same prompt, adapted for pasting into a claude.ai chat: one message
+ * (instructions + brief) and the answer delivered in a single copyable code
+ * block, which parseGeneratedArticle unwraps.
+ */
+export function buildChatPrompt(userPrompt: string): string {
+  const system = buildSystemPrompt()
+    .replace(
+      "your entire reply must be this and nothing else",
+      "your entire reply must be this, inside one code block (see DELIVERY RULES), and nothing else",
+    )
+    .replace(
+      "- Your reply starts with the characters 'Title:'. No preamble, no code fences, no notes, no explanations, no sign-off.",
+      "- Your reply is ONE code block (see DELIVERY RULES) whose first line starts with 'Title:'. No preamble, no notes, no explanations, no sign-off outside it.",
+    )
+    .replace(
+      "You have live web search and web fetch tools.",
+      "Use web search (and open the result pages) for the research.",
+    )
+    .replace(
+      "10. FINAL CHECK. Your reply must be only the format above, starting with 'Title:'.",
+      "10. FINAL CHECK. Your reply must be only the format above, inside one code block, its first line starting with 'Title:'.",
+    );
+  const brief = userPrompt
+    .replace(
+      "Use your web search and web fetch tools before writing",
+      "Use web search before writing",
+    )
+    .replace(
+      "Reply now with the finished, fully written article in the exact output format.",
+      "Reply now with the finished, fully written article in the exact output format, inside one code block.",
+    );
+  return [system, "=".repeat(60), brief, "=".repeat(60), CHAT_DELIVERY].join(
+    "\n\n",
+  );
+}
+
 export interface PromptContext {
   /** YYYY-MM-DD */
   today: string;
@@ -139,7 +184,9 @@ export function buildUserPrompt(brief: BriefData, ctx: PromptContext): string {
   L.push(`- Secondary keywords and entities: ${brief.sk.join("; ")}`);
   L.push(`- Search intent: ${brief.intent}`);
   L.push(`- Description of the article: ${brief.summary}`);
-  L.push(`- Unique angle (what must make this better than page one): ${brief.angle}`);
+  L.push(
+    `- Unique angle (what must make this better than page one): ${brief.angle}`,
+  );
   L.push(`- Hook seed for the introduction: ${brief.hook}`);
   L.push(`- Format: ${TYPEHINT[brief.type] ?? ""}`);
   L.push(
@@ -159,9 +206,12 @@ export function buildUserPrompt(brief: BriefData, ctx: PromptContext): string {
   L.push(`- Category line to copy exactly: Category: ${cat.name}`);
   L.push(`- Author line to copy exactly: Author: ${cat.author}`);
   L.push(
-    "- Cover image scene (for your Cover Alt line; the image itself is produced separately): " + brief.cover,
+    "- Cover image scene (for your Cover Alt line; the image itself is produced separately): " +
+      brief.cover,
   );
-  L.push("- Related articles to link naturally (internal links; use these exact URLs):");
+  L.push(
+    "- Related articles to link naturally (internal links; use these exact URLs):",
+  );
   if (ctx.related.length) {
     for (const r of ctx.related) {
       L.push(
@@ -171,13 +221,17 @@ export function buildUserPrompt(brief: BriefData, ctx: PromptContext): string {
   } else {
     L.push("  * (none)");
   }
-  L.push(`- Category hub URL (one natural link to it is welcome): ${ctx.categoryHubUrl}`);
+  L.push(
+    `- Category hub URL (one natural link to it is welcome): ${ctx.categoryHubUrl}`,
+  );
   if (ctx.liveArticles.length) {
     L.push(
       "- LIVE SITE ARTICLES (already published on PerkTonic; link to one of these only when it is directly relevant to the sentence, using its exact URL; never link to a PerkTonic URL that is not listed in this brief):",
     );
     for (const a of ctx.liveArticles) {
-      L.push(`  * "${a.title}" -> ${a.url}${a.category ? ` [${a.category}]` : ""}`);
+      L.push(
+        `  * "${a.title}" -> ${a.url}${a.category ? ` [${a.category}]` : ""}`,
+      );
     }
   }
   if (brief.first) {
@@ -210,7 +264,10 @@ export function buildUserPrompt(brief: BriefData, ctx: PromptContext): string {
 }
 
 /** The featured-image prompt (shown in the admin's image popup, step 1). */
-export function buildCoverPrompt(brief: BriefData, articleTitle: string): string {
+export function buildCoverPrompt(
+  brief: BriefData,
+  articleTitle: string,
+): string {
   return [
     `Create a photo for the top of a PerkTonic article titled "${articleTitle}". It is also the thumbnail in article lists.`,
     "",

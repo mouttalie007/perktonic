@@ -17,10 +17,26 @@ export function asSlots(value: unknown): ImageSlot[] {
 }
 
 /** A readable alt text when the model didn't supply one for a tag. */
-export function fallbackAlt(prompt: string, kind: ImageSlot["kind"], primaryKeyword: string): string {
-  const cleaned = prompt.replace(/^SCREENSHOT:\s*/i, "").replace(/\s+/g, " ").trim();
-  if (kind === "screenshot") return `Screenshot: ${cleaned}`.slice(0, 110).replace(/\s+\S*$/, "").trim() || `Screenshot about ${primaryKeyword}`;
+export function fallbackAlt(
+  prompt: string,
+  kind: ImageSlot["kind"],
+  primaryKeyword: string,
+): string {
+  const cleaned = prompt
+    .replace(/^SCREENSHOT:\s*/i, "")
+    .replace(/\s+/g, " ")
+    .trim();
+  if (kind === "screenshot")
+    return (
+      `Screenshot: ${cleaned}`
+        .slice(0, 110)
+        .replace(/\s+\S*$/, "")
+        .trim() || `Screenshot about ${primaryKeyword}`
+    );
   const firstSentence = cleaned.split(/(?<=[.!?])\s/)[0] ?? cleaned;
-  const alt = firstSentence.length > 110 ? firstSentence.slice(0, 110).replace(/\s+\S*$/, "") : firstSentence;
+  const alt =
+    firstSentence.length > 110
+      ? firstSentence.slice(0, 110).replace(/\s+\S*$/, "")
+      : firstSentence;
   return alt.replace(/[.\s]+$/, "") || primaryKeyword;
 }

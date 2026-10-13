@@ -1,4 +1,9 @@
-import { createCipheriv, createDecipheriv, randomBytes, scryptSync } from "node:crypto";
+import {
+  createCipheriv,
+  createDecipheriv,
+  randomBytes,
+  scryptSync,
+} from "node:crypto";
 import { prisma } from "@/lib/prisma";
 
 /**
@@ -19,7 +24,10 @@ const SALT = "perktonic-anthropic-api-key-v1";
 
 function derivedKey(): Buffer {
   const secret = process.env.AUTH_SECRET;
-  if (!secret) throw new Error("AUTH_SECRET is not set, so the API key can't be encrypted or decrypted.");
+  if (!secret)
+    throw new Error(
+      "AUTH_SECRET is not set, so the API key can't be encrypted or decrypted.",
+    );
   return scryptSync(secret, SALT, 32);
 }
 
@@ -28,16 +36,28 @@ export function encryptSecret(plain: string): string {
   const cipher = createCipheriv("aes-256-gcm", derivedKey(), iv);
   const ct = Buffer.concat([cipher.update(plain, "utf8"), cipher.final()]);
   const tag = cipher.getAuthTag();
-  return ["v1", iv.toString("base64"), tag.toString("base64"), ct.toString("base64")].join(":");
+  return [
+    "v1",
+    iv.toString("base64"),
+    tag.toString("base64"),
+    ct.toString("base64"),
+  ].join(":");
 }
 
 export function decryptSecret(stored: string): string | null {
   try {
     const [v, iv, tag, ct] = stored.split(":");
     if (v !== "v1" || !iv || !tag || !ct) return null;
-    const decipher = createDecipheriv("aes-256-gcm", derivedKey(), Buffer.from(iv, "base64"));
+    const decipher = createDecipheriv(
+      "aes-256-gcm",
+      derivedKey(),
+      Buffer.from(iv, "base64"),
+    );
     decipher.setAuthTag(Buffer.from(tag, "base64"));
-    return Buffer.concat([decipher.update(Buffer.from(ct, "base64")), decipher.final()]).toString("utf8");
+    return Buffer.concat([
+      decipher.update(Buffer.from(ct, "base64")),
+      decipher.final(),
+    ]).toString("utf8");
   } catch {
     // Wrong AUTH_SECRET (rotated) or corrupt value -- treat as "not set".
     return null;
@@ -52,7 +72,10 @@ export function maskKey(key: string): string {
 
 export type ApiKeySource = "settings" | "env" | "none";
 
-export async function getAnthropicApiKey(): Promise<{ key: string | null; source: ApiKeySource }> {
+export async function getAnthropicApiKey(): Promise<{
+  key: string | null;
+  source: ApiKeySource;
+}> {
   const row = await prisma.siteSettings.findUnique({
     where: { id: "singleton" },
     select: { anthropicApiKeyEnc: true },
@@ -76,7 +99,10 @@ export async function saveAnthropicApiKey(plain: string): Promise<void> {
 }
 
 export async function clearAnthropicApiKey(): Promise<void> {
-  await prisma.siteSettings.updateMany({ where: { id: "singleton" }, data: { anthropicApiKeyEnc: null } });
+  await prisma.siteSettings.updateMany({
+    where: { id: "singleton" },
+    data: { anthropicApiKeyEnc: null },
+  });
 }
 
 export interface KeyStatus {
@@ -89,5 +115,10 @@ export interface KeyStatus {
 /** Safe to show an admin: the masked key and where it came from, never the key. */
 export async function getKeyStatus(model: string): Promise<KeyStatus> {
   const { key, source } = await getAnthropicApiKey();
-  return { configured: Boolean(key), source, masked: key ? maskKey(key) : null, model };
+  return {
+    configured: Boolean(key),
+    source,
+    masked: key ? maskKey(key) : null,
+    model,
+  };
 }

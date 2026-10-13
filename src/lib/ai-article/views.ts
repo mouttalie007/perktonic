@@ -14,7 +14,8 @@ export interface BriefView {
   pk: string;
   first: boolean;
   tsens: boolean;
-  status: "PENDING" | "QUEUED" | "GENERATING" | "DRAFTED" | "PUBLISHED" | "FAILED";
+  status:
+    "PENDING" | "QUEUED" | "GENERATING" | "DRAFTED" | "PUBLISHED" | "FAILED";
   /** Failure reason, or (for a DRAFTED brief) review warnings. */
   message: string | null;
   notes: string | null;
@@ -22,6 +23,7 @@ export interface BriefView {
   slug: string | null;
   slotsDone: number;
   slotsTotal: number;
+  hasQuiz: boolean;
   costUsd: number | null;
   webSearches: number | null;
 }
@@ -32,6 +34,17 @@ export async function getBriefViews(): Promise<BriefView[]> {
     orderBy: [{ source: "asc" }, { briefNo: "asc" }],
     include: { article: { select: { slug: true } } },
   });
+  const quizzes = await prisma.quiz.findMany({
+    where: {
+      articleId: {
+        in: rows
+          .map((r) => r.articleId)
+          .filter((id): id is string => Boolean(id)),
+      },
+    },
+    select: { articleId: true },
+  });
+  const withQuiz = new Set(quizzes.map((q) => q.articleId));
   return rows.map((b) => {
     const data = asBriefData(b.data);
     const slots = asSlots(b.imageSlots);
@@ -52,6 +65,7 @@ export async function getBriefViews(): Promise<BriefView[]> {
       slug: b.article?.slug ?? null,
       slotsDone: slots.filter((s) => s.url).length,
       slotsTotal: slots.length,
+      hasQuiz: b.articleId ? withQuiz.has(b.articleId) : false,
       costUsd: cost,
       webSearches: b.webSearches,
     };

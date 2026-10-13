@@ -1,4 +1,9 @@
-import { parse as parseHtml, HTMLElement, TextNode, type Node } from "node-html-parser";
+import {
+  parse as parseHtml,
+  HTMLElement,
+  TextNode,
+  type Node,
+} from "node-html-parser";
 
 /**
  * Turns the model's reply (the plain-text "Title: ... --- <html body>"
@@ -37,12 +42,50 @@ export interface ParsedArticle {
   externalLinks: number;
 }
 
-const ALLOWED = new Set(["h2", "h3", "p", "ul", "ol", "li", "strong", "em", "a", "blockquote", "br"]);
-const DROP = new Set([
-  "script", "style", "iframe", "object", "embed", "form", "input", "button", "textarea", "select",
-  "svg", "math", "noscript", "template", "img", "picture", "video", "audio", "canvas", "link", "meta",
+const ALLOWED = new Set([
+  "h2",
+  "h3",
+  "p",
+  "ul",
+  "ol",
+  "li",
+  "strong",
+  "em",
+  "a",
+  "blockquote",
+  "br",
 ]);
-const RENAME: Record<string, string> = { h1: "h2", h4: "h3", h5: "h3", h6: "h3", b: "strong", i: "em" };
+const DROP = new Set([
+  "script",
+  "style",
+  "iframe",
+  "object",
+  "embed",
+  "form",
+  "input",
+  "button",
+  "textarea",
+  "select",
+  "svg",
+  "math",
+  "noscript",
+  "template",
+  "img",
+  "picture",
+  "video",
+  "audio",
+  "canvas",
+  "link",
+  "meta",
+]);
+const RENAME: Record<string, string> = {
+  h1: "h2",
+  h4: "h3",
+  h5: "h3",
+  h6: "h3",
+  b: "strong",
+  i: "em",
+};
 
 const TOKEN = (n: number) => `@@IMG${n}@@`;
 const TOKEN_RE = /@@IMG(\d+)@@/g;
@@ -88,7 +131,8 @@ function cleanNode(node: Node, ctx: SanitizeCtx): string {
       return `<a href="${escapeAttr(href)}" target="_blank" rel="noopener noreferrer">${inner}</a>`;
     }
     if (href.startsWith("/") && !href.startsWith("//")) {
-      if (ctx.isKnownInternal(href)) return `<a href="${escapeAttr(href)}">${inner}</a>`;
+      if (ctx.isKnownInternal(href))
+        return `<a href="${escapeAttr(href)}">${inner}</a>`;
       ctx.warnings.push(`Removed an internal link to an unknown page: ${href}`);
     }
     return inner; // mailto:, javascript:, #fragments, unknown internal -> keep the words, drop the link
@@ -98,7 +142,14 @@ function cleanNode(node: Node, ctx: SanitizeCtx): string {
 }
 
 function sanitizeBody(body: string, ctx: SanitizeCtx): string {
-  const root = parseHtml(body, { blockTextElements: { script: false, noscript: false, style: false, pre: false } });
+  const root = parseHtml(body, {
+    blockTextElements: {
+      script: false,
+      noscript: false,
+      style: false,
+      pre: false,
+    },
+  });
   const pieces: string[] = [];
   for (const child of root.childNodes) {
     if (child instanceof TextNode) {
@@ -111,7 +162,11 @@ function sanitizeBody(body: string, ctx: SanitizeCtx): string {
     const html = cleanNode(child, ctx).trim();
     if (!html) continue;
     // An unwrapped <div>/<span> can leave loose prose at the top level: give it a paragraph.
-    pieces.push(html.startsWith("<") || /^(@@IMG\d+@@\s*)+$/.test(html) ? html : `<p>${html}</p>`);
+    pieces.push(
+      html.startsWith("<") || /^(@@IMG\d+@@\s*)+$/.test(html)
+        ? html
+        : `<p>${html}</p>`,
+    );
   }
   return pieces.join("\n");
 }
@@ -127,12 +182,22 @@ function cleanTitle(s: string): string {
 
 /** Keeps a meta description inside 160 characters without an ellipsis. */
 export function fitMetaDescription(s: string): string {
-  const t = s.replace(/\s+/g, " ").replace(/^["“]|["”]$/g, "").trim();
+  const t = s
+    .replace(/\s+/g, " ")
+    .replace(/^["“]|["”]$/g, "")
+    .trim();
   if (t.length <= 160) return t;
   const cut = t.slice(0, 159);
-  const sentenceEnd = Math.max(cut.lastIndexOf(". "), cut.lastIndexOf("! "), cut.lastIndexOf("? "));
+  const sentenceEnd = Math.max(
+    cut.lastIndexOf(". "),
+    cut.lastIndexOf("! "),
+    cut.lastIndexOf("? "),
+  );
   if (sentenceEnd > 90) return cut.slice(0, sentenceEnd + 1).trim();
-  return cut.slice(0, cut.lastIndexOf(" ")).replace(/[,;:\-–—]+$/, "").trim();
+  return cut
+    .slice(0, cut.lastIndexOf(" "))
+    .replace(/[,;:\-–—]+$/, "")
+    .trim();
 }
 
 function plainWordCount(html: string): number {
@@ -150,12 +215,22 @@ export function parseGeneratedArticle(
 ): ParsedArticle {
   let text = raw.replace(/\r\n/g, "\n").trim();
 
-  // Tolerate a fenced reply even though the prompt forbids it.
-  const fence = text.match(/^```[a-z]*\n([\s\S]*?)\n```\s*$/i);
-  if (fence) text = fence[1].trim();
+  // The copy-paste workflow asks claude.ai for ONE code block, so a fenced
+  // reply is normal: use the longest fenced block that holds an article.
+  const blocks = [...text.matchAll(/```[^\n]*\n([\s\S]*?)\n?```/g)].map(
+    (m) => m[1],
+  );
+  const article = blocks
+    .filter((b) => /^Title:/im.test(b))
+    .sort((a, b) => b.length - a.length)[0];
+  if (article) text = article.trim();
+  else text = text.replace(/\n?```[a-z]*\s*$/i, "").trim(); // a stray closing fence of a half-copied block
 
   const start = text.search(/^Title:/im);
-  if (start < 0) throw new GenerationParseError("The reply has no 'Title:' line, so it isn't an article in the expected format.");
+  if (start < 0)
+    throw new GenerationParseError(
+      "The reply has no 'Title:' line, so it isn't an article in the expected format.",
+    );
   text = text.slice(start);
 
   // Header / body split: the first line that is only ---.
@@ -167,7 +242,10 @@ export function parseGeneratedArticle(
     rest = text.slice(sep.index + sep[0].length);
   } else {
     const firstBlock = text.search(/^(<[a-z]|\[IMAGE:)/im);
-    if (firstBlock < 0) throw new GenerationParseError("The reply has no '---' separator and no article body.");
+    if (firstBlock < 0)
+      throw new GenerationParseError(
+        "The reply has no '---' separator and no article body.",
+      );
     header = text.slice(0, firstBlock);
     rest = text.slice(firstBlock);
   }
@@ -178,7 +256,8 @@ export function parseGeneratedArticle(
     if (m) fields[m[1].toLowerCase().trim()] = m[2].trim();
   }
   const title = cleanTitle(fields["title"] ?? "");
-  if (!title) throw new GenerationParseError("The reply's Title line is empty.");
+  if (!title)
+    throw new GenerationParseError("The reply's Title line is empty.");
 
   // Body / alts split.
   let bodyRaw = rest;
@@ -191,39 +270,68 @@ export function parseGeneratedArticle(
 
   // Lift [IMAGE: ...] tags out before parsing so the HTML parser never sees them.
   const markers: ParsedMarker[] = [];
-  const tokenized = bodyRaw.replace(/\[IMAGE:\s*([^\]]+)\]/g, (_m, p: string) => {
-    const prompt = p.trim().replace(/\s+/g, " ");
-    markers.push({ prompt, kind: /^SCREENSHOT:/i.test(prompt) ? "screenshot" : "photo" });
-    return `\n${TOKEN(markers.length - 1)}\n`;
-  });
+  const tokenized = bodyRaw.replace(
+    /\[IMAGE:\s*([^\]]+)\]/g,
+    (_m, p: string) => {
+      const prompt = p.trim().replace(/\s+/g, " ");
+      markers.push({
+        prompt,
+        kind: /^SCREENSHOT:/i.test(prompt) ? "screenshot" : "photo",
+      });
+      return `\n${TOKEN(markers.length - 1)}\n`;
+    },
+  );
 
   const warnings: string[] = [];
   const stats = { externalLinks: 0 };
-  let body = sanitizeBody(tokenized, { isKnownInternal: opts.isKnownInternal, warnings, stats });
+  let body = sanitizeBody(tokenized, {
+    isKnownInternal: opts.isKnownInternal,
+    warnings,
+    stats,
+  });
 
   // A marker that ended up wrapped in its own <p> (or any block) goes back to being a bare line.
   body = body.replace(/<(p|li|blockquote)>\s*(@@IMG\d+@@)\s*<\/\1>/g, "$2");
-  body = body.replace(TOKEN_RE, (_m, n: string) => `[IMAGE: ${markers[Number(n)].prompt}]`);
+  body = body.replace(
+    TOKEN_RE,
+    (_m, n: string) => `[IMAGE: ${markers[Number(n)].prompt}]`,
+  );
   body = body.replace(/\n{2,}/g, "\n").trim();
 
   const wordCount = plainWordCount(body.replace(/\[IMAGE:[^\]]*\]/g, " "));
-  if (!/<h2>/.test(body)) throw new GenerationParseError("The article body has no <h2> sections.");
+  if (!/<h2>/.test(body))
+    throw new GenerationParseError("The article body has no <h2> sections.");
   if (wordCount < 300) {
-    throw new GenerationParseError(`The article body is only ${wordCount} words, so it looks truncated or incomplete.`);
+    throw new GenerationParseError(
+      `The article body is only ${wordCount} words, so it looks truncated or incomplete.`,
+    );
   }
-  if (wordCount < 700) warnings.push(`Short article (${wordCount} words) — check it covers the headline's promise.`);
-  if (!/Quick answer/i.test(body)) warnings.push("No 'Quick answer' paragraph found.");
-  if (!/Frequently asked questions/i.test(body)) warnings.push("No FAQ section found.");
-  if (stats.externalLinks === 0) warnings.push("No external source links — the model may not have researched. Review before publishing.");
-  else if (stats.externalLinks < 3) warnings.push(`Only ${stats.externalLinks} external source link(s) (the brief asks for 3-6).`);
-  if (markers.length === 0) warnings.push("The article has no image tags (only the cover image).");
+  if (wordCount < 700)
+    warnings.push(
+      `Short article (${wordCount} words) — check it covers the headline's promise.`,
+    );
+  if (!/Quick answer/i.test(body))
+    warnings.push("No 'Quick answer' paragraph found.");
+  if (!/Frequently asked questions/i.test(body))
+    warnings.push("No FAQ section found.");
+  if (stats.externalLinks === 0)
+    warnings.push(
+      "No external source links — the model may not have researched. Review before publishing.",
+    );
+  else if (stats.externalLinks < 3)
+    warnings.push(
+      `Only ${stats.externalLinks} external source link(s) (the brief asks for 3-6).`,
+    );
+  if (markers.length === 0)
+    warnings.push("The article has no image tags (only the cover image).");
 
   const alts: (string | undefined)[] = markers.map(() => undefined);
   for (const line of altsRaw.split("\n")) {
     const m = line.match(/^\s*(\d{1,2})\s*[:.)\-–]\s*(.+?)\s*$/);
     if (!m) continue;
     const i = Number(m[1]) - 1;
-    if (i >= 0 && i < alts.length) alts[i] = m[2].replace(/^["“]|["”]$/g, "").slice(0, 160);
+    if (i >= 0 && i < alts.length)
+      alts[i] = m[2].replace(/^["“]|["”]$/g, "").slice(0, 160);
   }
 
   return {
@@ -236,7 +344,9 @@ export function parseGeneratedArticle(
       .slice(0, 8),
     category: fields["category"] ?? "",
     author: fields["author"] ?? "",
-    coverAlt: (fields["cover alt"] ?? "").replace(/^["“]|["”]$/g, "").slice(0, 160),
+    coverAlt: (fields["cover alt"] ?? "")
+      .replace(/^["“]|["”]$/g, "")
+      .slice(0, 160),
     bodyHtml: body,
     markers,
     alts,
