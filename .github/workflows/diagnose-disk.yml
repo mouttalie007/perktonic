@@ -1,0 +1,23 @@
+name: Diagnose server disk
+
+on:
+  workflow_dispatch:
+
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Report disk and inode usage (read-only)
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.DEPLOY_HOST }}
+          port: ${{ secrets.DEPLOY_PORT }}
+          username: ${{ secrets.DEPLOY_USER }}
+          key: ${{ secrets.DEPLOY_SSH_KEY }}
+          script: |
+            echo "--- quota ---"; quota -s 2>&1 | head -8 || true
+            echo "--- df ---"; df -h "$HOME" 2>&1 | head -5; df -i "$HOME" 2>&1 | head -5
+            echo "--- top-level sizes (MB) ---"; du -sm "$HOME"/* "$HOME"/.[!.]* 2>/dev/null | sort -rn | head -15
+            echo "--- top-level file counts ---"
+            for d in "$HOME"/* "$HOME"/.[!.]*; do [ -e "$d" ] && echo "$(find "$d" 2>/dev/null | wc -l) $d"; done | sort -rn | head -12
+            echo "--- nodevenv file count ---"; find "$HOME/nodevenv" 2>/dev/null | wc -l
