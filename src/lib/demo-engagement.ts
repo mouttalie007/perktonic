@@ -34,8 +34,8 @@ const REACTION_MIN = 10;
 const REACTION_MAX = 100;
 const REACTION_EMOJIS = ["LAUGH", "LOVE", "WOW", "ANGRY", "SAD"] as const;
 
-const COMMENT_COUNT_MIN = 6;
-const COMMENT_COUNT_MAX = 20;
+const COMMENT_COUNT_MIN = 5;
+const COMMENT_COUNT_MAX = 10;
 
 function randomInt(min: number, max: number): number {
   return Math.floor(Math.random() * (max - min + 1)) + min;
