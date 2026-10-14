@@ -12,8 +12,21 @@ import { prisma } from "@/lib/prisma";
 
 /** Plain-name fallback only — used when randomuser.me is unreachable, never by default. */
 const PLACEHOLDER_NAMES = [
-  "Sam", "Jordan", "Taylor", "Casey", "Morgan", "Jamie", "Riley", "Drew",
-  "Alex P.", "Chris T.", "Jess", "Pat", "Robin", "Dana", "Lee K.",
+  "Sam",
+  "Jordan",
+  "Taylor",
+  "Casey",
+  "Morgan",
+  "Jamie",
+  "Riley",
+  "Drew",
+  "Alex P.",
+  "Chris T.",
+  "Jess",
+  "Pat",
+  "Robin",
+  "Dana",
+  "Lee K.",
 ];
 
 /** Every emoji in the same 10-100 range — looks organic, not implausibly huge for a new site. */
@@ -86,19 +99,7 @@ async function fetchFakeUsers(n: number): Promise<FakeUser[]> {
   }
 }
 
-/**
- * Applies random reactions + a random subset of comments to one article.
- * Call only for articles with zero existing reactions/comments — this
- * doesn't check that itself, callers (the publish hook, the backfill
- * action) decide when it's appropriate.
- */
-export async function applyDemoEngagementToArticle(
-  articleId: string,
-  publishedAt: Date,
-): Promise<void> {
-  const settings = await prisma.siteSettings.findUnique({ where: { id: "singleton" } });
-  const pool = parseCommentPool(settings?.demoCommentPool);
-
+async function seedReactions(articleId: string): Promise<void> {
   await prisma.articleReaction.createMany({
     data: REACTION_EMOJIS.map((emoji) => ({
       articleId,
@@ -107,8 +108,14 @@ export async function applyDemoEngagementToArticle(
     })),
     skipDuplicates: true,
   });
+}
 
-  if (pool.length === 0) return;
+async function seedComments(
+  articleId: string,
+  publishedAt: Date,
+  pool: string[],
+): Promise<number> {
+  if (pool.length === 0) return 0;
 
   const maxComments = Math.min(COMMENT_COUNT_MAX, pool.length);
   const minComments = Math.min(COMMENT_COUNT_MIN, maxComments);
@@ -131,26 +138,84 @@ export async function applyDemoEngagementToArticle(
       createdAt: new Date(start + Math.random() * span),
     })),
   });
+  return bodies.length;
 }
 
-/** Backfill: applies demo engagement to every published article that has none yet. */
+async function loadPool(): Promise<string[]> {
+  const settings = await prisma.siteSettings.findUnique({
+    where: { id: "singleton" },
+  });
+  return parseCommentPool(settings?.demoCommentPool);
+}
+
+/**
+ * Applies random reactions + a random subset of comments to one article.
+ * Call only for articles with zero existing reactions/comments — this
+ * doesn't check that itself, callers (the publish hook) decide when it's
+ * appropriate.
+ */
+export async function applyDemoEngagementToArticle(
+  articleId: string,
+  publishedAt: Date,
+): Promise<void> {
+  const pool = await loadPool();
+  await seedReactions(articleId);
+  await seedComments(articleId, publishedAt, pool);
+}
+
+/**
+ * Seeds only what an article is still missing (reactions and/or comments).
+ * Used by every publish path, so a draft published later gets engagement too,
+ * while an article that already has some is never doubled.
+ */
+export async function ensureDemoEngagement(
+  articleId: string,
+  publishedAt: Date,
+): Promise<void> {
+  const [reactions, comments, pool] = await Promise.all([
+    prisma.articleReaction.count({ where: { articleId } }),
+    prisma.comment.count({ where: { articleId } }),
+    loadPool(),
+  ]);
+  if (reactions === 0) await seedReactions(articleId);
+  if (comments === 0) await seedComments(articleId, publishedAt, pool);
+}
+
+/**
+ * Backfill: fills in whatever is missing on every published article --
+ * reactions where it has none, comments where it has none. (It used to skip
+ * any article that already had reactions, so once the comment pool was
+ * pasted AFTER articles were published, they never got comments.)
+ */
 export async function applyDemoEngagementToAllMissing(): Promise<number> {
+  const pool = await loadPool();
   const candidates = await prisma.article.findMany({
     where: {
       status: "PUBLISHED",
-      reactions: { none: {} },
-      comments: { none: {} },
+      OR: [
+        { reactions: { none: {} } },
+        ...(pool.length ? [{ comments: { none: {} } }] : []),
+      ],
     },
-    select: { id: true, publishedAt: true },
+    select: {
+      id: true,
+      publishedAt: true,
+      _count: { select: { reactions: true, comments: true } },
+    },
   });
   for (const a of candidates) {
-    await applyDemoEngagementToArticle(a.id, a.publishedAt ?? new Date());
+    if (a._count.reactions === 0) await seedReactions(a.id);
+    if (a._count.comments === 0)
+      await seedComments(a.id, a.publishedAt ?? new Date(), pool);
   }
   return candidates.length;
 }
 
 /** Wipes every seeded reaction/comment — run once, right before going live with real traffic. */
-export async function clearAllDemoEngagement(): Promise<{ reactions: number; comments: number }> {
+export async function clearAllDemoEngagement(): Promise<{
+  reactions: number;
+  comments: number;
+}> {
   const comments = await prisma.comment.deleteMany({ where: { isSeed: true } });
   const reactions = await prisma.articleReaction.deleteMany({});
   return { reactions: reactions.count, comments: comments.count };

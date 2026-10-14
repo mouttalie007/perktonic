@@ -12,7 +12,7 @@ import {
   listicleReadingTimeMinutes,
 } from "@/lib/reading-time";
 import { hasUnresolvedImagePrompt } from "@/lib/quick-article";
-import { applyDemoEngagementToArticle } from "@/lib/demo-engagement";
+import { ensureDemoEngagement } from "@/lib/demo-engagement";
 
 export type SaveState = { status: "idle" | "error"; message?: string };
 
@@ -139,6 +139,14 @@ export async function saveStandardArticle(
     readingTime: readingTimeMinutes(v.content ?? ""),
   };
 
+  const prevStatus = id
+    ? (
+        await prisma.article.findUnique({
+          where: { id },
+          select: { status: true },
+        })
+      )?.status
+    : undefined;
   let articleId = id;
   try {
     if (id) {
@@ -158,13 +166,16 @@ export async function saveStandardArticle(
   // Pre-launch demo engagement (perktonic workflow, 2026-10-09): a newly
   // published article gets random reactions/comments right away, so it
   // never shows up with zero engagement. Only for a brand-new article
-  // being published for the first time — never re-applies on edits.
-  if (!id && data.status === "PUBLISHED" && data.publishedAt) {
-    await applyDemoEngagementToArticle(articleId, data.publishedAt).catch(
-      () => {
-        /* non-critical — the article itself already saved successfully */
-      },
-    );
+  // being published for the first time (new, or a draft turned live) —
+  // never re-applies on later edits, and only fills in what's missing.
+  if (
+    data.status === "PUBLISHED" &&
+    data.publishedAt &&
+    (!id || prevStatus !== "PUBLISHED")
+  ) {
+    await ensureDemoEngagement(articleId, data.publishedAt).catch(() => {
+      /* non-critical — the article itself already saved successfully */
+    });
   }
 
   // Quick Article tab: the source prompt only gets consumed once the
@@ -246,6 +257,14 @@ export async function saveListicleArticle(
     ),
   };
 
+  const prevStatus = id
+    ? (
+        await prisma.article.findUnique({
+          where: { id },
+          select: { status: true },
+        })
+      )?.status
+    : undefined;
   let articleId = id;
   try {
     if (id) {
@@ -266,12 +285,14 @@ export async function saveListicleArticle(
     throw e;
   }
 
-  if (!id && data.status === "PUBLISHED" && data.publishedAt) {
-    await applyDemoEngagementToArticle(articleId, data.publishedAt).catch(
-      () => {
-        /* non-critical — the article itself already saved successfully */
-      },
-    );
+  if (
+    data.status === "PUBLISHED" &&
+    data.publishedAt &&
+    (!id || prevStatus !== "PUBLISHED")
+  ) {
+    await ensureDemoEngagement(articleId, data.publishedAt).catch(() => {
+      /* non-critical — the article itself already saved successfully */
+    });
   }
 
   revalidatePath("/adminiyad/articles");

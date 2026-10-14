@@ -20,7 +20,7 @@ export function DemoEngagementActions() {
     const { count } = await applyDemoEngagementNow();
     setApplyResult(
       count === 0
-        ? "Nothing to do — every published article already has engagement."
+        ? "Nothing to do — every published article already has reactions and comments."
         : `Applied demo engagement to ${count} article(s).`,
     );
     setPending(null);

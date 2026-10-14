@@ -2,7 +2,7 @@ import { revalidatePath } from "next/cache";
 import type { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { performUpload } from "@/lib/media-upload";
-import { applyDemoEngagementToArticle } from "@/lib/demo-engagement";
+import { ensureDemoEngagement } from "@/lib/demo-engagement";
 import { hasUnresolvedImagePrompt } from "@/lib/quick-article";
 import { asSlots, type ImageSlot } from "./slots";
 
@@ -207,7 +207,7 @@ export async function publishBrief(
   });
 
   // Same as a brand-new article published from the editor: seed demo engagement.
-  await applyDemoEngagementToArticle(article.id, publishedAt).catch(() => {
+  await ensureDemoEngagement(article.id, publishedAt).catch(() => {
     /* non-critical: the article is already live */
   });
 
