@@ -1,7 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import { applyDemoEngagementNow, clearDemoEngagementNow } from "@/app/actions/demo-engagement";
+import {
+  applyDemoEngagementNow,
+  clearDemoEngagementNow,
+} from "@/app/actions/demo-engagement";
 import { Button } from "./ui";
 
 /**
@@ -17,39 +20,70 @@ export function DemoEngagementActions() {
   async function apply() {
     setPending("apply");
     setApplyResult(null);
-    const { count } = await applyDemoEngagementNow();
-    setApplyResult(
-      count === 0
-        ? "Nothing to do — every published article already has reactions and comments."
-        : `Applied demo engagement to ${count} article(s).`,
-    );
-    setPending(null);
+    try {
+      const { count } = await applyDemoEngagementNow();
+      setApplyResult(
+        count === 0
+          ? "Nothing to do — every published article already has reactions and comments."
+          : `Applied demo engagement to ${count} article(s).`,
+      );
+    } catch {
+      setApplyResult(
+        "That didn't go through. Hard-refresh the page (Ctrl+F5) and try again; if it repeats, tell Claude.",
+      );
+    } finally {
+      setPending(null);
+    }
   }
 
   async function clear() {
-    if (!window.confirm("Remove all demo reactions and comments from every article? This can't be undone.")) {
+    if (
+      !window.confirm(
+        "Remove all demo reactions and comments from every article? This can't be undone.",
+      )
+    ) {
       return;
     }
     setPending("clear");
     setClearResult(null);
-    const result = await clearDemoEngagementNow();
-    setClearResult(`Removed ${result.comments} comment(s) and reset reactions on every article.`);
-    setPending(null);
+    try {
+      const result = await clearDemoEngagementNow();
+      setClearResult(
+        `Removed ${result.comments} comment(s) and reset reactions on every article.`,
+      );
+    } catch {
+      setClearResult(
+        "That didn't go through. Hard-refresh the page (Ctrl+F5) and try again.",
+      );
+    } finally {
+      setPending(null);
+    }
   }
 
   return (
     <div className="space-y-4">
       <div>
         <Button type="button" onClick={apply} disabled={pending !== null}>
-          {pending === "apply" ? "Applying…" : "Apply to articles missing engagement"}
+          {pending === "apply"
+            ? "Applying…"
+            : "Apply to articles missing engagement"}
         </Button>
-        {applyResult && <p className="text-muted mt-2 text-sm">{applyResult}</p>}
+        {applyResult && (
+          <p className="text-muted mt-2 text-sm">{applyResult}</p>
+        )}
       </div>
       <div>
-        <Button type="button" variant="danger" onClick={clear} disabled={pending !== null}>
+        <Button
+          type="button"
+          variant="danger"
+          onClick={clear}
+          disabled={pending !== null}
+        >
           {pending === "clear" ? "Clearing…" : "Clear all demo engagement"}
         </Button>
-        {clearResult && <p className="text-muted mt-2 text-sm">{clearResult}</p>}
+        {clearResult && (
+          <p className="text-muted mt-2 text-sm">{clearResult}</p>
+        )}
       </div>
     </div>
   );
