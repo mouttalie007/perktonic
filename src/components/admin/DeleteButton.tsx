@@ -4,9 +4,11 @@
 export function DeleteButton({
   label = "Delete",
   confirmText = "Delete this? This cannot be undone.",
+  className = "text-accent-red text-xs font-bold hover:underline",
 }: {
   label?: string;
   confirmText?: string;
+  className?: string;
 }) {
   return (
     <button
@@ -14,7 +16,7 @@ export function DeleteButton({
       onClick={(e) => {
         if (!confirm(confirmText)) e.preventDefault();
       }}
-      className="text-accent-red text-xs font-bold hover:underline"
+      className={className}
     >
       {label}
     </button>

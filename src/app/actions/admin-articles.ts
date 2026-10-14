@@ -7,7 +7,10 @@ import type { Route } from "next";
 import { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { requireUser } from "@/lib/require-admin";
-import { readingTimeMinutes, listicleReadingTimeMinutes } from "@/lib/reading-time";
+import {
+  readingTimeMinutes,
+  listicleReadingTimeMinutes,
+} from "@/lib/reading-time";
 import { hasUnresolvedImagePrompt } from "@/lib/quick-article";
 import { applyDemoEngagementToArticle } from "@/lib/demo-engagement";
 
@@ -92,10 +95,7 @@ async function syncTags(articleId: string, tagIds: string[]) {
 }
 
 function friendlyDbError(e: unknown): string | null {
-  if (
-    e instanceof Prisma.PrismaClientKnownRequestError &&
-    e.code === "P2002"
-  ) {
+  if (e instanceof Prisma.PrismaClientKnownRequestError && e.code === "P2002") {
     return "That slug is already used by another article. Choose a different one.";
   }
   return null;
@@ -112,7 +112,10 @@ export async function saveStandardArticle(
   await requireUser("AUTHOR");
   const parsed = standardSchema.safeParse(Object.fromEntries(formData));
   if (!parsed.success) {
-    return { status: "error", message: parsed.error.issues[0]?.message ?? "Invalid input." };
+    return {
+      status: "error",
+      message: parsed.error.issues[0]?.message ?? "Invalid input.",
+    };
   }
   const v = parsed.data;
   const id = String(formData.get("id") || "");
@@ -124,7 +127,8 @@ export async function saveStandardArticle(
   if (v.status === "PUBLISHED" && hasUnresolvedImagePrompt(v.content ?? "")) {
     return {
       status: "error",
-      message: "This article still has an unresolved [IMAGE: ...] placeholder — paste the image there before publishing.",
+      message:
+        "This article still has an unresolved [IMAGE: ...] placeholder — paste the image there before publishing.",
     };
   }
 
@@ -156,9 +160,11 @@ export async function saveStandardArticle(
   // never shows up with zero engagement. Only for a brand-new article
   // being published for the first time — never re-applies on edits.
   if (!id && data.status === "PUBLISHED" && data.publishedAt) {
-    await applyDemoEngagementToArticle(articleId, data.publishedAt).catch(() => {
-      /* non-critical — the article itself already saved successfully */
-    });
+    await applyDemoEngagementToArticle(articleId, data.publishedAt).catch(
+      () => {
+        /* non-critical — the article itself already saved successfully */
+      },
+    );
   }
 
   // Quick Article tab: the source prompt only gets consumed once the
@@ -192,7 +198,10 @@ export async function saveListicleArticle(
   await requireUser("AUTHOR");
   const parsed = listicleSchema.safeParse(Object.fromEntries(formData));
   if (!parsed.success) {
-    return { status: "error", message: parsed.error.issues[0]?.message ?? "Invalid input." };
+    return {
+      status: "error",
+      message: parsed.error.issues[0]?.message ?? "Invalid input.",
+    };
   }
   const v = parsed.data;
   const id = String(formData.get("id") || "");
@@ -220,7 +229,10 @@ export async function saveListicleArticle(
     .filter((it) => it.description.length > 0 || it.imageUrl || it.mediaId);
 
   if (items.length < 2) {
-    return { status: "error", message: "Add at least 2 items to a Top N list." };
+    return {
+      status: "error",
+      message: "Add at least 2 items to a Top N list.",
+    };
   }
 
   const data = {
@@ -255,9 +267,11 @@ export async function saveListicleArticle(
   }
 
   if (!id && data.status === "PUBLISHED" && data.publishedAt) {
-    await applyDemoEngagementToArticle(articleId, data.publishedAt).catch(() => {
-      /* non-critical — the article itself already saved successfully */
-    });
+    await applyDemoEngagementToArticle(articleId, data.publishedAt).catch(
+      () => {
+        /* non-critical — the article itself already saved successfully */
+      },
+    );
   }
 
   revalidatePath("/adminiyad/articles");
@@ -269,9 +283,51 @@ export async function saveListicleArticle(
 // Shared
 // ---------------------------------------------------------------------------
 
+/** Refreshes every public page an article can appear on (article, home, its category) plus the admin lists. */
+async function revalidateArticleSurfaces(
+  slug: string,
+  categoryId: string | null,
+) {
+  revalidatePath(`/story/${slug}`);
+  revalidatePath("/");
+  if (categoryId) {
+    const cat = await prisma.category.findUnique({
+      where: { id: categoryId },
+      select: { slug: true },
+    });
+    if (cat) revalidatePath(`/category/${cat.slug}`);
+  }
+  revalidatePath("/adminiyad/articles");
+  revalidatePath("/adminiyad/ai-articles");
+}
+
 export async function deleteArticle(formData: FormData) {
   await requireUser("EDITOR");
   const id = String(formData.get("id"));
+  const article = await prisma.article.findUnique({
+    where: { id },
+    select: { slug: true, categoryId: true },
+  });
   await prisma.article.delete({ where: { id } }).catch(() => {});
-  revalidatePath("/adminiyad/articles");
+  if (article)
+    await revalidateArticleSurfaces(article.slug, article.categoryId);
+  else revalidatePath("/adminiyad/articles");
+}
+
+/** Takes a live (or scheduled) article offline by turning it back into a draft. */
+export async function makeArticleDraft(formData: FormData) {
+  await requireUser("EDITOR");
+  const id = String(formData.get("id"));
+  const article = await prisma.article.findUnique({
+    where: { id },
+    select: { slug: true, categoryId: true, status: true },
+  });
+  if (!article || article.status === "DRAFT") return;
+  await prisma.article.update({ where: { id }, data: { status: "DRAFT" } });
+  // An API-articles brief that was marked published goes back to "Draft" on its board.
+  await prisma.articleBrief.updateMany({
+    where: { articleId: id, status: "PUBLISHED" },
+    data: { status: "DRAFTED" },
+  });
+  await revalidateArticleSurfaces(article.slug, article.categoryId);
 }
