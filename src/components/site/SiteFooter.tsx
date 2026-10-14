@@ -73,7 +73,7 @@ export function SiteFooter({
 }) {
   return (
     <footer className="bg-ink-deep mt-16 text-white">
-      <div className="site-container py-14">
+      <div className="site-container py-14" data-nosnippet>
         <div className="grid gap-10 md:grid-cols-2 lg:grid-cols-[1.4fr_1fr_1fr_1fr]">
           <div>
             <Logo onDark />
@@ -105,7 +105,7 @@ export function SiteFooter({
         </div>
       </div>
 
-      <div className="border-t border-white/10">
+      <div className="border-t border-white/10" data-nosnippet>
         <div className="site-container flex flex-col items-center justify-between gap-3 py-5 text-xs text-white/50 sm:flex-row">
           <p>© {new Date().getFullYear()} {SITE.name}. All rights reserved.</p>
           <ul className="flex flex-wrap items-center gap-x-4 gap-y-1">

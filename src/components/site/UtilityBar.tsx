@@ -23,7 +23,7 @@ export function UtilityBar({
   social: Partial<Record<SocialPlatform, string>>;
 }) {
   return (
-    <div className="bg-ink text-white/80">
+    <div className="bg-ink text-white/80" data-nosnippet>
       <div className="site-container flex h-9 items-center justify-between gap-4 text-[0.78rem]">
         {/* Date — desktop only */}
         <span className="hidden shrink-0 md:block">{todayLabel}</span>

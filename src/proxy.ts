@@ -32,6 +32,17 @@ async function getRedirectMap() {
 export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
+  // One canonical host: www.perktonic.com/... -> perktonic.com/... (permanent), so Google
+  // stops indexing every page twice (the canonical tags already point at the bare domain).
+  const host = (request.headers.get("host") ?? "").toLowerCase();
+  if (host.startsWith("www.")) {
+    const url = new URL(request.url);
+    url.host = host.slice(4);
+    url.protocol = "https:";
+    url.port = "";
+    return NextResponse.redirect(url, 301);
+  }
+
   try {
     const map = await getRedirectMap();
     const hit = map.get(pathname);

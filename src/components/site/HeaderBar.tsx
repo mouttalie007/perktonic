@@ -64,7 +64,7 @@ export function HeaderBar({
 
   return (
     <header className="bg-canvas border-line border-b">
-      <div className="site-container flex items-center justify-between gap-3 py-4 xl:gap-6">
+      <div className="site-container flex items-center justify-between gap-3 py-4 xl:gap-6" data-nosnippet>
         <Logo withTagline />
 
         {/* Desktop navigation */}
