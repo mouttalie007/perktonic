@@ -47,6 +47,8 @@ export const metadata: Metadata = {
     locale: SITE.locale,
   },
   twitter: { card: "summary_large_image" },
+  // Google Search Console ownership (HTML tag method). A public token, not a secret.
+  verification: { google: "t7CaLm5cNWIb73SRwNgb_MsDjltN_0jsKNhbvlvWJEo" },
 };
 
 export default function RootLayout({
