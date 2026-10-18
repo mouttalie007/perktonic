@@ -19,6 +19,8 @@ import {
  */
 const ANONYMOUS_POST_TARGETS: { label: string; href: string }[] = [
   { label: "Posteezy", href: "https://posteezy.com/node/add/post" },
+  { label: "PublishTo.us", href: "https://publishto.us/" },
+  { label: "SlugPost", href: "https://slugpost.com/" },
 ];
 
 /**
