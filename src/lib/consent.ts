@@ -33,11 +33,20 @@ interface ConsentCookiePayload extends ConsentState {
 }
 
 /** Parses the raw cookie value. Returns `null` when absent/corrupt (= no decision yet). */
-export function parseConsentCookie(raw: string | undefined | null): ConsentState | null {
+export function parseConsentCookie(
+  raw: string | undefined | null,
+): ConsentState | null {
   if (!raw) return null;
   try {
-    const parsed = JSON.parse(decodeURIComponent(raw)) as Partial<ConsentCookiePayload>;
-    if (typeof parsed !== "object" || parsed === null || parsed.v !== CONSENT_VERSION) return null;
+    const parsed = JSON.parse(
+      decodeURIComponent(raw),
+    ) as Partial<ConsentCookiePayload>;
+    if (
+      typeof parsed !== "object" ||
+      parsed === null ||
+      parsed.v !== CONSENT_VERSION
+    )
+      return null;
     return {
       analytics: parsed.analytics === true,
       advertising: parsed.advertising === true,
@@ -62,9 +71,14 @@ export function writeConsentCookie(state: ConsentState) {
 /** Client-only: reads the consent cookie from `document.cookie`. */
 export function readConsentCookieClient(): ConsentState | null {
   if (typeof document === "undefined") return null;
-  const match = document.cookie.match(new RegExp(`(?:^|; )${CONSENT_COOKIE}=([^;]*)`));
+  const match = document.cookie.match(
+    new RegExp(`(?:^|; )${CONSENT_COOKIE}=([^;]*)`),
+  );
   return parseConsentCookie(match?.[1]);
 }
+
+/** Dispatched after a decision is saved without a reload, so script gating can react at once. */
+export const CONSENT_CHANGED_EVENT = "vt:consent-changed";
 
 /** Event name dispatched to reopen the banner (e.g. from a footer "Cookie Preferences" link). */
 export const OPEN_CONSENT_EVENT = "vt:open-consent";

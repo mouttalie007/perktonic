@@ -3,13 +3,21 @@
 import { useEffect, useState } from "react";
 import Script from "next/script";
 import { ADSENSE } from "@/config/ads";
-import { DEFAULT_CONSENT, readConsentCookieClient, type ConsentState } from "@/lib/consent";
+import {
+  CONSENT_CHANGED_EVENT,
+  DEFAULT_CONSENT,
+  readConsentCookieClient,
+  type ConsentState,
+} from "@/lib/consent";
 
 interface AnalyticsConfig {
   ga4MeasurementId: string;
   gtmContainerId: string;
 }
-const EMPTY_CONFIG: AnalyticsConfig = { ga4MeasurementId: "", gtmContainerId: "" };
+const EMPTY_CONFIG: AnalyticsConfig = {
+  ga4MeasurementId: "",
+  gtmContainerId: "",
+};
 
 /**
  * Consent-gated script loading (Phase 9; admin-editable analytics IDs
@@ -38,6 +46,12 @@ export function AnalyticsScripts() {
     // only run after mount.
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setConsent(readConsentCookieClient() ?? DEFAULT_CONSENT);
+
+    // A decision saved without a reload (see ConsentBanner) loads the scripts right away.
+    const onChanged = () =>
+      setConsent(readConsentCookieClient() ?? DEFAULT_CONSENT);
+    window.addEventListener(CONSENT_CHANGED_EVENT, onChanged);
+    return () => window.removeEventListener(CONSENT_CHANGED_EVENT, onChanged);
   }, []);
 
   useEffect(() => {

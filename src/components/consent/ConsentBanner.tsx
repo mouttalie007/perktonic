@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import type { Route } from "next";
 import {
+  CONSENT_CHANGED_EVENT,
   DEFAULT_CONSENT,
   OPEN_CONSENT_EVENT,
   readConsentCookieClient,
@@ -15,9 +16,12 @@ import {
  * Cookie consent banner (Necessary / Analytics / Advertising / Preferences).
  * Shows once, on first visit with no recorded decision, and can be reopened
  * any time via the footer's "Cookie Preferences" link (dispatches
- * `OPEN_CONSENT_EVENT`). Saving reloads the page so server-rendered script
- * gating (`AnalyticsScripts`) picks up the new decision immediately and any
- * already-loaded third-party script is actually gone, not just un-rendered.
+ * `OPEN_CONSENT_EVENT`). Granting consent does NOT reload the page: a reload
+ * replaces `document.referrer` with the page's own URL, so Google Analytics
+ * would record every first visit as direct traffic and lose the real source
+ * (Facebook, X, Google...). `AnalyticsScripts` listens for
+ * `CONSENT_CHANGED_EVENT` instead. Withdrawing a consent that was already
+ * granted still reloads, so the already-loaded third-party script is really gone.
  */
 export function ConsentBanner() {
   const [open, setOpen] = useState(false);
@@ -43,8 +47,19 @@ export function ConsentBanner() {
   }, []);
 
   function save(state: ConsentState) {
+    const before = readConsentCookieClient();
     writeConsentCookie(state);
-    window.location.reload();
+    const withdrew =
+      Boolean(before) &&
+      ((before!.analytics && !state.analytics) ||
+        (before!.advertising && !state.advertising));
+    if (withdrew) {
+      window.location.reload();
+      return;
+    }
+    window.dispatchEvent(new Event(CONSENT_CHANGED_EVENT));
+    setOpen(false);
+    setCustomizing(false);
   }
 
   if (!open) return null;
@@ -61,7 +76,10 @@ export function ConsentBanner() {
           <p className="max-w-2xl text-sm text-white/80">
             We use cookies to run the site and, with your consent, to measure
             traffic and show relevant ads. See our{" "}
-            <Link href={"/cookie-policy" as Route} className="font-semibold text-white underline">
+            <Link
+              href={"/cookie-policy" as Route}
+              className="font-semibold text-white underline"
+            >
               Cookie Policy
             </Link>{" "}
             for details.
@@ -83,7 +101,9 @@ export function ConsentBanner() {
             </button>
             <button
               type="button"
-              onClick={() => save({ analytics: true, advertising: true, preferences: true })}
+              onClick={() =>
+                save({ analytics: true, advertising: true, preferences: true })
+              }
               className="bg-brand text-ink hover:bg-brand-strong rounded-sm px-4 py-2 text-sm font-bold transition-colors"
             >
               Accept All
@@ -93,7 +113,12 @@ export function ConsentBanner() {
 
         {customizing && (
           <div className="grid gap-4 border-t border-white/10 pt-4 sm:grid-cols-2 lg:grid-cols-4">
-            <ConsentToggle label="Necessary" description="Required for the site to function." checked disabled />
+            <ConsentToggle
+              label="Necessary"
+              description="Required for the site to function."
+              checked
+              disabled
+            />
             <ConsentToggle
               label="Analytics"
               description="Helps us understand how the site is used."
@@ -142,7 +167,9 @@ function ConsentToggle({
   onChange?: (v: boolean) => void;
 }) {
   return (
-    <label className={`flex items-start gap-2 text-sm ${disabled ? "opacity-60" : "cursor-pointer"}`}>
+    <label
+      className={`flex items-start gap-2 text-sm ${disabled ? "opacity-60" : "cursor-pointer"}`}
+    >
       <input
         type="checkbox"
         checked={checked}
