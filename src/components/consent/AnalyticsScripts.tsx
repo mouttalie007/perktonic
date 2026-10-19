@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 import Script from "next/script";
-import { ADSENSE } from "@/config/ads";
 import {
   CONSENT_CHANGED_EVENT,
   DEFAULT_CONSENT,
@@ -99,14 +98,9 @@ j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNo
         </Script>
       )}
 
-      {consent.advertising && ADSENSE.enabled && ADSENSE.publisherId && (
-        <Script
-          async
-          src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${ADSENSE.publisherId}`}
-          crossOrigin="anonymous"
-          strategy="afterInteractive"
-        />
-      )}
+      {/* The AdSense library itself is now a raw <script> in (site)/layout.tsx
+          (AdSense verification needs it in the HTML source); loading it here
+          too would run it twice. */}
     </>
   );
 }

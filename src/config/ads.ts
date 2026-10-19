@@ -7,6 +7,23 @@ import { clientEnv } from "./env";
  * Admin Dashboard (Phase 7). This file defines the fixed set of template slots.
  */
 
+/**
+ * The AdSense publisher identity used for site verification. It is a public
+ * identifier (it sits in every page's HTML and in /ads.txt by design), not a
+ * secret, so it lives here rather than in an env var: verification must work
+ * on every deploy with no server-side setup.
+ */
+export const ADSENSE_PUBLISHER = {
+  client: "ca-pub-4779364737907056",
+  /** Script URL exactly as AdSense issues it for the site-verification snippet. */
+  scriptSrc:
+    "https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4779364737907056",
+} as const;
+
+/** ads.txt line served when ADS_TXT_CONTENT isn't set in the environment. */
+export const DEFAULT_ADS_TXT =
+  "google.com, pub-4779364737907056, DIRECT, f08c47fec0942fa0";
+
 export const ADSENSE = {
   enabled: clientEnv.NEXT_PUBLIC_ADSENSE_ENABLED,
   publisherId: clientEnv.NEXT_PUBLIC_ADSENSE_PUBLISHER_ID,
@@ -58,8 +75,7 @@ export const AD_PLACEMENTS: AdPlacementDef[] = [
   {
     key: "between-slides",
     label: "Between Slides",
-    description:
-      "Between the image and the description on a listicle subpage.",
+    description: "Between the image and the description on a listicle subpage.",
     reservedHeight: { desktop: 280, mobile: 250 },
   },
   {

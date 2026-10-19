@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
-import type { Route } from "next";
+import type { Metadata, Route } from "next";
+import { ADSENSE_PUBLISHER } from "@/config/ads";
 import { siteSettingsService } from "@/services/site-settings.service";
 import { trendingService } from "@/services/trending.service";
 import { UtilityBar } from "@/components/site/UtilityBar";
@@ -14,6 +15,11 @@ const dateFmt = new Intl.DateTimeFormat("en-US", {
   month: "long",
   day: "numeric",
 });
+
+// Second AdSense ownership signal (the meta-tag method); loads nothing by itself.
+export const metadata: Metadata = {
+  other: { "google-adsense-account": ADSENSE_PUBLISHER.client },
+};
 
 /**
  * Public site chrome (spec §96): utility bar, header/nav, footer. The admin
@@ -31,6 +37,11 @@ export default async function SiteLayout({
 
   return (
     <>
+      {/* AdSense site-verification snippet. A raw async script (React hoists it
+          into <head>) because the AdSense crawler reads the HTML source and
+          does not run our consent-gated loader. Public pages only: the admin
+          area uses a different layout and loads no third-party scripts. */}
+      <script async src={ADSENSE_PUBLISHER.scriptSrc} crossOrigin="anonymous" />
       <a href="#main-content" className="skip-link">
         Skip to content
       </a>
