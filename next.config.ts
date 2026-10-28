@@ -8,6 +8,8 @@ const CSP_GOOGLE_SCRIPT_ORIGINS = [
   "https://*.googlesyndication.com",
   "https://*.google-analytics.com",
   "https://*.doubleclick.net",
+  // AdSense's invalid-traffic / ad-quality check (the library now loads on every public page).
+  "https://*.adtrafficquality.google",
 ];
 
 // Note on 'unsafe-inline' in script-src: Ad Units are admin-authored raw

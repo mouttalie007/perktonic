@@ -30,7 +30,12 @@ export default async function SiteLayout({
           into <head>) because the AdSense crawler reads the HTML source and
           does not run our consent-gated loader. Public pages only: the admin
           area uses a different layout and loads no third-party scripts. */}
-      <script async src={ADSENSE_PUBLISHER.scriptSrc} crossOrigin="anonymous" />
+      <script
+        async
+        src={ADSENSE_PUBLISHER.scriptSrc}
+        crossOrigin="anonymous"
+        suppressHydrationWarning
+      />
       <a href="#main-content" className="skip-link">
         Skip to content
       </a>

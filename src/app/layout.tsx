@@ -51,13 +51,12 @@ export const metadata: Metadata = {
   verification: { google: "t7CaLm5cNWIb73SRwNgb_MsDjltN_0jsKNhbvlvWJEo" },
 };
 
-export default function RootLayout({
-  children,
-}: {
-  children: ReactNode;
-}) {
+export default function RootLayout({ children }: { children: ReactNode }) {
   return (
-    <html lang="en" className={`${inter.variable} ${plusJakarta.variable} h-full`}>
+    <html
+      lang="en"
+      className={`${inter.variable} ${plusJakarta.variable} h-full`}
+    >
       <head>
         {/* Zod v4 probes `new Function("")` once per load to decide whether
             it can use a faster JIT-compiled validator path. It's wrapped in
@@ -76,7 +75,14 @@ export default function RootLayout({
             the race). This sets the same globalThis slot Zod's module
             reads, so by the time Zod's code runs anywhere, the probe is
             already skipped regardless of chunk load order. */}
-        <script dangerouslySetInnerHTML={{ __html: "window.__zod_globalConfig={jitless:true};" }} />
+        {/* suppressHydrationWarning: third-party scripts (the AdSense library) insert their own <script> nodes into <head> before React hydrates;
+            without it React compares this element with the wrong one and logs a harmless mismatch. */}
+        <script
+          suppressHydrationWarning
+          dangerouslySetInnerHTML={{
+            __html: "window.__zod_globalConfig={jitless:true};",
+          }}
+        />
       </head>
       <body className="bg-canvas text-ink flex min-h-full flex-col antialiased">
         {children}

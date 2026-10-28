@@ -1,0 +1,13 @@
+Icons taken from the free Iconify icon data (https://iconify.design, @iconify-json packages).
+Sets: Fluent UI System Color Icons and Fluent Emoji, Microsoft, MIT License.
+https://github.com/microsoft/fluentui-system-icons  https://github.com/microsoft/fluentui-emoji
+
+sheet.svg  <-  fluent-color:table-48
+database.svg  <-  fluent-color:database-48
+pdf.svg  <-  fluent-color:document-text-48
+gear.svg  <-  fluent-color:arrow-clockwise-dashes-settings-48
+globe.svg  <-  fluent-color:globe-shield-48
+swap.svg  <-  fluent-emoji:counterclockwise-arrows-button
+code.svg  <-  fluent-color:code-block-48
+clock.svg  <-  fluent-color:clock-48
+link.svg  <-  fluent-emoji:link
