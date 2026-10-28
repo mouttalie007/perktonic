@@ -19,8 +19,7 @@ const CATEGORIES = [
     shortDescription: "Excel & Sheets formulas, explained",
     description:
       "Stop wrestling with broken syntax and #VALUE! errors. Use PerkTonic’s cloud-powered Spreadsheet Studio to translate plain English into production-ready Excel and Google Sheets formulas, explain nested logic step-by-step, and automate complex data lookups.",
-    seoTitle:
-      "Spreadsheet & Formula Studio | Excel & Google Sheets AI Tools - PerkTonic",
+    seoTitle: "Spreadsheet & Formula Studio | Excel & Google Sheets AI Tools",
     metaDescription:
       "Generate, debug, and explain complex Excel and Google Sheets formulas instantly with PerkTonic. Build dynamic XLOOKUP, QUERY, ARRAYFORMULA, and VBA/Apps Script automations online.",
   },
@@ -33,7 +32,7 @@ const CATEGORIES = [
     description:
       "Transform raw, unformatted data into clean, structured assets in seconds. PerkTonic’s server-side conversion engine sanitizes messy CSV exports, removes duplicate records, normalizes dates, and converts seamlessly between JSON, Excel, Markdown, and LaTeX.",
     seoTitle:
-      "Data Cleaning & Cloud File Converters | CSV, JSON, Markdown & LaTeX - PerkTonic",
+      "Data Cleaning & Cloud File Converters | CSV, JSON, Markdown & LaTeX",
     metaDescription:
       "Clean messy datasets and convert files seamlessly in the cloud with PerkTonic. Transform CSV, JSON, Excel, Markdown tables, HTML, and LaTeX documents with zero formatting loss.",
   },
@@ -46,7 +45,7 @@ const CATEGORIES = [
     description:
       "Unlock trapped data inside static files and lengthy documents. PerkTonic’s Document Intelligence tools extract financial and technical tables from PDFs directly into Excel, distill complex agreements into actionable checklists, and generate standardized business documentation.",
     seoTitle:
-      "Document & Text Intelligence | PDF Table Extractor & AI Summarizer - PerkTonic",
+      "Document & Text Intelligence | PDF Table Extractor & AI Summarizer",
     metaDescription:
       "Extract tables from PDFs to Excel, parse structured data from documents, and generate professional B2B templates and SOPs with PerkTonic’s Document Intelligence suite.",
   },
@@ -59,7 +58,7 @@ const CATEGORIES = [
     description:
       "Precision utilities built for operations teams, developers, and no-code automation architects. Build bulletproof Regex patterns, schedule Cron expressions with human-readable translations, inspect JSON webhook payloads, and convert text into visual flowcharts.",
     seoTitle:
-      "Workflow & Automation Utilities | Regex, Cron, Webhooks & Diagrams - PerkTonic",
+      "Workflow & Automation Utilities | Regex, Cron, Webhooks & Diagrams",
     metaDescription:
       "Supercharge your technical workflows with PerkTonic. Build and test Regular Expressions (Regex), generate Cron job schedules, format Webhook JSON payloads, and render Mermaid.js diagrams.",
   },
@@ -72,7 +71,7 @@ const CATEGORIES = [
     description:
       "Deep server-side inspection tools for webmasters, technical SEOs, and system administrators. Trace multi-hop 301/302 redirect chains, audit HTTP security headers, measure global Time to First Byte (TTFB), and verify structured metadata in real time.",
     seoTitle:
-      "Web & Network Diagnostics | Redirect Checker, HTTP Headers & Meta Audit - PerkTonic",
+      "Web & Network Diagnostics | Redirect Checker, HTTP Headers & Meta Audit",
     metaDescription:
       "Analyze website performance and server configurations with PerkTonic’s cloud diagnostics. Trace 301/302 redirect chains, inspect HTTP response headers, measure TTFB, and validate OpenGraph tags.",
   },
