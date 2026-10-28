@@ -1,8 +1,10 @@
 name: Deploy to VPS
 
-# Manual only until the DNS cutover (then this becomes the main deploy and the
-# cPanel one is switched to manual). Runs as the unprivileged `perktonic` user.
+# The main deploy since the DNS cutover (2026-10-28): every push to main. Runs as
+# the unprivileged `perktonic` user on the VPS.
 on:
+  push:
+    branches: [main]
   workflow_dispatch:
 
 concurrency:
