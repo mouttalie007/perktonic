@@ -33,7 +33,12 @@ export function TrendingRail({
   const railRef = useRef<HTMLUListElement>(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(false);
-  const drag = useRef<{ active: boolean; startX: number; startScrollLeft: number; moved: boolean }>({
+  const drag = useRef<{
+    active: boolean;
+    startX: number;
+    startScrollLeft: number;
+    moved: boolean;
+  }>({
     active: false,
     startX: 0,
     startScrollLeft: 0,
@@ -71,7 +76,12 @@ export function TrendingRail({
     if (e.pointerType !== "mouse") return;
     const el = railRef.current;
     if (!el) return;
-    drag.current = { active: true, startX: e.clientX, startScrollLeft: el.scrollLeft, moved: false };
+    drag.current = {
+      active: true,
+      startX: e.clientX,
+      startScrollLeft: el.scrollLeft,
+      moved: false,
+    };
   }
 
   function onPointerMove(e: React.PointerEvent<HTMLUListElement>) {
@@ -99,9 +109,15 @@ export function TrendingRail({
   if (stories.length === 0) return null;
 
   return (
-    <section aria-label="Trending" className="group/rail relative -mx-4 px-4 sm:mx-0 sm:px-0">
+    <section
+      aria-label="Trending"
+      className="group/rail relative -mx-4 px-4 sm:mx-0 sm:px-0"
+    >
       <h2 className="mb-4 flex items-center gap-3 text-xl font-extrabold tracking-tight sm:text-2xl">
-        <span className="bg-brand inline-block h-6 w-1.5 rounded-full" aria-hidden />
+        <span
+          className="bg-brand inline-block h-6 w-1.5 rounded-full"
+          aria-hidden
+        />
         Trending
       </h2>
 
@@ -128,7 +144,7 @@ export function TrendingRail({
 
       <ul
         ref={railRef}
-        className="flex snap-x snap-mandatory gap-4 overflow-x-auto pb-2 [scrollbar-width:thin] active:cursor-grabbing sm:cursor-grab"
+        className="flex snap-x snap-mandatory [scrollbar-width:thin] gap-4 overflow-x-auto pb-2 active:cursor-grabbing sm:cursor-grab"
         role="list"
         onPointerDown={onPointerDown}
         onPointerMove={onPointerMove}
@@ -141,8 +157,14 @@ export function TrendingRail({
           const eng = engagement.get(story.id);
           const img = story.featuredImage;
           return (
-            <li key={story.id} className="w-[62vw] shrink-0 snap-start sm:w-[280px]">
-              <Link href={`/story/${story.slug}` as Route} className="group block">
+            <li
+              key={story.id}
+              className="w-[62vw] shrink-0 snap-start sm:w-[280px]"
+            >
+              <Link
+                href={`/story/${story.slug}` as Route}
+                className="group block"
+              >
                 <span className="border-line relative block aspect-[3/2] overflow-hidden rounded-md border">
                   {img?.url ? (
                     <Image

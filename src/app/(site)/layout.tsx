@@ -1,20 +1,11 @@
 import type { ReactNode } from "react";
-import type { Metadata, Route } from "next";
+import type { Metadata } from "next";
 import { ADSENSE_PUBLISHER } from "@/config/ads";
 import { siteSettingsService } from "@/services/site-settings.service";
-import { trendingService } from "@/services/trending.service";
-import { UtilityBar } from "@/components/site/UtilityBar";
 import { HeaderBar } from "@/components/site/HeaderBar";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { ConsentBanner } from "@/components/consent/ConsentBanner";
 import { AnalyticsScripts } from "@/components/consent/AnalyticsScripts";
-
-const dateFmt = new Intl.DateTimeFormat("en-US", {
-  weekday: "long",
-  year: "numeric",
-  month: "long",
-  day: "numeric",
-});
 
 // Second AdSense ownership signal (the meta-tag method); loads nothing by itself.
 export const metadata: Metadata = {
@@ -22,18 +13,16 @@ export const metadata: Metadata = {
 };
 
 /**
- * Public site chrome (spec §96): utility bar, header/nav, footer. The admin
- * area (Phase 7) lives outside this group with its own layout.
+ * Public site chrome: header/nav, footer. The admin area lives outside this
+ * group with its own layout. (The old date/ticker utility bar was removed in
+ * the 2026-10-29 tools redesign.)
  */
 export default async function SiteLayout({
   children,
 }: {
   children: ReactNode;
 }) {
-  const [social, ticker] = await Promise.all([
-    siteSettingsService.getSocialLinks(),
-    trendingService.getTicker(),
-  ]);
+  const social = await siteSettingsService.getSocialLinks();
 
   return (
     <>
@@ -45,16 +34,7 @@ export default async function SiteLayout({
       <a href="#main-content" className="skip-link">
         Skip to content
       </a>
-      <UtilityBar
-        todayLabel={dateFmt.format(new Date())}
-        ticker={
-          ticker
-            ? { title: ticker.title, href: `/story/${ticker.slug}` as Route }
-            : null
-        }
-        social={social}
-      />
-      <HeaderBar social={social} />
+      <HeaderBar />
       <main id="main-content" className="flex-1">
         {children}
       </main>

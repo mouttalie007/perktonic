@@ -4,49 +4,47 @@ import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import type { Route } from "next";
 import { usePathname } from "next/navigation";
-import { NAV_PRIMARY, NAV_MORE, type SocialPlatform } from "@/config/site";
+import { CATEGORIES, NAV_LINKS } from "@/config/site";
 import { Logo } from "./Logo";
-import { SearchIcon, MenuIcon, ChevronDownIcon } from "@/components/icons";
-import { CategoryIcon } from "@/components/CategoryIcon";
+import {
+  ArrowRightIcon,
+  ChevronDownIcon,
+  MenuIcon,
+  SearchIcon,
+} from "@/components/icons";
 import { MobileNav } from "./MobileNav";
 import { SearchOverlay } from "./SearchOverlay";
+import { ToolIcon } from "./ToolIcon";
 
 /**
- * Main header (spec §7, §8). Client island: active-link highlighting,
- * MORE dropdown, mobile menu and search overlay. Desktop nav is horizontal;
- * on < lg it collapses to a hamburger (never a squeezed desktop nav).
+ * Main header (2026-10-29 redesign): logo, Home / Tools / Categories ▾ / Blog /
+ * About, search, and the "Browse All Tools" call to action. Client island for
+ * active-link state, the Categories dropdown, the mobile menu and search.
  */
-export function HeaderBar({
-  social,
-}: {
-  social: Partial<Record<SocialPlatform, string>>;
-}) {
+export function HeaderBar() {
   const pathname = usePathname();
   const [menuOpen, setMenuOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
-  const [moreOpen, setMoreOpen] = useState(false);
-  const moreRef = useRef<HTMLDivElement>(null);
+  const [catsOpen, setCatsOpen] = useState(false);
+  const catsRef = useRef<HTMLDivElement>(null);
 
-  // Close everything on navigation — adjust state during render (React docs
-  // pattern), not in an effect.
+  // Close everything on navigation (adjust state during render, React docs pattern).
   const [lastPath, setLastPath] = useState(pathname);
   if (pathname !== lastPath) {
     setLastPath(pathname);
     setMenuOpen(false);
     setSearchOpen(false);
-    setMoreOpen(false);
+    setCatsOpen(false);
   }
 
-  // Close the MORE dropdown on outside click / Escape.
   useEffect(() => {
-    if (!moreOpen) return;
+    if (!catsOpen) return;
     function onDown(e: MouseEvent) {
-      if (moreRef.current && !moreRef.current.contains(e.target as Node)) {
-        setMoreOpen(false);
-      }
+      if (catsRef.current && !catsRef.current.contains(e.target as Node))
+        setCatsOpen(false);
     }
     function onKey(e: KeyboardEvent) {
-      if (e.key === "Escape") setMoreOpen(false);
+      if (e.key === "Escape") setCatsOpen(false);
     }
     document.addEventListener("mousedown", onDown);
     document.addEventListener("keydown", onKey);
@@ -54,143 +52,126 @@ export function HeaderBar({
       document.removeEventListener("mousedown", onDown);
       document.removeEventListener("keydown", onKey);
     };
-  }, [moreOpen]);
+  }, [catsOpen]);
 
   const isActive = (href: string) =>
     href === "/" ? pathname === "/" : pathname.startsWith(href);
-  const activeMoreItem = NAV_MORE.find((i) => isActive(i.href));
-  const moreActive = Boolean(activeMoreItem);
-  const moreAccent = activeMoreItem?.accentColor ?? "var(--color-brand)";
+  const catsActive = pathname.startsWith("/category/");
+
+  const linkBase =
+    "relative px-1 py-2 text-[0.95rem] font-semibold transition-colors after:absolute after:inset-x-1 after:-bottom-[1.05rem] after:h-0.5 after:rounded-full after:bg-primary after:transition-opacity";
 
   return (
-    <header className="bg-canvas border-line border-b">
-      <div className="site-container flex items-center justify-between gap-3 py-4 xl:gap-6" data-nosnippet>
-        <Logo withTagline />
+    <header className="sticky top-0 z-[100] border-b border-slate-200/70 bg-white/85 backdrop-blur">
+      <div className="site-container flex h-[4.25rem] items-center justify-between gap-4">
+        <div className="flex items-center gap-8 xl:gap-12">
+          <Logo />
 
-        {/* Desktop navigation */}
-        <nav
-          aria-label="Primary"
-          className="hidden min-w-0 items-center lg:flex"
-        >
-          {NAV_PRIMARY.map((item) => {
-            const active = isActive(item.href);
-            const accent = item.accentColor ?? "var(--color-brand)";
-            return (
+          <nav
+            aria-label="Primary"
+            className="hidden items-center gap-6 lg:flex xl:gap-8"
+          >
+            {NAV_LINKS.slice(0, 2).map((item) => (
               <Link
                 key={item.href}
                 href={item.href as Route}
-                aria-current={active ? "page" : undefined}
-                className="group relative flex items-center gap-1.5 px-2 py-2 text-[0.75rem] font-bold uppercase xl:px-3 xl:text-[0.82rem] xl:tracking-wide"
+                aria-current={isActive(item.href) ? "page" : undefined}
+                className={`${linkBase} ${
+                  isActive(item.href)
+                    ? "text-primary after:opacity-100"
+                    : "text-navy/80 hover:text-navy after:opacity-0 hover:after:opacity-30"
+                }`}
               >
-                {/* Icons only from xl — at lg (1024-1279px) 8 items + MORE
-                    plus icons overflowed the header by ~9px (found via the
-                    responsive audit, the same "nav vs logo" squeeze as the
-                    original Phase 1 1024px fix). */}
-                <CategoryIcon
-                  iconKey={item.iconKey}
+                {item.label}
+              </Link>
+            ))}
+
+            <div ref={catsRef} className="relative">
+              <button
+                type="button"
+                onClick={() => setCatsOpen((v) => !v)}
+                aria-expanded={catsOpen}
+                aria-haspopup="menu"
+                className={`${linkBase} inline-flex items-center gap-1 ${
+                  catsActive || catsOpen
+                    ? "text-primary after:opacity-100"
+                    : "text-navy/80 hover:text-navy after:opacity-0 hover:after:opacity-30"
+                }`}
+              >
+                Categories
+                <ChevronDownIcon
                   width={15}
                   height={15}
-                  className="hidden shrink-0 opacity-60 transition-[color,opacity,transform] duration-200 group-hover:scale-110 group-hover:opacity-100 xl:inline"
-                  style={{ color: active ? accent : undefined }}
+                  className={`transition-transform duration-200 ${catsOpen ? "rotate-180" : ""}`}
                 />
-                <span
-                  className={`transition-colors duration-200 ${active ? "text-ink" : "text-ink/70 group-hover:text-ink"}`}
+              </button>
+              {catsOpen && (
+                <div
+                  role="menu"
+                  className="absolute top-full left-0 z-[200] mt-4 w-80 rounded-2xl border border-slate-200 bg-white p-2 shadow-[var(--shadow-soft-hover)]"
                 >
-                  {item.label}
-                </span>
-                <span
-                  aria-hidden
-                  className={`absolute inset-x-2 -bottom-[1.05rem] h-[3px] rounded-full transition-opacity duration-200 xl:inset-x-3 ${
-                    active ? "opacity-100" : "opacity-0 group-hover:opacity-40"
-                  }`}
-                  style={{ background: accent }}
-                />
-              </Link>
-            );
-          })}
-
-          {/* MORE dropdown — hidden entirely when there's nothing to put in it
-              (all categories fit in the primary bar, as of the PerkTonic pivot) */}
-          {NAV_MORE.length > 0 && (
-          <div ref={moreRef} className="group relative">
-            <button
-              type="button"
-              onClick={() => setMoreOpen((v) => !v)}
-              aria-expanded={moreOpen}
-              aria-haspopup="menu"
-              className={`relative flex items-center gap-1 px-2 py-2 text-[0.75rem] font-bold uppercase transition-colors xl:px-3 xl:text-[0.82rem] xl:tracking-wide ${
-                moreActive || moreOpen ? "text-ink" : "text-ink/70 hover:text-ink"
-              }`}
-            >
-              More
-              <ChevronDownIcon
-                width={14}
-                height={14}
-                className={`transition-transform duration-200 ${moreOpen ? "rotate-180" : ""}`}
-              />
-              <span
-                aria-hidden
-                className={`absolute inset-x-2 -bottom-[1.05rem] h-[3px] rounded-full transition-opacity duration-200 xl:inset-x-3 ${
-                  moreActive ? "opacity-100" : "opacity-0 group-hover:opacity-40"
-                }`}
-                style={{ background: moreAccent }}
-              />
-            </button>
-            {moreOpen && (
-              <div
-                role="menu"
-                aria-label="More categories"
-                className="animate-slide-down border-line bg-canvas absolute right-0 top-[calc(100%+0.9rem)] z-[80] min-w-48 origin-top-right rounded-md border py-1.5 shadow-[var(--shadow-raised)]"
-              >
-                {NAV_MORE.map((item) => {
-                  const active = isActive(item.href);
-                  const accent = item.accentColor ?? "var(--color-brand)";
-                  return (
+                  {CATEGORIES.map((c) => (
                     <Link
-                      key={item.href}
-                      href={item.href as Route}
+                      key={c.slug}
                       role="menuitem"
-                      aria-current={active ? "page" : undefined}
-                      className={`group/item flex items-center gap-2.5 border-l-2 px-4 py-2 text-[0.8rem] font-bold tracking-wide uppercase transition-colors duration-150 ${
-                        active ? "bg-surface text-ink" : "text-ink/75 hover:bg-surface hover:text-ink border-transparent"
-                      }`}
-                      style={{ borderLeftColor: active ? accent : undefined }}
+                      href={`/category/${c.slug}` as Route}
+                      className="flex items-center gap-3 rounded-xl px-3 py-2.5 transition-colors hover:bg-slate-50"
                     >
-                      <CategoryIcon
-                        iconKey={item.iconKey}
-                        width={15}
-                        height={15}
-                        className="shrink-0 opacity-60 transition-[color,opacity] duration-150 group-hover/item:opacity-100"
-                        style={{ color: active ? accent : undefined }}
+                      <ToolIcon
+                        kind={c.iconKey}
+                        size={36}
+                        className="!rounded-xl"
                       />
-                      {item.label}
+                      <span className="text-navy text-sm font-semibold">
+                        {c.name}
+                      </span>
                     </Link>
-                  );
-                })}
-              </div>
-            )}
-          </div>
-          )}
-        </nav>
+                  ))}
+                </div>
+              )}
+            </div>
 
-        {/* Right controls */}
-        <div className="flex items-center gap-1">
+            {NAV_LINKS.slice(2).map((item) => (
+              <Link
+                key={item.href}
+                href={item.href as Route}
+                aria-current={isActive(item.href) ? "page" : undefined}
+                className={`${linkBase} ${
+                  isActive(item.href)
+                    ? "text-primary after:opacity-100"
+                    : "text-navy/80 hover:text-navy after:opacity-0 hover:after:opacity-30"
+                }`}
+              >
+                {item.label}
+              </Link>
+            ))}
+          </nav>
+        </div>
+
+        <div className="flex items-center gap-2 sm:gap-3">
           <button
             type="button"
             onClick={() => setSearchOpen(true)}
-            aria-label="Open search"
-            className="text-ink hover:bg-surface rounded-sm p-2 transition-colors"
+            aria-label="Search"
+            className="text-navy hover:bg-primary-soft flex h-10 w-10 items-center justify-center rounded-full transition-colors"
           >
-            <SearchIcon width={20} height={20} aria-hidden={false} />
+            <SearchIcon width={20} height={20} />
           </button>
+          <Link
+            href={"/tools" as Route}
+            className="bg-primary hover:bg-primary-dark hidden items-center gap-2 rounded-xl px-5 py-2.5 text-sm font-bold text-white transition-colors lg:inline-flex"
+          >
+            Browse All Tools
+            <ArrowRightIcon width={16} height={16} />
+          </Link>
           <button
             type="button"
             onClick={() => setMenuOpen(true)}
             aria-label="Open menu"
             aria-expanded={menuOpen}
-            className="text-ink hover:bg-surface rounded-sm p-2 transition-colors lg:hidden"
+            className="text-navy hover:bg-primary-soft flex h-10 w-10 items-center justify-center rounded-full transition-colors lg:hidden"
           >
-            <MenuIcon width={22} height={22} aria-hidden={false} />
+            <MenuIcon width={22} height={22} />
           </button>
         </div>
       </div>
@@ -199,7 +180,6 @@ export function HeaderBar({
         open={menuOpen}
         onClose={() => setMenuOpen(false)}
         pathname={pathname}
-        social={social}
       />
       <SearchOverlay open={searchOpen} onClose={() => setSearchOpen(false)} />
     </header>

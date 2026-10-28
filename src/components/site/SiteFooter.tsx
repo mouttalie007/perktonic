@@ -12,6 +12,8 @@ import { CookiePreferencesButton } from "@/components/consent/CookiePreferencesB
 
 const QUICK_LINKS: { label: string; href: Route }[] = [
   { label: "Home", href: "/" },
+  { label: "All Tools", href: "/tools" as Route },
+  { label: "Blog", href: "/blog" as Route },
   { label: "About Us", href: "/about" as Route },
   { label: "Contact", href: "/contact" as Route },
   { label: "Privacy Policy", href: "/privacy-policy" as Route },
@@ -72,18 +74,15 @@ export function SiteFooter({
   social: Partial<Record<SocialPlatform, string>>;
 }) {
   return (
-    <footer className="bg-ink-deep mt-16 text-white">
+    <footer className="bg-navy text-white">
       <div className="site-container py-14" data-nosnippet>
         <div className="grid gap-10 md:grid-cols-2 lg:grid-cols-[1.4fr_1fr_1fr_1fr]">
           <div>
             <Logo onDark />
-            <p className="text-meta mt-2 font-semibold tracking-[0.2em] text-white/50 uppercase">
-              {SITE.tagline}
-            </p>
             <p className="mt-4 max-w-xs text-sm text-white/60">
-              PerkTonic finds the free samples, AI tools, rewards and
-              discounts actually worth your time — verified before we share
-              them.
+              {SITE.tagline} Free tools for spreadsheets, data, documents,
+              automation and web diagnostics, with practical guides to get
+              more from them.
             </p>
             <SocialLinks
               links={social}

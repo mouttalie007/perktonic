@@ -1,42 +1,41 @@
 import Link from "next/link";
-import { SITE } from "@/config/site";
 
 /**
- * PerkTonic wordmark (spec §7; renamed from ViralTrendly 2026-10-08).
- * Text/vector — never a raster image. "Perk" + ".com" take the foreground
- * colour, "Tonic" is brand yellow. Pass `onDark` on dark surfaces (footer)
- * so it keeps AA contrast.
+ * PerkTonic logo: the lightning-bolt mark (public/brand, 6 KB) + wordmark in
+ * live text ("Perk" dark, "Tonic" blue). `onDark` flips the wordmark to white
+ * for the footer.
  */
 export function Logo({
-  withTagline = false,
   onDark = false,
   className = "",
 }: {
+  /** @deprecated kept for old call sites; the tagline now lives in the footer copy. */
   withTagline?: boolean;
   onDark?: boolean;
   className?: string;
 }) {
-  const fg = onDark ? "text-white" : "text-ink";
-  const tag = onDark ? "text-white/55" : "text-muted";
-  // Brand yellow only clears AA contrast on a dark surface; on light
-  // surfaces (the default) use the darker "ink" gold instead (see globals.css).
-  const brand = onDark ? "text-brand" : "text-brand-ink";
-
   return (
-    <Link href="/" className={`group inline-flex flex-col leading-none ${className}`}>
+    <Link
+      href="/"
+      aria-label="PerkTonic home"
+      className={`group inline-flex items-center gap-2.5 ${className}`}
+    >
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src="/brand/logo-mark-128.webp"
+        alt=""
+        width={40}
+        height={40}
+        className="h-9 w-9 sm:h-10 sm:w-10"
+      />
       <span
-        className={`text-xl font-extrabold tracking-tight sm:text-2xl xl:text-[1.7rem] ${fg}`}
+        className={`font-heading text-[1.4rem] leading-none font-extrabold tracking-tight sm:text-[1.6rem] ${
+          onDark ? "text-white" : "text-navy"
+        }`}
       >
-        Perk<span className={brand}>Tonic</span>
-        <span className={fg}>.com</span>
+        Perk
+        <span className={onDark ? "text-sky-400" : "text-primary"}>Tonic</span>
       </span>
-      {withTagline && (
-        <span
-          className={`mt-1 text-[0.6rem] font-semibold tracking-[0.22em] uppercase sm:text-[0.65rem] ${tag}`}
-        >
-          {SITE.tagline}
-        </span>
-      )}
     </Link>
   );
 }

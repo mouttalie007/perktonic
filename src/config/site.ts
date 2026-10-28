@@ -10,11 +10,11 @@ import { clientEnv } from "./env";
 export const SITE = {
   name: "PerkTonic.com",
   shortName: "PerkTonic",
-  tagline: "Find the good stuff before everyone else does.",
+  tagline: "Free online tools for smarter workflows.",
   url: clientEnv.NEXT_PUBLIC_SITE_URL,
   locale: "en_US",
   description:
-    "Legit freebies, free AI tools, hidden web tricks and smart deals. Checked, honest and updated.",
+    "Free online tools for spreadsheets, data, documents, automation and web diagnostics, plus practical guides to get more from them.",
 } as const;
 
 /** Social profiles. Empty until set from the Admin Dashboard / env. */
@@ -38,107 +38,85 @@ export const SOCIAL_PLATFORMS: { key: SocialPlatform; label: string }[] = [
 ];
 
 export type CategoryKey =
-  | "free-samples"
-  | "ai-tools"
-  | "rewards-perks"
-  | "money-saving";
+  | "spreadsheet-studio"
+  | "data-converters"
+  | "document-intelligence"
+  | "workflow-automation"
+  | "web-diagnostics";
 
 export interface CategoryDef {
   slug: CategoryKey;
   name: string;
+  /** ToolIcon key (src/components/site/ToolIcon.tsx). */
   iconKey: string;
   shortDescription: string;
   description: string;
-  /** Text-safe accent (Tailwind 700/800-depth — see prisma/seed.ts's note
-   *  on why that tier, not the brighter 500/600, is what clears WCAG AA
-   *  against white). Kept in sync with the DB seed's category colors by
-   *  hand — this config predates the DB and several other fields
-   *  (name/description) are already duplicated the same way. */
+  /** Text-safe accent colour for the category. */
   accentColor: string;
 }
 
-// Replaced 2026-10-08 (pivot to PerkTonic.com — a verified free-samples/
-// AI-tools/rewards/savings niche, per the AdSense-approval-focused site
-// structure doc). The old 14-category "viral magazine" taxonomy is gone.
+// Replaced 2026-10-29 (pivot to cloud tools; AdSense "low value content" feedback).
+// Names/descriptions mirror the Category rows seeded by prisma/seed-tool-categories.ts;
+// the copy shown on the homepage cards is the short one below.
 export const CATEGORIES: CategoryDef[] = [
   {
-    slug: "free-samples",
-    name: "Free Samples & Products",
-    iconKey: "gift",
-    shortDescription: "Real freebies, verified",
+    slug: "spreadsheet-studio",
+    name: "Spreadsheet & Formula Studio",
+    iconKey: "sheet",
+    shortDescription: "Generate, debug and explain Excel & Google Sheets formulas.",
     description:
-      "Legitimate free samples, product-testing programs and freebie offers — checked for scams before we share them.",
+      "Translate plain English into production-ready Excel and Google Sheets formulas, explain nested logic step by step, and automate complex lookups.",
     accentColor: "#047857",
   },
   {
-    slug: "ai-tools",
-    name: "Internet Secrets & AI Tools",
-    iconKey: "cpu",
-    shortDescription: "Hidden tools & AI tricks",
+    slug: "data-converters",
+    name: "Data Cleaning & File Converters",
+    iconKey: "database",
+    shortDescription: "Clean, transform and convert your data files with ease.",
     description:
-      "Free AI tools, hidden Google features and useful websites most people have never heard of.",
-    accentColor: "#1D4ED8",
-  },
-  {
-    slug: "rewards-perks",
-    name: "Rewards, Trials & Digital Perks",
-    iconKey: "trophy",
-    shortDescription: "Gift cards, trials & perks",
-    description:
-      "Gift card programs, free trials, cashback apps and digital perks worth knowing about — including how to cancel before you're charged.",
+      "Clean messy CSV exports, remove duplicates, normalize dates and convert between JSON, Excel, Markdown and LaTeX.",
     accentColor: "#6D28D9",
   },
   {
-    slug: "money-saving",
-    name: "Money-Saving Guides",
-    iconKey: "wallet",
-    shortDescription: "Smarter spending",
+    slug: "document-intelligence",
+    name: "Document & Text Intelligence",
+    iconKey: "pdf",
+    shortDescription: "Extract data, summarize text and create professional docs.",
     description:
-      "Coupon tools, price-history tricks and the discounts most people miss — practical ways to spend less.",
-    accentColor: "#92400E",
+      "Pull tables out of PDFs, turn long agreements into checklists and generate standardized business documents.",
+    accentColor: "#B91C1C",
+  },
+  {
+    slug: "workflow-automation",
+    name: "Workflow & Automation Utilities",
+    iconKey: "gear",
+    shortDescription: "Regex, cron, webhooks, diagrams and more.",
+    description:
+      "Build and test regular expressions, schedule cron jobs, inspect webhook payloads and turn text into diagrams.",
+    accentColor: "#B45309",
+  },
+  {
+    slug: "web-diagnostics",
+    name: "Web & Network Diagnostics",
+    iconKey: "globe",
+    shortDescription: "Analyze websites, headers, redirects and server performance.",
+    description:
+      "Trace redirect chains, audit HTTP headers, measure server response time and validate page metadata.",
+    accentColor: "#1D4ED8",
   },
 ];
 
-export interface NavItem {
+export interface NavLink {
   label: string;
   href: string;
-  /** icons.tsx key ("home") or a CategoryIcon key — null falls back to no icon. */
-  iconKey: string | null;
-  /** Text-safe accent for the icon/underline on hover+active — null = brand yellow. */
-  accentColor: string | null;
 }
 
-function navItemFor(slug: CategoryKey): NavItem {
-  const c = CATEGORIES.find((cat) => cat.slug === slug)!;
-  return { label: c.name, href: `/category/${c.slug}`, iconKey: c.iconKey, accentColor: c.accentColor };
-}
-
-/**
- * Primary desktop navigation (spec §7), with icon+accent for the redesigned
- * nav (2026-09-12). Only 4 categories now (PerkTonic pivot, 2026-10-08) —
- * all of them fit directly in the primary bar, so there's nothing left for
- * a "MORE" dropdown (HeaderBar hides that button entirely when NAV_MORE is
- * empty).
- */
-export const NAV_PRIMARY: NavItem[] = [
-  { label: "Home", href: "/", iconKey: "home", accentColor: null },
-  navItemFor("free-samples"),
-  navItemFor("ai-tools"),
-  navItemFor("rewards-perks"),
-  navItemFor("money-saving"),
-];
-
-/** "MORE" dropdown (spec §7) — empty since the 2026-10-08 pivot; kept as a
- *  typed array (not deleted) so HeaderBar's empty-state guard has something
- *  to check against, and so a future 5th+ category has somewhere to go. */
-export const NAV_MORE: NavItem[] = [];
-
-/** Categories shown in the homepage "quick navigation" strip (spec §13). */
-export const QUICK_NAV_CATEGORIES: CategoryKey[] = [
-  "free-samples",
-  "ai-tools",
-  "rewards-perks",
-  "money-saving",
+/** Primary navigation (desktop + mobile). "Categories" is a dropdown built from CATEGORIES. */
+export const NAV_LINKS: NavLink[] = [
+  { label: "Home", href: "/" },
+  { label: "Tools", href: "/tools" },
+  { label: "Blog", href: "/blog" },
+  { label: "About", href: "/about" },
 ];
 
 /**

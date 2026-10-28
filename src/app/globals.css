@@ -24,6 +24,14 @@
      for that, paired with dark text. */
   --color-brand-ink: #b45309;
 
+  /* --- Color: PerkTonic tools identity (2026-10-29 redesign) --- */
+  --color-primary: #0b5cff; /* buttons, links, highlighted words */
+  --color-primary-dark: #0846c9;
+  --color-primary-soft: #eaf1ff; /* chips, tints */
+  --color-navy: #0b1530; /* headings / logo text */
+  --color-slate-ink: #55627a; /* secondary text on white (AA) */
+  --color-hero-wash: #eef4ff;
+
   /* --- Color: accents --- */
   /* Both tuned to clear WCAG AA (4.5:1) against white at normal text sizes —
      the original values (#ff304f / #1683ff) only cleared ~3.6:1. */
@@ -65,6 +73,8 @@
   --radius-lg: 8px;
 
   /* --- Shadow (minimal, spec §97) --- */
+  --shadow-soft: 0 1px 2px rgba(15, 35, 95, 0.04), 0 10px 28px rgba(15, 35, 95, 0.07);
+  --shadow-soft-hover: 0 2px 4px rgba(15, 35, 95, 0.05), 0 16px 36px rgba(15, 35, 95, 0.12);
   --shadow-card: 0 1px 2px rgba(17, 17, 17, 0.04), 0 1px 3px rgba(17, 17, 17, 0.06);
   --shadow-raised: 0 4px 12px rgba(17, 17, 17, 0.08);
   --shadow-overlay: 0 12px 40px rgba(10, 10, 10, 0.18);
