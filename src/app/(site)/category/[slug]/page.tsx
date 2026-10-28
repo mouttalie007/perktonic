@@ -21,7 +21,9 @@ type Params = {
 };
 
 function categoryHref(slug: string, page: number): Route {
-  return (page > 1 ? `/category/${slug}?page=${page}` : `/category/${slug}`) as Route;
+  return (
+    page > 1 ? `/category/${slug}?page=${page}` : `/category/${slug}`
+  ) as Route;
 }
 
 export async function generateStaticParams() {
@@ -39,11 +41,16 @@ export async function generateMetadata({
   if (!category) return { title: "Category not found" };
 
   const page = Math.max(1, Number(pageParam) || 1);
+  // A category with no published article yet is an empty page: keep it out of the index.
+  const { total } = await articleService.listByCategory(slug, {
+    page: 1,
+    pageSize: 1,
+  });
   return seoService.buildMetadata({
     title: category.seoTitle ?? category.name,
     description: category.metaDescription ?? category.description ?? undefined,
     path: categoryHref(slug, page),
-    robotsIndex: category.robotsIndex,
+    robotsIndex: category.robotsIndex && total > 0,
   });
 }
 
@@ -125,7 +132,10 @@ export default async function CategoryPage({ params, searchParams }: Params) {
             <aside className="space-y-6 lg:sticky lg:top-6 lg:self-start">
               <AdSlot placement="sidebar" />
               {topViewed.length > 0 && (
-                <TrendingList stories={topViewed} title={`Most Read in ${category.name}`} />
+                <TrendingList
+                  stories={topViewed}
+                  title={`Most Read in ${category.name}`}
+                />
               )}
             </aside>
           </div>

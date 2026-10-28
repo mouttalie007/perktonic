@@ -35,7 +35,13 @@ export const categoryService = {
   /** Indexable categories, for the sitemap (spec §38). */
   async listIndexable() {
     return prisma.category.findMany({
-      where: { robotsIndex: true },
+      // Empty categories stay out of the sitemap until their first article is live.
+      where: {
+        robotsIndex: true,
+        articles: {
+          some: { status: "PUBLISHED", publishedAt: { lte: new Date() } },
+        },
+      },
       select: { slug: true, updatedAt: true },
       orderBy: { order: "asc" },
     });
