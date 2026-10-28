@@ -28,10 +28,16 @@ export const BRIEF_CATEGORIES: Record<
   BriefCategoryKey,
   { name: string; author: string }
 > = {
-  fs: { name: "Free Samples & Products", author: "Mia Reynolds" },
-  is: { name: "Internet Secrets & AI Tools", author: "Alex Carter" },
-  rt: { name: "Rewards, Trials & Digital Perks", author: "Daniel Brooks" },
-  ms: { name: "Money-Saving Guides", author: "Alex Carter" },
+  fs: { name: "Free Samples & Products", author: "PerkTonic Editorial Team" },
+  is: {
+    name: "Internet Secrets & AI Tools",
+    author: "PerkTonic Editorial Team",
+  },
+  rt: {
+    name: "Rewards, Trials & Digital Perks",
+    author: "PerkTonic Editorial Team",
+  },
+  ms: { name: "Money-Saving Guides", author: "PerkTonic Editorial Team" },
 };
 
 /**

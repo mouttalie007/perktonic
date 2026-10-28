@@ -13,10 +13,7 @@ const initial: NewsletterState = { status: "idle" };
  * with client + server validation. No fake subscriber counts.
  */
 export function NewsletterCTA() {
-  const [state, formAction, pending] = useActionState(
-    subscribeAction,
-    initial,
-  );
+  const [state, formAction, pending] = useActionState(subscribeAction, initial);
   const emailId = useId();
   const msgId = useId();
 
@@ -29,7 +26,8 @@ export function NewsletterCTA() {
             <span className="text-brand">Straight to Your Inbox</span>
           </h2>
           <p className="mt-2 text-sm text-white/70">
-            Join thousands of smart shoppers. No spam, just the good stuff.
+            New guides by email when we publish them. No spam, unsubscribe
+            anytime.
           </p>
         </div>
 

@@ -178,7 +178,7 @@ export function buildUserPrompt(brief: BriefData, ctx: PromptContext): string {
   );
   L.push(`- Category (fixed): ${cat.name} (hub: ${ctx.categoryHubUrl})`);
   L.push(
-    `- Byline author (fixed): ${cat.author}. Beat: ${AUTHORS[cat.author] ?? ""} Write in a voice that fits this beat. Any first-person claim of personal testing must come only from the author's notes below; never invent it.`,
+    `- Byline (fixed): ${cat.author}. ${AUTHORS[cat.author] ? `Beat: ${AUTHORS[cat.author]} ` : ""}This is a team byline, not a person: write in a plain editorial voice ("we" or neutral), never invent a personal backstory, and never claim to have personally tested something unless the author's notes below say so.`,
   );
   L.push(`- Primary keyword: ${brief.pk}`);
   L.push(`- Secondary keywords and entities: ${brief.sk.join("; ")}`);

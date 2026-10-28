@@ -1,7 +1,10 @@
 "use client";
 
 import { useActionState, useId } from "react";
-import { subscribeAction, type NewsletterState } from "@/app/actions/newsletter";
+import {
+  subscribeAction,
+  type NewsletterState,
+} from "@/app/actions/newsletter";
 
 const initial: NewsletterState = { status: "idle" };
 
@@ -22,7 +25,7 @@ export function NewsletterSidebarCTA() {
         Get the Best Deals
       </h2>
       <p className="text-muted mt-1.5 text-xs">
-        Join thousands of smart shoppers. No spam, just the good stuff.
+        New guides by email when we publish them. No spam, unsubscribe anytime.
       </p>
 
       <form action={formAction} noValidate className="mt-3 space-y-2">

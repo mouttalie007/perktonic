@@ -34,6 +34,9 @@ const REACTION_MIN = 10;
 const REACTION_MAX = 100;
 const REACTION_EMOJIS = ["LAUGH", "LOVE", "WOW", "ANGRY", "SAD"] as const;
 
+/** Master switch for seeding at publish time (see ensureDemoEngagement). */
+const AUTO_SEED_ON_PUBLISH = false;
+
 const COMMENT_COUNT_MIN = 5;
 const COMMENT_COUNT_MAX = 10;
 
@@ -172,6 +175,10 @@ export async function ensureDemoEngagement(
   articleId: string,
   publishedAt: Date,
 ): Promise<void> {
+  // 2026-10-28: automatic fake comments/reactions on publish are OFF (they read as
+  // fabricated social proof and hurt the AdSense review). The manual "Apply" button
+  // on the Demo Engagement settings page still works if ever wanted again.
+  if (!AUTO_SEED_ON_PUBLISH) return;
   const [reactions, comments, pool] = await Promise.all([
     prisma.articleReaction.count({ where: { articleId } }),
     prisma.comment.count({ where: { articleId } }),

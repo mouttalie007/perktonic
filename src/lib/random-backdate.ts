@@ -9,9 +9,14 @@
 const BACKDATE_WINDOW_DAYS = 60;
 
 /** Returns a `datetime-local`-input-ready string, randomly within the last `days`. */
-export function randomBackdatedPublishedAt(days = BACKDATE_WINDOW_DAYS): string {
+export function randomBackdatedPublishedAt(
+  days = BACKDATE_WINDOW_DAYS,
+): string {
+  // 2026-10-28: back-dating is switched OFF while the date policy is reviewed (AdSense
+  // flagged the site; dates before the real launch can read as misrepresentation).
+  // New articles pre-fill with the real current time. To re-enable the random
+  // window, replace `now` below with `past + Math.random() * (now - past)`.
   const now = Date.now();
-  const past = now - days * 86_400_000;
-  const t = past + Math.random() * (now - past);
-  return new Date(t).toISOString().slice(0, 16);
+  void days;
+  return new Date(now).toISOString().slice(0, 16);
 }

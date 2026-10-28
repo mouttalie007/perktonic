@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { SITE } from "@/config/site";
+import { DEFAULT_AUTHOR_NAME, SITE } from "@/config/site";
 import { siteSettingsService } from "./site-settings.service";
 
 /**
@@ -53,9 +53,7 @@ export const seoService = {
         type: input.type ?? "website",
         locale: SITE.locale,
         images: [{ url: ogImage }],
-        ...(input.publishedTime
-          ? { publishedTime: input.publishedTime }
-          : {}),
+        ...(input.publishedTime ? { publishedTime: input.publishedTime } : {}),
         ...(input.modifiedTime ? { modifiedTime: input.modifiedTime } : {}),
       },
       twitter: {
@@ -121,7 +119,11 @@ export const seoService = {
       ...(input.datePublished ? { datePublished: input.datePublished } : {}),
       dateModified: input.dateModified ?? input.datePublished,
       ...(input.section ? { articleSection: input.section } : {}),
-      author: { "@type": "Person", name: input.authorName },
+      author: {
+        "@type":
+          input.authorName === DEFAULT_AUTHOR_NAME ? "Organization" : "Person",
+        name: input.authorName,
+      },
       publisher: {
         "@type": "Organization",
         name: seo.organizationName,
@@ -153,7 +155,9 @@ export const seoService = {
       url: absoluteUrl(input.url),
       ...(input.bio ? { description: input.bio } : {}),
       ...(input.imageUrl ? { image: absoluteUrl(input.imageUrl) } : {}),
-      ...(input.sameAs && input.sameAs.length > 0 ? { sameAs: input.sameAs } : {}),
+      ...(input.sameAs && input.sameAs.length > 0
+        ? { sameAs: input.sameAs }
+        : {}),
     };
   },
 
