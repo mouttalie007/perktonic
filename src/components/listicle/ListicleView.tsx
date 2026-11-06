@@ -11,7 +11,7 @@ import { QuizCta } from "@/components/article/QuizCta";
 import { AdSlot } from "@/components/ads/AdSlot";
 import { TrendingList } from "@/components/home/TrendingList";
 import { reactionService } from "@/services/reaction.service";
-import { formatDateLong, formatReadingTime } from "@/lib/format";
+import { formatReadingTime } from "@/lib/format";
 import { DEFAULT_AUTHOR_NAME } from "@/config/site";
 import {
   subpagePath,
@@ -115,12 +115,6 @@ export async function ListicleView({
               </h1>
               <div className="text-muted mt-5 flex flex-wrap items-center gap-x-2 gap-y-1 text-[0.82rem]">
                 <span className="text-ink font-semibold">{authorName}</span>
-                <span aria-hidden>·</span>
-                {article.publishedAt && (
-                  <time dateTime={article.publishedAt.toISOString()}>
-                    {formatDateLong(article.publishedAt)}
-                  </time>
-                )}
                 <span aria-hidden>·</span>
                 <span>{formatReadingTime(article.readingTime)}</span>
                 <span aria-hidden>·</span>

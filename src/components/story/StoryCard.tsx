@@ -2,7 +2,7 @@ import Link from "next/link";
 import Image from "next/image";
 import type { Route } from "next";
 import type { ArticleCard } from "@/services/article.service";
-import { formatDate, formatViews, isoDate } from "@/lib/format";
+import { formatViews } from "@/lib/format";
 import { EngagementMeta } from "@/components/article/EngagementMeta";
 import type { ReactionCounts } from "@/services/reaction.service";
 
@@ -65,25 +65,18 @@ function Meta({
   tone?: "muted" | "light";
 }) {
   const cls = tone === "light" ? "text-white/75" : "text-muted";
+  const parts = [
+    ...(story.viewCount > 0 ? [formatViews(story.viewCount)] : []),
+    ...(story.readingTime > 0 ? [`${story.readingTime} min read`] : []),
+  ];
   return (
     <p className={`flex flex-wrap items-center gap-x-2 gap-y-1 text-[0.75rem] ${cls}`}>
-      {story.publishedAt && (
-        <time dateTime={isoDate(story.publishedAt)}>
-          {formatDate(story.publishedAt)}
-        </time>
-      )}
-      {story.viewCount > 0 && (
-        <>
-          <span aria-hidden>·</span>
-          <span>{formatViews(story.viewCount)}</span>
-        </>
-      )}
-      {story.readingTime > 0 && (
-        <>
-          <span aria-hidden>·</span>
-          <span>{story.readingTime} min read</span>
-        </>
-      )}
+      {parts.map((p, i) => (
+        <span key={p} className="flex items-center gap-x-2">
+          {i > 0 && <span aria-hidden>·</span>}
+          <span>{p}</span>
+        </span>
+      ))}
     </p>
   );
 }

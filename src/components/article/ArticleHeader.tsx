@@ -1,7 +1,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import type { Route } from "next";
-import { formatDateLong, isDifferentDay, formatReadingTime } from "@/lib/format";
+import { formatReadingTime } from "@/lib/format";
 import { DEFAULT_AUTHOR_NAME } from "@/config/site";
 
 type HeaderArticle = {
@@ -23,12 +23,11 @@ type HeaderArticle = {
 };
 
 /**
- * Article header (spec §25, §26, §72): category, H1, dek, byline + dates +
- * reading time, featured image with caption/credit.
+ * Article header (spec §25, §26, §72): category, H1, dek, byline + reading time
+ * (no publication or update date: a technical guide is kept current instead of dated), featured image with caption/credit.
  */
 export function ArticleHeader({ article }: { article: HeaderArticle }) {
   const authorName = article.author?.name ?? DEFAULT_AUTHOR_NAME;
-  const showUpdated = isDifferentDay(article.updatedAt, article.publishedAt);
 
   return (
     <header>
@@ -54,19 +53,7 @@ export function ArticleHeader({ article }: { article: HeaderArticle }) {
       <div className="text-muted mt-5 flex flex-wrap items-center gap-x-2 gap-y-1 text-[0.82rem]">
         <span className="text-ink font-semibold">{authorName}</span>
         <span aria-hidden>·</span>
-        {article.publishedAt && (
-          <time dateTime={article.publishedAt.toISOString()}>
-            {formatDateLong(article.publishedAt)}
-          </time>
-        )}
-        <span aria-hidden>·</span>
         <span>{formatReadingTime(article.readingTime)}</span>
-        {showUpdated && (
-          <>
-            <span aria-hidden>·</span>
-            <span>Updated {formatDateLong(article.updatedAt)}</span>
-          </>
-        )}
       </div>
 
       {article.featuredImage?.url && (

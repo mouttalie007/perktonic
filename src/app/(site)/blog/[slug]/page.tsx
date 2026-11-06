@@ -37,8 +37,6 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
       type: "article",
       ogImage: meta.ogImageUrl ?? undefined,
       robotsIndex: meta.robotsIndex,
-      publishedTime: article.publishedAt?.toISOString(),
-      modifiedTime: article.updatedAt.toISOString(),
     });
   }
 
@@ -49,8 +47,6 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
     type: "article",
     ogImage: resolveOgImage(article.ogImage, article.featuredImage),
     robotsIndex: article.robotsIndex,
-    publishedTime: article.publishedAt?.toISOString(),
-    modifiedTime: article.updatedAt.toISOString(),
   });
 }
 
@@ -98,8 +94,6 @@ export default async function StoryPage({ params }: Params) {
             description: meta.description,
             path,
             imageUrl: meta.ogImageUrl ?? undefined,
-            datePublished: article.publishedAt?.toISOString(),
-            dateModified: article.updatedAt.toISOString(),
             authorName,
             section: article.category?.name,
           })}
@@ -132,8 +126,6 @@ export default async function StoryPage({ params }: Params) {
           description: article.metaDescription ?? article.excerpt ?? "",
           path,
           imageUrl: resolveOgImage(article.ogImage, article.featuredImage),
-          datePublished: article.publishedAt?.toISOString(),
-          dateModified: article.updatedAt.toISOString(),
           authorName,
           section: article.category?.name,
         })}

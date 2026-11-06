@@ -126,7 +126,7 @@ export const seoService = {
       description: input.description,
       ...(input.imageUrl ? { image: [absoluteUrl(input.imageUrl)] } : {}),
       ...(input.datePublished ? { datePublished: input.datePublished } : {}),
-      dateModified: input.dateModified ?? input.datePublished,
+      ...((input.dateModified ?? input.datePublished) ? { dateModified: input.dateModified ?? input.datePublished } : {}),
       ...(input.section ? { articleSection: input.section } : {}),
       author: {
         "@type":

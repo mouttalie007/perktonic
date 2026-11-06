@@ -52,7 +52,6 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
       type: "article",
       ogImage: resolveOgImage(article.ogImage, article.featuredImage),
       robotsIndex: false,
-      modifiedTime: article.updatedAt.toISOString(),
     });
   }
 
@@ -64,8 +63,6 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
     type: "article",
     ogImage: meta.ogImageUrl ?? undefined,
     robotsIndex: meta.robotsIndex,
-    publishedTime: article.publishedAt?.toISOString(),
-    modifiedTime: article.updatedAt.toISOString(),
   });
 }
 
@@ -142,8 +139,6 @@ export default async function ListicleSubpage({ params }: Params) {
           description: meta.description,
           path: meta.canonicalPath,
           imageUrl: meta.ogImageUrl ?? undefined,
-          datePublished: article.publishedAt?.toISOString(),
-          dateModified: article.updatedAt.toISOString(),
           authorName,
           section: article.category?.name,
         })}
