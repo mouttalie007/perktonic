@@ -80,6 +80,11 @@ const nextConfig: NextConfig = {
     },
   },
 
+  async redirects() {
+    // Guides moved from /story/<slug> to /blog/<slug> (2026-11-06): keep every old link working.
+    return [{ source: "/story/:path*", destination: "/blog/:path*", permanent: true }];
+  },
+
   async headers() {
     return [
       { source: "/:path*", headers: SECURITY_HEADERS },

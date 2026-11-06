@@ -38,7 +38,7 @@ export async function saveQuizAction(articleId: string, raw: string): Promise<Sa
   });
 
   revalidatePath(`/adminiyad/articles/${articleId}/edit`);
-  revalidatePath(`/story/${article.slug}`);
+  revalidatePath(`/blog/${article.slug}`);
   return { ok: true, quizId, title: parsed.title, questionCount: parsed.questions.length };
 }
 
@@ -47,7 +47,7 @@ export async function deleteQuizAction(articleId: string): Promise<void> {
   const article = await prisma.article.findUnique({ where: { id: articleId }, select: { slug: true } });
   await prisma.quiz.deleteMany({ where: { articleId } });
   revalidatePath(`/adminiyad/articles/${articleId}/edit`);
-  if (article) revalidatePath(`/story/${article.slug}`);
+  if (article) revalidatePath(`/blog/${article.slug}`);
 }
 
 export type LookupCodeResult =

@@ -394,7 +394,7 @@ function BriefCard({
         )}
         {b.status === "PUBLISHED" && b.slug && (
           <>
-            <LinkButton href={`/story/${b.slug}`}>View live</LinkButton>
+            <LinkButton href={`/blog/${b.slug}`}>View live</LinkButton>
             {b.articleId && (
               <LinkButton href={`/adminiyad/articles/${b.articleId}/edit`}>
                 Edit
@@ -460,7 +460,7 @@ function PublishDialog({
               </ul>
             )}
             <div className="mt-5 flex gap-3">
-              <LinkButton href={`/story/${done.slug}`} variant="primary">
+              <LinkButton href={`/blog/${done.slug}`} variant="primary">
                 View live
               </LinkButton>
               <Button type="button" variant="secondary" onClick={onClose}>

@@ -46,7 +46,7 @@ export function CompletionModal({
   }
 
   function shareTo(platform: "facebook" | "x") {
-    const articleUrl = `${window.location.origin}/story/${slug}`;
+    const articleUrl = `${window.location.origin}/blog/${slug}`;
     const text = `I just finished the "${articleTitle}" quiz on PerkTonic!`;
     const shareUrl =
       platform === "facebook"

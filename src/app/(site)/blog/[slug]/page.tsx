@@ -5,6 +5,7 @@ import { adService } from "@/services/ad.service";
 import { seoService } from "@/services/seo.service";
 import { quizService } from "@/services/quiz.service";
 import { processArticleHtml } from "@/lib/article-html";
+import { unlinkUnpublished } from "@/lib/unlink-unpublished";
 import { buildSubpageMeta } from "@/lib/listicle";
 import { resolveOgImage } from "@/lib/resolve-og-image";
 import { StandardArticleView } from "@/components/article/StandardArticleView";
@@ -13,6 +14,9 @@ import { JsonLd } from "@/components/seo/JsonLd";
 import { DEFAULT_AUTHOR_NAME } from "@/config/site";
 
 type Params = { params: Promise<{ slug: string }> };
+
+/** A scheduled guide appears (and links to it come back) within the hour after its publish date. */
+export const revalidate = 3600;
 
 export async function generateStaticParams() {
   const refs = await articleService.listAllPublishedRefs();
@@ -41,7 +45,7 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
   return seoService.buildMetadata({
     title: article.seoTitle ?? article.title,
     description: article.metaDescription ?? article.excerpt ?? undefined,
-    path: `/story/${article.slug}`,
+    path: `/blog/${article.slug}`,
     type: "article",
     ogImage: resolveOgImage(article.ogImage, article.featuredImage),
     robotsIndex: article.robotsIndex,
@@ -55,12 +59,13 @@ export default async function StoryPage({ params }: Params) {
   const article = await articleService.getForRender(slug);
   if (!article) notFound();
 
-  const path = `/story/${article.slug}`;
+  const path = `/blog/${article.slug}`;
   const canonical = seoService.absoluteUrl(path);
   const authorName = article.author?.name ?? DEFAULT_AUTHOR_NAME;
 
   const crumbs = [
     { name: "Home", path: "/" },
+    { name: "Blog", path: "/blog" },
     ...(article.category
       ? [
           {
@@ -114,7 +119,7 @@ export default async function StoryPage({ params }: Params) {
   }
 
   // ---- Standard article ----
-  const { toc, segments } = processArticleHtml(article.content ?? "", {
+  const { toc, segments } = processArticleHtml(await unlinkUnpublished(article.content ?? ""), {
     adEveryNParagraphs: adRule?.everyNParagraphs,
     maxAds: adRule?.maxInjections,
   });

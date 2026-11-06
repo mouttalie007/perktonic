@@ -203,14 +203,14 @@ function userPromptFor(
     related: (data.relResolved ?? []).map((r) => ({
       title: r.title,
       pk: r.pk,
-      url: `/story/${briefSlug(r.pk)}`,
+      url: `/blog/${briefSlug(r.pk)}`,
       live: liveSlugs.has(briefSlug(r.pk)),
     })),
     liveArticles: site.liveArticles
       .filter((a) => a.slug !== slug)
       .map((a) => ({
         title: a.title,
-        url: `/story/${a.slug}`,
+        url: `/blog/${a.slug}`,
         category: a.category,
       })),
     notes: brief.notes,
@@ -242,8 +242,8 @@ async function persistDraft(
     isKnownInternal: (href) => {
       const path = href.split(/[?#]/)[0].replace(/\/+$/, "") || "/";
       if (path === "/") return true;
-      if (path.startsWith("/story/"))
-        return site.knownSlugs.has(path.slice("/story/".length));
+      if (path.startsWith("/blog/"))
+        return site.knownSlugs.has(path.slice("/blog/".length));
       if (path.startsWith("/category/"))
         return site.categorySlugs.has(path.slice("/category/".length));
       return false;

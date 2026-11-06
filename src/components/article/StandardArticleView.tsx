@@ -53,6 +53,7 @@ export async function StandardArticleView({
 
   const crumbs: Crumb[] = [
     { name: "Home", href: "/" as Route },
+    { name: "Blog", href: "/blog" as Route },
     ...(article.category
       ? [
           {
@@ -93,7 +94,7 @@ export async function StandardArticleView({
 
           <AdSlot placement="below-article" article={adCtx} className="mt-10" />
 
-          <CommentSection articleId={article.id} path={`/story/${article.slug}`} className="mt-12" />
+          <CommentSection articleId={article.id} path={`/blog/${article.slug}`} className="mt-12" />
         </div>
 
         <aside className="space-y-6 lg:sticky lg:top-6 lg:self-start">

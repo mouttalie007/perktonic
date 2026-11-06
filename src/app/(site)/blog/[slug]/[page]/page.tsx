@@ -81,6 +81,7 @@ export default async function ListicleSubpage({ params }: Params) {
   const authorName = article.author?.name ?? DEFAULT_AUTHOR_NAME;
   const crumbs = [
     { name: "Home", path: "/" },
+    { name: "Blog", path: "/blog" },
     ...(article.category
       ? [
           {

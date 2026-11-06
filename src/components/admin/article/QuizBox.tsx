@@ -52,7 +52,7 @@ export function QuizBox({ articleId, articleSlug, initialQuiz }: Props) {
   const [deleting, startDeleting] = useTransition();
 
   function copyPrompt() {
-    const articleUrl = `${window.location.origin}/story/${articleSlug}`;
+    const articleUrl = `${window.location.origin}/blog/${articleSlug}`;
     navigator.clipboard.writeText(buildQuizPrompt(articleUrl)).then(() => {
       setPromptCopied(true);
       setTimeout(() => setPromptCopied(false), 2000);

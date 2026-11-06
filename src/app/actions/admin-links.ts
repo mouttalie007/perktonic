@@ -59,6 +59,6 @@ export async function suggestInternalLinks({
     id: r.id,
     title: r.title,
     slug: r.slug,
-    linkHtml: `<a href="${seoService.absoluteUrl(`/story/${r.slug}`)}">${r.title}</a>`,
+    linkHtml: `<a href="${seoService.absoluteUrl(`/blog/${r.slug}`)}">${r.title}</a>`,
   }));
 }

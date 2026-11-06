@@ -47,7 +47,7 @@ export function CodeLookupForm() {
           {result.ok && !result.alreadyChecked && (
             <p className="rounded-sm bg-green-50 p-3 text-sm font-semibold text-green-800">
               ✓ Valid — first time this code has been checked. From article:{" "}
-              <Link href={`/story/${result.articleSlug}` as Route} className="underline" target="_blank">
+              <Link href={`/blog/${result.articleSlug}` as Route} className="underline" target="_blank">
                 {result.articleTitle}
               </Link>
             </p>
@@ -57,7 +57,7 @@ export function CodeLookupForm() {
             <p className="bg-accent-red/10 text-accent-red rounded-sm p-3 text-sm font-semibold">
               ⚠ Already checked before
               {result.firstCheckedAt && ` on ${formatDateLong(result.firstCheckedAt)}`}. From article:{" "}
-              <Link href={`/story/${result.articleSlug}` as Route} className="underline" target="_blank">
+              <Link href={`/blog/${result.articleSlug}` as Route} className="underline" target="_blank">
                 {result.articleTitle}
               </Link>
             </p>

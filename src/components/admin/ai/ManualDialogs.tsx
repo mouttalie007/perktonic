@@ -283,7 +283,7 @@ export function QuizDialog({
   const [busy, setBusy] = useState(false);
   const [msg, setMsg] = useState<{ ok: boolean; text: string } | null>(null);
   const { copied, copy } = useCopied();
-  const liveUrl = `${typeof window === "undefined" ? "" : window.location.origin}/story/${brief.slug}`;
+  const liveUrl = `${typeof window === "undefined" ? "" : window.location.origin}/blog/${brief.slug}`;
 
   async function save() {
     setBusy(true);

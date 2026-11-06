@@ -102,6 +102,12 @@ export const articleService = {
     });
   },
 
+  /** Which of these slugs are published right now. */
+  async publishedSlugs(slugs: string[]): Promise<Set<string>> {
+    const rows = await prisma.article.findMany({ where: { ...published(), slug: { in: slugs } }, select: { slug: true } });
+    return new Set(rows.map((r) => r.slug));
+  },
+
   /** Published guides that link to a tool page (the tool is linked from the guide body), newest first. */
   async listByTool(toolSlug: string, limit = 4): Promise<ArticleCard[]> {
     return prisma.article.findMany({

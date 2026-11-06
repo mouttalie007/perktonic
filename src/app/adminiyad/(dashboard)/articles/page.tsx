@@ -230,7 +230,7 @@ export default async function ArticlesListPage({
                       Edit
                     </Link>
                     <a
-                      href={`/story/${a.slug}`}
+                      href={`/blog/${a.slug}`}
                       target="_blank"
                       rel="noreferrer"
                       className="text-muted text-xs font-bold hover:underline"

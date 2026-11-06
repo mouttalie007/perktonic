@@ -9,7 +9,7 @@ export async function GET() {
   for (const r of refs) {
     const lastmod = r.updatedAt.toISOString();
     urls.push({
-      loc: seoService.absoluteUrl(`/story/${r.slug}`),
+      loc: seoService.absoluteUrl(`/blog/${r.slug}`),
       lastmod,
       changefreq: "weekly",
       priority: 0.8,
@@ -18,7 +18,7 @@ export async function GET() {
     if (r.type === "LISTICLE" && r.listicleIndexSubpages) {
       for (let n = 2; n <= r._count.listicleItems; n++) {
         urls.push({
-          loc: seoService.absoluteUrl(`/story/${r.slug}/${n}`),
+          loc: seoService.absoluteUrl(`/blog/${r.slug}/${n}`),
           lastmod,
           changefreq: "weekly",
           priority: 0.6,

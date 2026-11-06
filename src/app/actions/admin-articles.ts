@@ -194,7 +194,7 @@ export async function saveStandardArticle(
   }
 
   revalidatePath("/adminiyad/articles");
-  revalidatePath(`/story/${v.slug}`);
+  revalidatePath(`/blog/${v.slug}`);
   redirect(`/adminiyad/articles/${articleId}/edit?saved=1` as Route);
 }
 
@@ -296,7 +296,7 @@ export async function saveListicleArticle(
   }
 
   revalidatePath("/adminiyad/articles");
-  revalidatePath(`/story/${v.slug}`);
+  revalidatePath(`/blog/${v.slug}`);
   redirect(`/adminiyad/articles/${articleId}/edit?saved=1` as Route);
 }
 
@@ -309,7 +309,7 @@ async function revalidateArticleSurfaces(
   slug: string,
   categoryId: string | null,
 ) {
-  revalidatePath(`/story/${slug}`);
+  revalidatePath(`/blog/${slug}`);
   revalidatePath("/");
   if (categoryId) {
     const cat = await prisma.category.findUnique({

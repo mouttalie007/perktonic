@@ -3,8 +3,8 @@ import { resolveOgImage } from "./resolve-og-image";
 
 /**
  * Shared logic for Top-N listicle articles (spec §4, discussion notes):
- * each item is its own real subpage at /story/{slug}/{n}. Page 1 is the base
- * route /story/{slug} and also shows the first item. /story/{slug}/all is a
+ * each item is its own real subpage at /blog/{slug}/{n}. Page 1 is the base
+ * route /blog/{slug} and also shows the first item. /blog/{slug}/all is a
  * secondary single-page view.
  */
 
@@ -43,12 +43,12 @@ export function itemImage(item: ListicleItemLike) {
 /** 1-based; page 1 lives at the bare slug, pages 2..N at /{n}. */
 export function subpagePath(slug: string, position: number): Route {
   return (position <= 1
-    ? `/story/${slug}`
-    : `/story/${slug}/${position}`) as Route;
+    ? `/blog/${slug}`
+    : `/blog/${slug}/${position}`) as Route;
 }
 
 export function allViewPath(slug: string): Route {
-  return `/story/${slug}/all` as Route;
+  return `/blog/${slug}/all` as Route;
 }
 
 export interface SubpageMeta {

@@ -28,7 +28,7 @@ const emptyItem = (): ItemDraft => ({
 /**
  * Repeatable Top-N items — the LISTICLE editor's core (spec §4). Each item
  * renders as its own real subpage, so the heading and description here map
- * 1:1 to what the visitor sees on /story/{slug}/{n}. Images are paste-to-
+ * 1:1 to what the visitor sees on /blog/{slug}/{n}. Images are paste-to-
  * upload, per feedback. Reorder is up/down buttons rather than drag-and-drop,
  * to avoid an extra dependency.
  */

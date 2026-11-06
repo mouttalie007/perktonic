@@ -20,7 +20,7 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
 
   return seoService.buildMetadata({
     title: `${quiz.title} — Question ${n} of ${quiz.questions.length}`,
-    path: `/story/${slug}/quiz/${step}`,
+    path: `/blog/${slug}/quiz/${step}`,
     type: "website",
     // Thin, near-duplicate per-question pages -- keep out of the index.
     robotsIndex: false,

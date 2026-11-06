@@ -1,7 +1,7 @@
 /**
  * Imports an article written to the PerkTonic brief (tools-handbook/ARTICLE-WRITER-BRIEF.md) into the local database.
  *
- *   npx tsx --env-file=.env scripts/import-article.mts <article.md> [--shots <shots.json>] [--cover] [--draft] [--author <slug>] [--skip-links] [--dry]
+ *   npx tsx --env-file=.env scripts/import-article.mts <article.md> [--shots <shots.json>] [--cover] [--draft] [--at <ISO date: schedule the guide>] [--author <slug>] [--skip-links] [--dry]
  *
  *  1. reads the meta block and the Markdown body; finds the [IMAGE n] blocks. Two layouts are accepted:
  *     the block written in place, or a bare `[IMAGE n]` line in the text with its definition (Tool/Setup/Show/Mark/Alt/Caption)
@@ -9,7 +9,7 @@
  *  2. --shots: runs the screenshot spec. Each shot is { "n": <IMAGE number>, steps, capture, annotate, viewport? }: the tool, the alt text and
  *     the caption come from the image block; images are registered in the media library and placed where the block was;
  *  3. --cover: draws the cover image of the guide (scripts/cover.mts, optional cover.json next to the article) and makes it the featured image;
- *  4. converts Markdown to HTML (`article:<slug>` -> /story/<slug>, external links get rel="nofollow noopener noreferrer"), checks every link
+ *  4. converts Markdown to HTML (`article:<slug>` -> /blog/<slug>, external links get rel="nofollow noopener noreferrer"), checks every link
  *     (external ones are fetched), creates or updates the article (published, or --draft), and prints the SEO check.
  * Safe to run again: the article (same slug) is updated and its images are replaced.
  */
@@ -29,7 +29,7 @@ import { registerWebp } from "./media-register.mjs";
 const args = process.argv.slice(2);
 const flag = (n: string) => args.includes(n);
 const opt = (n: string) => (args.includes(n) ? args[args.indexOf(n) + 1] : undefined);
-const file = args.find((a) => !a.startsWith("--") && ![opt("--shots"), opt("--author")].includes(a));
+const file = args.find((a) => !a.startsWith("--") && ![opt("--shots"), opt("--author"), opt("--at")].includes(a));
 if (!file) {
   console.error("Usage: npx tsx --env-file=.env scripts/import-article.mts <article.md> [--shots shots.json] [--cover] [--draft] [--author slug] [--skip-links] [--dry]");
   process.exit(1);
@@ -142,7 +142,7 @@ for (const n of defs.keys()) if (!flag("--dry") && !images.has(n)) console.log(`
 // ------------------------------------------------------------------ 3. html
 let html = (marked.parse(bodyLines.join("\n"), { gfm: true, async: false }) as string).trim();
 html = html.replace(/<p>IMGBLOCKTOKEN(\d+)<\/p>/g, (_m, n: string) => images.get(Number(n))?.html ?? "");
-html = html.replace(/href="article:([a-z0-9-]+)"/g, 'href="/story/$1"');
+html = html.replace(/href="article:([a-z0-9-]+)"/g, 'href="/blog/$1"');
 html = html.replace(/<a href="(https?:\/\/[^"]+)"(?![^>]*\brel=)/g, '<a href="$1" rel="nofollow noopener noreferrer" target="_blank"');
 if (/IMGBLOCKTOKEN|\[IMAGE/.test(html) && !flag("--dry")) throw new Error("An image placeholder is still in the article.");
 
@@ -160,7 +160,7 @@ for (const slugOf of toolSlugs) if (!liveTools.has(slugOf)) note(false, `meta To
 for (const h of hrefs) {
   if (h.startsWith("/tools/")) note(liveTools.has(h.slice(7)), h);
   else if (h.startsWith("/category/")) note(cats.has(h.slice(10)), h);
-  else if (h.startsWith("/story/")) {
+  else if (h.startsWith("/blog/")) {
     const exists = !!(await prisma.article.findUnique({ where: { slug: h.slice(7) }, select: { id: true } }));
     linkReport.push(`${exists ? "ok  " : "wait"} ${h}${exists ? "" : "  (guide not imported yet)"}`);
   } else if (/^https?:\/\//.test(h)) {
@@ -215,7 +215,7 @@ const data = {
   categoryId: category.id,
   authorId: author.id,
   status: publish ? ("PUBLISHED" as const) : ("DRAFT" as const),
-  publishedAt: publish ? (existing?.publishedAt ?? new Date()) : null,
+  publishedAt: publish ? (opt("--at") ? new Date(opt("--at") as string) : (existing?.publishedAt ?? new Date())) : null,
   readingTime: readingTimeMinutes(html),
   seoTitle,
   metaDescription,
@@ -232,7 +232,7 @@ fs.writeFileSync(path.join(dir, "article.html"), html);
 console.log(`\n${existing ? "Updated" : "Created"} "${title}" (${publish ? "published" : "draft"}, ${article.readingTime} min, ${images.size}/${defs.size} image(s), cover: ${coverMediaId ? "yes" : "no"})`);
 console.log("\nLinks:\n  " + linkReport.join("\n  "));
 console.log("\nSEO check:\n" + seoLines.join("\n"));
-console.log(`\nKeyword: ${primaryKeyword}\nArticle:  ${PREVIEW}/story/${slug}\nAdmin:    ${PREVIEW}/adminiyad/articles/${article.id}/edit`);
+console.log(`\nKeyword: ${primaryKeyword}\nArticle:  ${PREVIEW}/blog/${slug}\nAdmin:    ${PREVIEW}/adminiyad/articles/${article.id}/edit`);
 fs.appendFileSync(path.join("content", "articles", "_report.jsonl"), JSON.stringify({ at: new Date().toISOString(), slug, title, images: images.size, linkProblems, seoProblems: problems.map((p) => `${p.status}:${p.id}`), placeholdersMissing: [...defs.keys()].filter((n) => !placeholders.has(n)) }) + "\n");
 await prisma.$disconnect();
 process.exit(linkProblems ? 2 : 0);

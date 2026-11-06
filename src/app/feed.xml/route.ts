@@ -19,7 +19,7 @@ export async function GET() {
 
   const entries = items
     .map((a) => {
-      const link = seoService.absoluteUrl(`/story/${a.slug}`);
+      const link = seoService.absoluteUrl(`/blog/${a.slug}`);
       const bits = [
         `    <title>${esc(a.title)}</title>`,
         `    <link>${link}</link>`,

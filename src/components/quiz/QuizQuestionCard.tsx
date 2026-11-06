@@ -31,7 +31,7 @@ export function QuizQuestionCard({
     if (isLast) {
       setShowModal(true);
     } else {
-      router.push(`/story/${slug}/quiz/q${position + 1}`);
+      router.push(`/blog/${slug}/quiz/q${position + 1}`);
     }
   }
 

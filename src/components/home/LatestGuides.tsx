@@ -30,7 +30,7 @@ export function LatestGuides({ articles }: { articles: ArticleCard[] }) {
           return (
             <li key={a.id} className={i === articles.length - 1 && articles.length % 2 === 1 ? "sm:col-span-2 lg:col-span-1" : ""}>
               <Link
-                href={`/story/${a.slug}` as Route}
+                href={`/blog/${a.slug}` as Route}
                 className="group relative flex h-full flex-col overflow-hidden rounded-2xl bg-white shadow-[var(--shadow-soft)] ring-1 ring-slate-900/[0.06] transition duration-200 hover:-translate-y-1 hover:shadow-[var(--shadow-soft-hover)]"
               >
                 <span className="relative block aspect-[1200/630] w-full overflow-hidden bg-slate-100">

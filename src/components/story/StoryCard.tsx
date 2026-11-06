@@ -38,7 +38,7 @@ interface Props {
 }
 
 function storyHref(slug: string): Route {
-  return `/story/${slug}` as Route;
+  return `/blog/${slug}` as Route;
 }
 
 function Badge({ story }: { story: ArticleCard }) {

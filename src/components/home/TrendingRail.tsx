@@ -162,7 +162,7 @@ export function TrendingRail({
               className="w-[62vw] shrink-0 snap-start sm:w-[280px]"
             >
               <Link
-                href={`/story/${story.slug}` as Route}
+                href={`/blog/${story.slug}` as Route}
                 className="group block"
               >
                 <span className="border-line relative block aspect-[3/2] overflow-hidden rounded-md border">

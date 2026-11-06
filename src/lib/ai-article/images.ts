@@ -180,10 +180,10 @@ export async function publishBrief(
   // sibling -- tell the admin which of them aren't live yet (non-blocking).
   const warnings: string[] = [];
   const hrefs = [
-    ...(article.content ?? "").matchAll(/<a href="(\/story\/[^"#?]+)"/g),
+    ...(article.content ?? "").matchAll(/<a href="(\/blog\/[^"#?]+)"/g),
   ].map((m) => m[1]);
   if (hrefs.length) {
-    const slugs = [...new Set(hrefs.map((h) => h.replace("/story/", "")))];
+    const slugs = [...new Set(hrefs.map((h) => h.replace("/blog/", "")))];
     const live = await prisma.article.findMany({
       where: { slug: { in: slugs }, status: "PUBLISHED" },
       select: { slug: true },
@@ -192,7 +192,7 @@ export async function publishBrief(
     for (const s of slugs) {
       if (!liveSet.has(s))
         warnings.push(
-          `Links to /story/${s}, which isn't published yet (it will work once that article goes live).`,
+          `Links to /blog/${s}, which isn't published yet (it will work once that article goes live).`,
         );
     }
   }
@@ -211,7 +211,7 @@ export async function publishBrief(
     /* non-critical: the article is already live */
   });
 
-  revalidatePath(`/story/${article.slug}`);
+  revalidatePath(`/blog/${article.slug}`);
   revalidatePath("/");
   if (article.category?.slug)
     revalidatePath(`/category/${article.category.slug}`);

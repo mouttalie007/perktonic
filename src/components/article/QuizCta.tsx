@@ -18,7 +18,7 @@ export function QuizCta({
         {quiz.questionCount} quick questions — think you know this one?
       </p>
       <Link
-        href={`/story/${slug}/quiz/q1` as Route}
+        href={`/blog/${slug}/quiz/q1` as Route}
         className="bg-brand text-ink hover:bg-brand-strong mt-5 inline-block rounded-sm px-8 py-3 text-sm font-bold transition-colors"
       >
         Test Your Knowledge →

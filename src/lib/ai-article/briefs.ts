@@ -43,7 +43,7 @@ export const BRIEF_CATEGORIES: Record<
 /**
  * The article's URL slug is ALWAYS slugify(primary keyword) -- the same
  * convention the already-published articles follow (e.g. "free samples by
- * mail" -> /story/free-samples-by-mail). It is forced, never left to the
+ * mail" -> /blog/free-samples-by-mail). It is forced, never left to the
  * model, because sibling briefs link to each other by exactly this slug.
  */
 export function briefSlug(pk: string): string {

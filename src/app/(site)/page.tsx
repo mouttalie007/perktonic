@@ -19,6 +19,9 @@ export async function generateMetadata(): Promise<Metadata> {
   return { ...meta, title: { absolute: seo.defaultTitle } };
 }
 
+/** Refreshed hourly so a scheduled guide shows up in "Latest guides" once its date has passed. */
+export const revalidate = 3600;
+
 /** Homepage (2026-10-29 redesign): hero, tool categories, popular tools, latest guides. */
 export default async function HomePage() {
   const [latest, jsonLd] = await Promise.all([

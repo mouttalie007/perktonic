@@ -11,7 +11,7 @@ import {
 /** Comments and reaction counts are baked into the static article pages, so refresh them all. */
 function revalidateEngagementSurfaces() {
   revalidatePath("/adminiyad/settings/demo-engagement");
-  revalidatePath("/story/[slug]", "page");
+  revalidatePath("/blog/[slug]", "page");
   revalidatePath("/");
 }
 
