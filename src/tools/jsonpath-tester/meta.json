@@ -1,0 +1,18 @@
+{
+  "title": "JSONPath Tester Online: JSONPath and jq, Explained",
+  "metaDescription": "A JSONPath tester online that also runs jq: paste JSON, type an expression, see the live result and a step-by-step explanation of what it does.",
+  "h1": "JSONPath Tester Online, with jq",
+  "primaryKeyword": "jsonpath tester online",
+  "secondaryKeywords": [
+    "jq playground",
+    "jq online",
+    "jsonpath evaluator",
+    "jsonpath filter example",
+    "jq select filter"
+  ],
+  "relatedSlugs": [
+    "json-data-formatter-and-validator",
+    "webhook-json-payload-formatter",
+    "regex-generator-tester"
+  ]
+}

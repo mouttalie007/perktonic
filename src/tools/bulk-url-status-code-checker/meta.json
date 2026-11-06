@@ -1,0 +1,18 @@
+{
+  "title": "Bulk URL Status Code Checker: 50 URLs, CSV Export",
+  "metaDescription": "A bulk URL status code checker for up to 50 URLs: see each status code, final URL after redirects, response time and content type, then export to CSV.",
+  "h1": "Bulk URL Status Code Checker",
+  "primaryKeyword": "bulk url status code checker",
+  "secondaryKeywords": [
+    "check http status of multiple urls",
+    "bulk redirect checker",
+    "404 checker for a list of urls",
+    "site migration url check",
+    "http status code checker csv"
+  ],
+  "relatedSlugs": [
+    "redirect-chain-checker",
+    "broken-link-checker",
+    "robots-txt-tester-and-sitemap-validator"
+  ]
+}

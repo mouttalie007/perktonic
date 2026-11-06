@@ -1,0 +1,18 @@
+{
+  "title": "Regex Tester Online: Highlight, Explain, Convert",
+  "metaDescription": "A free regex tester online that highlights matches and groups as you type, explains every token and shows the pattern for Python, Java, PCRE or Go.",
+  "h1": "Regex Tester Online",
+  "primaryKeyword": "regex tester online",
+  "secondaryKeywords": [
+    "regex explainer",
+    "regex library",
+    "python regex tester",
+    "regex named groups",
+    "catastrophic backtracking"
+  ],
+  "relatedSlugs": [
+    "text-data-parser-and-normalizer",
+    "jsonpath-tester",
+    "json-data-formatter-and-validator"
+  ]
+}

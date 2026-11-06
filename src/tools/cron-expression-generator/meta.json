@@ -1,0 +1,18 @@
+{
+  "title": "Cron Expression Generator Online: Plain English, Next Runs",
+  "metaDescription": "A cron expression generator online for standard cron, Quartz and AWS EventBridge: describe a schedule in words and see the next 10 runs in your time zone.",
+  "h1": "Cron Expression Generator Online",
+  "primaryKeyword": "cron expression generator online",
+  "secondaryKeywords": [
+    "quartz cron expression generator",
+    "aws eventbridge cron expression",
+    "cron expression next run times",
+    "crontab generator",
+    "cron to plain english"
+  ],
+  "relatedSlugs": [
+    "cron-job-monitoring-heartbeat",
+    "remote-team-timezone-overlap-planner",
+    "regex-generator-tester"
+  ]
+}

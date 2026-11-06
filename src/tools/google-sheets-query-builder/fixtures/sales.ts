@@ -1,0 +1,30 @@
+/** "Try an example": 24 sales rows as copied from a sheet (tab separated, one header row). */
+export const SALES_TSV = [
+  "Date\tRegion\tRep\tProduct\tUnits\tRevenue",
+  "2026-01-05\tNorth\tAva Chen\tLaptop\t3\t3897",
+  "2026-01-07\tSouth\tLiam O'Brien\tMonitor\t5\t1245",
+  "2026-01-12\tWest\tSofia Rossi\tLaptop\t2\t2598",
+  "2026-01-15\tNorth\tAva Chen\tDock\t8\t1192",
+  "2026-01-21\tEast\tNoah Kim\tMonitor\t4\t996",
+  "2026-01-28\tSouth\tLiam O'Brien\tLaptop\t1\t1299",
+  "2026-02-02\tWest\tSofia Rossi\tDock\t6\t894",
+  "2026-02-06\tEast\tNoah Kim\tLaptop\t4\t5196",
+  "2026-02-11\tNorth\tMaya Patel\tMonitor\t7\t1743",
+  "2026-02-17\tSouth\tLiam O'Brien\tDock\t3\t447",
+  "2026-02-23\tWest\tSofia Rossi\tMonitor\t2\t498",
+  "2026-02-27\tEast\tNoah Kim\tDock\t5\t745",
+  "2026-03-03\tNorth\tAva Chen\tLaptop\t2\t2598",
+  "2026-03-09\tSouth\tGrace Lee\tMonitor\t6\t1494",
+  "2026-03-13\tWest\tSofia Rossi\tLaptop\t3\t3897",
+  "2026-03-18\tEast\tNoah Kim\tMonitor\t3\t747",
+  "2026-03-24\tNorth\tMaya Patel\tDock\t4\t596",
+  "2026-03-30\tSouth\tGrace Lee\tLaptop\t2\t2598",
+  "2026-04-02\tWest\tSofia Rossi\tDock\t9\t1341",
+  "2026-04-08\tEast\tNoah Kim\tLaptop\t1\t1299",
+  "2026-04-14\tNorth\tAva Chen\tMonitor\t5\t1245",
+  "2026-04-20\tSouth\tLiam O'Brien\tMonitor\t2\t498",
+  "2026-04-24\tWest\tSofia Rossi\tLaptop\t4\t5196",
+  "2026-04-29\tEast\tGrace Lee\tDock\t2\t298",
+].join("\n");
+
+export const EXAMPLE_RANGE = "Sales!A1:F";

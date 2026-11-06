@@ -41,7 +41,7 @@ export async function generateMetadata({ searchParams }: Params): Promise<Metada
   const seo = await siteSettingsService.getSeoSettings();
   return seoService.buildMetadata({
     title: q ? `Search results for “${q}”` : "Search",
-    description: `Search PerkTonic for free samples, AI tools, rewards and money-saving guides.`,
+    description: `Search PerkTonic's free online tools and technical guides.`,
     path: "/search",
     robotsIndex: seo.searchPagesIndexable,
   });
@@ -89,6 +89,7 @@ export default async function SearchPage({ searchParams }: Params) {
               {results.total} {results.total === 1 ? "result" : "results"} for
               <span className="text-ink font-semibold"> “{q}”</span>
             </p>
+            <h2 className="sr-only">Results</h2>
             <StoryGrid stories={results.items} columns={3} />
             <Pagination
               page={results.page}

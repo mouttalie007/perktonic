@@ -1,0 +1,8 @@
+{
+  "title": "Google Apps Script Automation Generator for Sheets",
+  "metaDescription": "Google Apps Script automation generator: describe a Sheets task, pick a trigger, and get commented code with install steps, permissions and a safety review.",
+  "h1": "Google Apps Script Automation Generator",
+  "primaryKeyword": "google apps script automation generator",
+  "secondaryKeywords": ["apps script generator", "google sheets script generator", "apps script onedit trigger", "google sheets automation"],
+  "relatedSlugs": ["excel-formula-generator", "excel-vba-macro-generator", "conditional-formatting-formula-generator"]
+}

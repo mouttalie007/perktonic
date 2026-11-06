@@ -1,0 +1,18 @@
+{
+  "title": "Standardize Phone Numbers in a CSV, Plus Emails and Names",
+  "metaDescription": "Standardize phone numbers in a CSV to E.164, and clean emails, name capitals, amounts and country codes, with every invalid value listed by line. No upload.",
+  "h1": "Standardize Phone Numbers, Emails, Names and Countries in a CSV",
+  "primaryKeyword": "standardize phone numbers csv",
+  "secondaryKeywords": [
+    "convert phone numbers to e164",
+    "validate emails in csv",
+    "fix name capitalization",
+    "country name to iso code",
+    "normalize currency format"
+  ],
+  "relatedSlugs": [
+    "clean-messy-csv-data",
+    "csv-to-json-converter",
+    "csv-splitter-merger"
+  ]
+}

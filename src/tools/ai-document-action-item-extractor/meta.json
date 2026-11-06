@@ -1,0 +1,8 @@
+{
+  "title": "AI Document Action Item Extractor: Tasks, Owners, Dates",
+  "metaDescription": "AI document action item extractor: paste meeting notes or an e-mail thread and get each task with its owner, deadline and source quote, ready for CSV.",
+  "h1": "Action Item Extractor",
+  "primaryKeyword": "ai document action item extractor",
+  "secondaryKeywords": ["action items from meeting notes", "extract tasks from email", "meeting notes to task list", "action item list csv"],
+  "relatedSlugs": ["meeting-minutes-generator-from-transcript", "ai-document-summarizer", "text-data-parser-and-normalizer"]
+}

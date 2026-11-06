@@ -62,9 +62,9 @@ const PAGES: {
 <ul>
 <li><strong>General questions and corrections:</strong> contact@perktonic.com</li>
 <li><strong>Business and partnerships:</strong> contact@perktonic.com (subject: "Partnership")</li>
-<li><strong>Report a broken or suspicious offer:</strong> use the form below and include the link.</li>
+<li><strong>Report a bug or a wrong result:</strong> use the form below and tell us the tool and what you entered.</li>
 </ul>
-<p>We do not provide personal financial advice.</p>`.trim(),
+<p>We cannot review private files sent by e-mail: please describe the problem instead.</p>`.trim(),
     metaDescription: "Contact the PerkTonic team for questions, corrections, tips or business inquiries. We reply within 2 to 3 business days.",
   },
   {

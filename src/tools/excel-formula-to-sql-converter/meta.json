@@ -1,0 +1,8 @@
+{
+  "title": "Excel Formula to SQL Converter (and Python pandas)",
+  "metaDescription": "Excel formula to SQL converter: turn SUMIFS, lookups and IF chains into PostgreSQL, MySQL, SQLite, SQL Server or pandas, with a mapping and a syntax check.",
+  "h1": "Formula to SQL / Python (pandas) Converter",
+  "primaryKeyword": "excel formula to sql converter",
+  "secondaryKeywords": ["sumifs in sql", "vlookup in sql", "vlookup in pandas", "excel to pandas", "if formula to case when"],
+  "relatedSlugs": ["excel-formula-generator", "xlookup-vs-index-match-generator", "csv-to-sql-insert-generator"]
+}

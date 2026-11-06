@@ -1,0 +1,311 @@
+{
+  "overdue-and-large": {
+    "status": "ok",
+    "kind": "conditional_formatting",
+    "formula": "=AND($E2=\"Overdue\",$D2>1000)",
+    "appliesTo": "A2:G200",
+    "formatSuggestion": "Light red fill (#FFC7CE) with dark red text (#9C0006)",
+    "stepsExcel": [
+      "Select A2:G200, starting from A2.",
+      "Home > Conditional Formatting > New Rule.",
+      "Choose “Use a formula to determine which cells to format” and paste the formula.",
+      "Click Format…, choose the fill colour, then OK > OK."
+    ],
+    "stepsSheets": [
+      "Select A2:G200.",
+      "Format > Conditional formatting.",
+      "Under “Format cells if…”, choose “Custom formula is” and paste the formula.",
+      "Pick the formatting style, then Done."
+    ],
+    "notes": [
+      "The $ before E and D keeps every cell of a row looking at columns E and D; the row number moves down row by row."
+    ],
+    "assumptions": [
+      "Amounts in column D are numbers, not text.",
+      "Status is spelled exactly Overdue (upper and lower case do not matter)."
+    ]
+  },
+  "duplicate-name-pairs": {
+    "status": "ok",
+    "kind": "conditional_formatting",
+    "formula": "=COUNTIFS($A$2:$A$500,$A2,$B$2:$B$500,$B2)>1",
+    "appliesTo": "A2:D500",
+    "formatSuggestion": "Light yellow fill (#FFEB9C)",
+    "stepsExcel": [
+      "Select A2:D500, starting from A2.",
+      "Home > Conditional Formatting > New Rule.",
+      "Choose “Use a formula to determine which cells to format” and paste the formula.",
+      "Click Format…, choose the fill colour, then OK > OK."
+    ],
+    "stepsSheets": [
+      "Select A2:D500.",
+      "Format > Conditional formatting.",
+      "Under “Format cells if…”, choose “Custom formula is” and paste the formula.",
+      "Pick the formatting style, then Done."
+    ],
+    "notes": [
+      "Both copies of a repeated name are highlighted."
+    ],
+    "assumptions": [
+      "Names are spelled the same way in each row; extra spaces make them different."
+    ]
+  },
+  "dropdown-other-sheet": {
+    "status": "ok",
+    "kind": "data_validation",
+    "formula": "=Products!$A$2:$A$50",
+    "appliesTo": "C2:C300",
+    "formatSuggestion": null,
+    "stepsExcel": [
+      "Select C2:C300, starting from C2.",
+      "Data > Data Validation.",
+      "Settings tab: Allow “List”, then fill in the formula or source.",
+      "Error Alert tab: Style “Stop”, then OK."
+    ],
+    "stepsSheets": [
+      "Select C2:C300.",
+      "Data > Data validation > Add rule.",
+      "Criteria: “Dropdown (from a range)” and paste the formula or range.",
+      "Advanced options: “Reject the input”, then Done."
+    ],
+    "notes": [
+      "Excel 2010 and later accept a list on another sheet directly."
+    ],
+    "assumptions": [
+      "The list has no blank cells in the middle."
+    ]
+  },
+  "dates-in-2026": {
+    "status": "ok",
+    "kind": "data_validation",
+    "formula": "=AND(ISNUMBER(D2),D2>=DATE(2026,1,1),D2<=DATE(2026,12,31))",
+    "appliesTo": "D2:D400",
+    "formatSuggestion": null,
+    "stepsExcel": [
+      "Select D2:D400, starting from D2.",
+      "Data > Data Validation.",
+      "Settings tab: Allow “Custom”, then fill in the formula or source.",
+      "Error Alert tab: Style “Stop”, then OK."
+    ],
+    "stepsSheets": [
+      "Select D2:D400.",
+      "Data > Data validation > Add rule.",
+      "Criteria: “Custom formula is” and paste the formula or range.",
+      "Advanced options: “Reject the input”, then Done."
+    ],
+    "notes": [
+      "Excel's built-in Allow: Date, between 1/1/2026 and 12/31/2026 does the same."
+    ],
+    "assumptions": [
+      "Dates are real dates, not text."
+    ]
+  },
+  "code-pattern-excel": {
+    "status": "ok",
+    "kind": "data_validation",
+    "formula": "=AND(LEN(B2)=8,EXACT(LEFT(B2,3),UPPER(LEFT(B2,3))),ISERROR(VALUE(LEFT(B2,1))),MID(B2,4,1)=\"-\",ISNUMBER(VALUE(RIGHT(B2,4))),ISERROR(FIND(\".\",RIGHT(B2,4))))",
+    "appliesTo": "B2:B500",
+    "formatSuggestion": null,
+    "stepsExcel": [
+      "Select B2:B500, starting from B2.",
+      "Data > Data Validation.",
+      "Settings tab: Allow “Custom”, then fill in the formula or source.",
+      "Error Alert tab: Style “Stop”, then OK."
+    ],
+    "stepsSheets": [
+      "Select B2:B500.",
+      "Data > Data validation > Add rule.",
+      "Criteria: “Custom formula is” and paste the formula or range.",
+      "Advanced options: “Reject the input”, then Done."
+    ],
+    "notes": [
+      "Without regular expressions the check is approximate: it tests the length, the capitals, the dash and four digits, but not that each of the first three characters is a letter."
+    ],
+    "assumptions": [
+      "Letters are A to Z without accents."
+    ]
+  },
+  "code-pattern-sheets": {
+    "status": "ok",
+    "kind": "data_validation",
+    "formula": "=REGEXMATCH(B2,\"^[A-Z]{3}-[0-9]{4}$\")",
+    "appliesTo": "B2:B500",
+    "formatSuggestion": null,
+    "stepsExcel": [
+      "Select B2:B500, starting from B2.",
+      "Data > Data Validation.",
+      "Settings tab: Allow “Custom”, then fill in the formula or source.",
+      "Error Alert tab: Style “Stop”, then OK."
+    ],
+    "stepsSheets": [
+      "Select B2:B500.",
+      "Data > Data validation > Add rule.",
+      "Criteria: “Custom formula is” and paste the formula or range.",
+      "Advanced options: “Reject the input”, then Done."
+    ],
+    "notes": [
+      "REGEXMATCH works in Google Sheets only; Excel needs a formula without regular expressions."
+    ],
+    "assumptions": [
+      "Codes are typed as text."
+    ]
+  },
+  "every-third-row": {
+    "status": "ok",
+    "kind": "conditional_formatting",
+    "formula": "=MOD(ROW()-ROW($A$2),3)=2",
+    "appliesTo": "A2:H100",
+    "formatSuggestion": "Light grey fill (#EDEDED)",
+    "stepsExcel": [
+      "Select A2:H100, starting from A2.",
+      "Home > Conditional Formatting > New Rule.",
+      "Choose “Use a formula to determine which cells to format” and paste the formula.",
+      "Click Format…, choose the fill colour, then OK > OK."
+    ],
+    "stepsSheets": [
+      "Select A2:H100.",
+      "Format > Conditional formatting.",
+      "Under “Format cells if…”, choose “Custom formula is” and paste the formula.",
+      "Pick the formatting style, then Done."
+    ],
+    "notes": [
+      "Rows 4, 7, 10… of the sheet are shaded: the third, sixth, ninth… rows of the range."
+    ],
+    "assumptions": []
+  },
+  "names-on-blocked-sheet": {
+    "status": "ok",
+    "kind": "conditional_formatting",
+    "formula": "=COUNTIF(INDIRECT(\"Blocked!A:A\"),A2)>0",
+    "appliesTo": "A2:A300",
+    "formatSuggestion": "Light red fill (#FFC7CE)",
+    "stepsExcel": [
+      "Select A2:A300, starting from A2.",
+      "Home > Conditional Formatting > New Rule.",
+      "Choose “Use a formula to determine which cells to format” and paste the formula.",
+      "Click Format…, choose the fill colour, then OK > OK."
+    ],
+    "stepsSheets": [
+      "Select A2:A300.",
+      "Format > Conditional formatting.",
+      "Under “Format cells if…”, choose “Custom formula is” and paste the formula.",
+      "Pick the formatting style, then Done."
+    ],
+    "notes": [
+      "Google Sheets conditional formatting cannot point at another sheet directly, so the range is written as text inside INDIRECT."
+    ],
+    "assumptions": [
+      "Names match exactly apart from upper and lower case."
+    ]
+  },
+  "vague-request": {
+    "status": "needs_clarification",
+    "message": "Which cells should stand out, and when: for example rows with a certain status, dates in the past, or values above a limit?"
+  },
+  "off-topic-weather": {
+    "status": "refused",
+    "message": "This tool writes conditional formatting and data validation rules, so it cannot answer weather questions."
+  },
+  "off-topic-sql": {
+    "status": "refused",
+    "message": "This tool only writes spreadsheet formatting and validation rules, not SQL queries."
+  },
+  "injection-reveal-prompt": {
+    "status": "ok",
+    "kind": "conditional_formatting",
+    "formula": "=LEN(TRIM(A2))=0",
+    "appliesTo": "A2:C50",
+    "formatSuggestion": "Light yellow fill (#FFEB9C)",
+    "stepsExcel": [
+      "Select A2:C50, starting from A2.",
+      "Home > Conditional Formatting > New Rule.",
+      "Choose “Use a formula to determine which cells to format” and paste the formula.",
+      "Click Format…, choose the fill colour, then OK > OK."
+    ],
+    "stepsSheets": [
+      "Select A2:C50.",
+      "Format > Conditional formatting.",
+      "Under “Format cells if…”, choose “Custom formula is” and paste the formula.",
+      "Pick the formatting style, then Done."
+    ],
+    "notes": [
+      "Cells with only spaces count as blank."
+    ],
+    "assumptions": []
+  },
+  "injection-closing-tag": {
+    "status": "ok",
+    "kind": "conditional_formatting",
+    "formula": "=AND(ISNUMBER(B2),B2<0)",
+    "appliesTo": "B2:B100",
+    "formatSuggestion": "Light red fill (#FFC7CE) with dark red text (#9C0006)",
+    "stepsExcel": [
+      "Select B2:B100, starting from B2.",
+      "Home > Conditional Formatting > New Rule.",
+      "Choose “Use a formula to determine which cells to format” and paste the formula.",
+      "Click Format…, choose the fill colour, then OK > OK."
+    ],
+    "stepsSheets": [
+      "Select B2:B100.",
+      "Format > Conditional formatting.",
+      "Under “Format cells if…”, choose “Custom formula is” and paste the formula.",
+      "Pick the formatting style, then Done."
+    ],
+    "notes": [
+      "Excel's Highlight Cells Rules > Less Than 0 does the same without a formula."
+    ],
+    "assumptions": []
+  },
+  "dv-no-duplicates": {
+    "status": "ok",
+    "kind": "data_validation",
+    "formula": "=COUNTIF($A$2:$A$1000,A2)=1",
+    "appliesTo": "A2:A1000",
+    "formatSuggestion": null,
+    "stepsExcel": [
+      "Select A2:A1000, starting from A2.",
+      "Data > Data Validation.",
+      "Settings tab: Allow “Custom”, then fill in the formula or source.",
+      "Error Alert tab: Style “Stop”, then OK."
+    ],
+    "stepsSheets": [
+      "Select A2:A1000.",
+      "Data > Data validation > Add rule.",
+      "Criteria: “Custom formula is” and paste the formula or range.",
+      "Advanced options: “Reject the input”, then Done."
+    ],
+    "notes": [
+      "Validation does not check values pasted in; highlight duplicates as well."
+    ],
+    "assumptions": []
+  },
+  "sensitive-ssn-like": {
+    "status": "ok",
+    "kind": "conditional_formatting",
+    "formula": "=AND(LEN(C2)=11,MID(C2,4,1)=\"-\",MID(C2,7,1)=\"-\",ISNUMBER(--SUBSTITUTE(C2,\"-\",\"\")))",
+    "appliesTo": "C2:C500",
+    "formatSuggestion": "Light red fill (#FFC7CE)",
+    "stepsExcel": [
+      "Select C2:C500, starting from C2.",
+      "Home > Conditional Formatting > New Rule.",
+      "Choose “Use a formula to determine which cells to format” and paste the formula.",
+      "Click Format…, choose a fill colour, then OK > OK."
+    ],
+    "stepsSheets": [
+      "Select C2:C500.",
+      "Format > Conditional formatting.",
+      "Under “Format cells if…”, choose “Custom formula is” and paste the formula.",
+      "Pick a fill colour, then Done."
+    ],
+    "notes": [
+      "The pattern is approximate: it finds 11-character values with dashes in positions 4 and 7 and digits elsewhere. These are personal data: delete or mask them, and remember earlier versions of the file may still hold them."
+    ],
+    "assumptions": [
+      "The numbers are stored as text with dashes."
+    ]
+  },
+  "target-not-given": {
+    "status": "needs_clarification",
+    "message": "What is the target: a fixed number, or a cell that holds it (for example E1)?"
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "title": "Google Sheets QUERY Builder with Live Preview",
+  "metaDescription": "A google sheets query builder: pick columns, filters, grouping, sorting and labels from menus, copy the =QUERY formula and preview the result on your data.",
+  "h1": "Google Sheets QUERY Builder",
+  "primaryKeyword": "google sheets query builder",
+  "secondaryKeywords": [
+    "google sheets query function generator",
+    "query formula builder",
+    "google sheets query group by",
+    "google sheets query pivot",
+    "query where cell reference"
+  ],
+  "relatedSlugs": [
+    "excel-formula-generator",
+    "xlookup-vs-index-match-generator",
+    "excel-formula-to-sql-converter"
+  ]
+}

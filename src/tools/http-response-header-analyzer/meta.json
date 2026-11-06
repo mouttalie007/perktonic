@@ -1,0 +1,18 @@
+{
+  "title": "HTTP Response Header Analyzer: Security Grade & Fixes",
+  "metaDescription": "An http response header analyzer that lists every header, grades HSTS, CSP and four more security headers, and gives Nginx, Apache and Caddy fixes.",
+  "h1": "HTTP Response Header Analyzer",
+  "primaryKeyword": "http response header analyzer",
+  "secondaryKeywords": [
+    "security headers checker",
+    "check http headers",
+    "hsts checker",
+    "content security policy checker",
+    "nginx security headers"
+  ],
+  "relatedSlugs": [
+    "redirect-chain-checker",
+    "opengraph-and-meta-tag-validator",
+    "ssl-certificate-checker"
+  ]
+}

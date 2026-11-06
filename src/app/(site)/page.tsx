@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { CATEGORIES } from "@/config/site";
 import { articleService } from "@/services/article.service";
 import { siteSettingsService } from "@/services/site-settings.service";
 import { seoService } from "@/services/seo.service";
@@ -21,7 +22,7 @@ export async function generateMetadata(): Promise<Metadata> {
 /** Homepage (2026-10-29 redesign): hero, tool categories, popular tools, latest guides. */
 export default async function HomePage() {
   const [latest, jsonLd] = await Promise.all([
-    articleService.listLatest({ limit: 4 }),
+    articleService.listLatestPerCategory(CATEGORIES.map((c) => c.slug)),
     seoService.organizationAndWebsiteJsonLd(),
   ]);
 

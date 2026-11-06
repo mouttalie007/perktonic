@@ -35,9 +35,8 @@ const plusJakarta = Plus_Jakarta_Sans({
 export const metadata: Metadata = {
   metadataBase: new URL(SITE.url),
   title: {
-    default:
-      "PerkTonic — Free Samples, AI Tools, Rewards & Money-Saving Guides",
-    template: "%s — PerkTonic",
+    default: "PerkTonic: Free Online Tools for Spreadsheets & Data",
+    template: "%s | PerkTonic",
   },
   description: SITE.description,
   applicationName: SITE.shortName,

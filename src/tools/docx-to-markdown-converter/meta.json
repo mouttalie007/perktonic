@@ -1,0 +1,18 @@
+{
+  "title": "DOCX to Markdown Converter, Pandoc-Style, in Your Browser",
+  "metaDescription": "A docx to markdown pandoc converter that runs in your browser: Word to Markdown with images in a ZIP and footnotes, and Markdown back to a .docx file.",
+  "h1": "DOCX to Markdown Converter (and Markdown to Word)",
+  "primaryKeyword": "docx to markdown pandoc converter",
+  "secondaryKeywords": [
+    "word to markdown",
+    "markdown to word",
+    "convert docx to md",
+    "markdown to docx",
+    "extract images from docx"
+  ],
+  "relatedSlugs": [
+    "excel-to-markdown-table-generator",
+    "json-data-formatter-and-validator",
+    "sop-template-generator"
+  ]
+}

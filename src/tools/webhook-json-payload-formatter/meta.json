@@ -1,0 +1,18 @@
+{
+  "title": "Webhook JSON Payload Formatter for Stripe, GitHub, Shopify",
+  "metaDescription": "A free webhook json payload formatter that pretty-prints the body, shows the path of every field and checks Stripe, GitHub, Shopify and Slack payloads.",
+  "h1": "Webhook JSON Payload Formatter and Inspector",
+  "primaryKeyword": "webhook json payload formatter",
+  "secondaryKeywords": [
+    "stripe webhook payload example",
+    "github webhook payload",
+    "shopify webhook payload",
+    "slack event payload",
+    "json path finder"
+  ],
+  "relatedSlugs": [
+    "webhook-test-url-generator",
+    "json-data-formatter-and-validator",
+    "jsonpath-tester"
+  ]
+}

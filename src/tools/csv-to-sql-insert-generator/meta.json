@@ -1,0 +1,18 @@
+{
+  "title": "CSV to SQL INSERT Generator: MySQL, PostgreSQL, SQLite",
+  "metaDescription": "A CSV to SQL INSERT generator for MySQL, PostgreSQL, SQLite and SQL Server: detects column types, escapes values and writes batched INSERT statements.",
+  "h1": "CSV to SQL INSERT Generator",
+  "primaryKeyword": "csv to sql insert generator",
+  "secondaryKeywords": [
+    "csv to mysql insert",
+    "csv to postgresql",
+    "csv to create table",
+    "convert csv to sql",
+    "csv to sql server"
+  ],
+  "relatedSlugs": [
+    "csv-to-json-converter",
+    "clean-messy-csv-data",
+    "excel-formula-to-sql-converter"
+  ]
+}

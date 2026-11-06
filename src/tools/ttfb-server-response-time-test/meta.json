@@ -1,0 +1,18 @@
+{
+  "title": "TTFB Server Response Time Test: Waterfall and Rating",
+  "metaDescription": "A free ttfb server response time test that times DNS, connect, TLS, server wait and download over three runs and rates the result against Google's guidance.",
+  "h1": "TTFB Server Response Time Test",
+  "primaryKeyword": "ttfb server response time test",
+  "secondaryKeywords": [
+    "time to first byte test",
+    "server response time checker",
+    "check ttfb",
+    "reduce server response time",
+    "website response time test"
+  ],
+  "relatedSlugs": [
+    "redirect-chain-checker",
+    "http-response-header-analyzer",
+    "ssl-certificate-checker"
+  ]
+}

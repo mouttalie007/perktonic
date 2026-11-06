@@ -33,9 +33,18 @@ pause
 exit /b 1
 :db_ready
 
+rem Already running (e.g. started earlier)? Just open it instead of failing with "Another next dev server is already running".
+netstat -ano | findstr /R /C:":3000 .*LISTENING" >nul 2>&1
+if not errorlevel 1 (
+  echo       The dev server is already running on port 3000 - opening the browser.
+  start "" http://localhost:3000
+  timeout /t 3 /nobreak >nul
+  exit /b 0
+)
+
 echo [3/4] Opening the browser in a few seconds...
 start "" cmd /c "timeout /t 10 /nobreak >nul & start http://localhost:3000"
 
 echo [4/4] Starting the dev server (first load of each page can take a few seconds)...
-call npm run dev
+call npm run dev -- -p 3000
 pause

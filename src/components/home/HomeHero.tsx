@@ -12,7 +12,12 @@ import { SearchIcon } from "@/components/icons";
 export function HomeHero() {
   return (
     <section className="from-hero-wash relative overflow-hidden bg-gradient-to-b to-white">
-      <div className="site-container relative grid grid-cols-1 items-center gap-6 pt-6 pb-8 sm:pt-12 lg:grid-cols-[1.05fr_1fr] lg:gap-4 lg:pt-14 lg:pb-12">
+      <div aria-hidden className="pointer-events-none absolute inset-0">
+        <span className="absolute top-4 right-[6%] hidden h-[26rem] w-[26rem] rounded-full bg-[#7C3AED]/15 blur-3xl lg:block" />
+        <span className="absolute top-40 right-[30%] hidden h-72 w-72 rounded-full bg-[#2563EB]/15 blur-3xl lg:block" />
+        <span className="absolute -bottom-10 left-[4%] hidden h-56 w-56 rounded-full bg-[#E0A800]/15 blur-3xl lg:block" />
+      </div>
+      <div className="site-container relative grid grid-cols-1 items-center gap-6 pt-6 pb-8 sm:pt-12 lg:grid-cols-[1.12fr_1fr] lg:gap-2 lg:pt-14 lg:pb-12">
         <div className="relative z-10 min-w-0">
           <span className="text-navy inline-flex items-center gap-2 rounded-full border border-blue-100 bg-white/80 px-3.5 py-1.5 text-[0.8rem] font-semibold shadow-sm">
             <svg
@@ -27,12 +32,11 @@ export function HomeHero() {
             Free Online Tools for Smarter Workflows
           </span>
 
-          <h1 className="font-heading text-navy mt-4 text-[clamp(1.45rem,6.5vw,1.9rem)] leading-[1.1] font-extrabold tracking-tight sm:mt-5 sm:text-5xl lg:text-[3.3rem]">
-            Powerful Online Tools
-            <span className="block">
-              for <span className="text-primary">Work, Data &amp;</span>
+          <h1 className="font-heading text-navy mt-4 text-[clamp(1.45rem,6.5vw,1.9rem)] leading-[1.1] font-extrabold tracking-tight sm:mt-5 sm:text-5xl lg:text-[3rem]">
+            <span className="block">Powerful Online Tools for</span>
+            <span className="from-primary block bg-gradient-to-r to-[#7C3AED] bg-clip-text text-transparent">
+              Work, Data &amp; Productivity
             </span>
-            <span className="text-primary block">Productivity</span>
           </h1>
 
           <p className="text-slate-ink mt-4 max-w-xl text-[0.98rem] leading-relaxed sm:mt-5 sm:text-lg">
@@ -93,7 +97,7 @@ export function HomeHero() {
         </div>
 
         {/* Desktop / tablet illustration */}
-        <div className="relative hidden lg:block">
+        <div className="relative -mr-10 hidden lg:block xl:-mr-16">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src="/brand/hero-desktop-900.webp"
@@ -104,7 +108,7 @@ export function HomeHero() {
             alt="PerkTonic tools: Excel & Sheets, PDF tools, data converters, automation and web diagnostics around a laptop"
             fetchPriority="high"
             decoding="async"
-            className="h-auto w-full"
+            className="h-auto w-full drop-shadow-[0_30px_40px_rgba(37,99,235,0.18)]"
           />
         </div>
 

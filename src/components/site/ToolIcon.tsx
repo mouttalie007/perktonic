@@ -6,6 +6,8 @@
  * public/brand/icons (see SOURCES.txt there): no third-party request at
  * runtime, each file 1-3 KB and cached by the browser.
  */
+import { CATEGORY_ICON_SLUGS, TOOL_ICON_SLUGS } from "@/config/tool-icons";
+
 const FILE: Record<string, string> = {
   sheet: "sheet",
   database: "database",
@@ -22,19 +24,34 @@ const FILE: Record<string, string> = {
 
 export function ToolIcon({
   kind,
+  slug,
+  category,
   size = 56,
+  fluid = false,
   className = "",
 }: {
   kind: string;
+  /** Tool slug: uses the tool's own 3D icon when public/brand/tool-icons has one. */
+  slug?: string;
+  /** Category slug: uses the category's own 3D icon when public/brand/category-icons has one. */
+  category?: string;
   /** Rendered size in px. */
   size?: number;
+  /** Let the className set the displayed size (width and height attributes stay as the intrinsic size). */
+  fluid?: boolean;
   className?: string;
 }) {
+  const own =
+    category !== undefined && CATEGORY_ICON_SLUGS.has(category)
+      ? `/brand/category-icons/${category}.webp`
+      : slug !== undefined && TOOL_ICON_SLUGS.has(slug)
+        ? `/brand/tool-icons/${slug}.webp`
+        : null;
   const file = FILE[kind] ?? "globe";
   return (
     // eslint-disable-next-line @next/next/no-img-element
     <img
-      src={`/brand/icons/${file}.svg`}
+      src={own ?? `/brand/icons/${file}.svg`}
       alt=""
       aria-hidden
       width={size}
@@ -42,7 +59,7 @@ export function ToolIcon({
       loading="lazy"
       decoding="async"
       className={`inline-block shrink-0 ${className}`}
-      style={{ width: size, height: size }}
+      style={fluid ? undefined : { width: size, height: size }}
     />
   );
 }

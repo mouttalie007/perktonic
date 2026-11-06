@@ -1,0 +1,17 @@
+{
+  "title": "Invoice Data Extractor Online: Lines, Taxes, Totals",
+  "metaDescription": "Invoice data extractor online: read invoices and receipts into JSON, CSV or Excel, with a check of each field and of the line, tax and total arithmetic.",
+  "h1": "Invoice & Receipt Data Extractor",
+  "primaryKeyword": "invoice data extractor online",
+  "secondaryKeywords": [
+    "extract data from invoices to excel",
+    "receipt to csv",
+    "invoice line items extraction",
+    "invoice ocr to json"
+  ],
+  "relatedSlugs": [
+    "convert-scanned-table-to-spreadsheet",
+    "pdf-to-excel",
+    "ai-document-action-item-extractor"
+  ]
+}

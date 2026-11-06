@@ -1,0 +1,268 @@
+{
+  "sumifs-per-region": {
+    "status": "ok",
+    "code": "SELECT region,\n       SUM(amount) AS total_amount\nFROM sales\nWHERE order_date >= DATE '2026-01-01'\nGROUP BY region\nORDER BY region;",
+    "explanation": "The formula is filled down for each region, so in SQL it becomes one query that groups the sales by region and adds the amounts from 1 January 2026 onwards.",
+    "mapping": [
+      {
+        "spreadsheet": "SUMIFS(Sales!$C:$C, …)",
+        "target": "SUM(amount)",
+        "note": "The column to add."
+      },
+      {
+        "spreadsheet": "Sales!$A:$A,$A2 filled down",
+        "target": "GROUP BY region",
+        "note": "One row per region instead of one formula per row."
+      },
+      {
+        "spreadsheet": "Sales!$B:$B,\">=\"&DATE(2026,1,1)",
+        "target": "WHERE order_date >= DATE '2026-01-01'",
+        "note": "The date condition applies to every group."
+      }
+    ],
+    "assumptions": [
+      "Regions that have no sales in 2026 do not appear; the spreadsheet would show 0 for them.",
+      "Rows with an empty amount (NULL) are ignored by SUM, like blank cells in SUMIFS."
+    ],
+    "warnings": []
+  },
+  "countifs-no-schema": {
+    "status": "ok",
+    "code": "SELECT COUNT(*) AS open_high_priority\nFROM tickets\nWHERE status = 'Open'\n  AND priority > 5;",
+    "explanation": "COUNTIFS counts the rows that meet both conditions; SQL counts the rows that pass the WHERE clause.",
+    "mapping": [
+      {
+        "spreadsheet": "COUNTIFS(…)",
+        "target": "COUNT(*)",
+        "note": ""
+      },
+      {
+        "spreadsheet": "Tickets!C:C,\"Open\"",
+        "target": "status = 'Open'",
+        "note": "Column C assumed to be status."
+      },
+      {
+        "spreadsheet": "Tickets!D:D,\">\"&5",
+        "target": "priority > 5",
+        "note": "Column D assumed to be priority."
+      }
+    ],
+    "assumptions": [
+      "The sheet Tickets is a table called tickets.",
+      "Column C is status and column D is priority (a number).",
+      "MySQL compares text without regard to case with the default collation, like COUNTIFS."
+    ],
+    "warnings": []
+  },
+  "vlookup-left-join": {
+    "status": "ok",
+    "code": "SELECT o.id,\n       o.product_code,\n       p.price\nFROM orders AS o\nLEFT JOIN products AS p\n  ON p.code = o.product_code;",
+    "explanation": "An exact-match VLOOKUP becomes a LEFT JOIN: every order row keeps its place, and orders whose code is missing from products get NULL, like #N/A.",
+    "mapping": [
+      {
+        "spreadsheet": "VLOOKUP(B2, …)",
+        "target": "LEFT JOIN products ON p.code = o.product_code",
+        "note": "B2 is the product code of the order row."
+      },
+      {
+        "spreadsheet": "Products!A:C, 3",
+        "target": "p.price",
+        "note": "The third column of the lookup range."
+      },
+      {
+        "spreadsheet": "FALSE",
+        "target": "exact join",
+        "note": ""
+      }
+    ],
+    "assumptions": [
+      "Product codes are unique in products; duplicates would repeat order rows, while VLOOKUP returns only the first match."
+    ],
+    "warnings": []
+  },
+  "xlookup-pandas-merge": {
+    "status": "ok",
+    "code": "import pandas as pd\n\n# orders and customers are DataFrames loaded from your data\nresult = orders.merge(\n    customers[[\"id\", \"email\"]],\n    how=\"left\",\n    left_on=\"customer_id\",\n    right_on=\"id\",\n)\nresult[\"email\"] = result[\"email\"].fillna(\"Not found\")\nresult = result.drop(columns=[\"id\"])",
+    "explanation": "XLOOKUP becomes a left merge on the customer ID; fillna supplies the \"Not found\" value for IDs that are missing.",
+    "mapping": [
+      {
+        "spreadsheet": "XLOOKUP(A2, Customers!A:A, …)",
+        "target": "orders.merge(customers, left_on=\"customer_id\", right_on=\"id\")",
+        "note": ""
+      },
+      {
+        "spreadsheet": "Customers!C:C",
+        "target": "\"email\"",
+        "note": "Column C assumed to be email."
+      },
+      {
+        "spreadsheet": "\"Not found\"",
+        "target": "fillna(\"Not found\")",
+        "note": ""
+      }
+    ],
+    "assumptions": [
+      "Column C of Customers holds the email.",
+      "Customer IDs are unique in customers."
+    ],
+    "warnings": []
+  },
+  "if-chain-case-when": {
+    "status": "ok",
+    "code": "SELECT student,\n       score,\n       CASE\n           WHEN score >= 90 THEN 'A'\n           WHEN score >= 75 THEN 'B'\n           WHEN score >= 60 THEN 'C'\n           ELSE 'F'\n       END AS grade\nFROM results;",
+    "explanation": "Each nested IF becomes one WHEN branch, tested in the same order; ELSE is the last IF's value_if_false.",
+    "mapping": [
+      {
+        "spreadsheet": "IF(C2>=90,\"A\", …)",
+        "target": "WHEN score >= 90 THEN 'A'",
+        "note": ""
+      },
+      {
+        "spreadsheet": "IF(C2>=75,\"B\", …)",
+        "target": "WHEN score >= 75 THEN 'B'",
+        "note": ""
+      },
+      {
+        "spreadsheet": "\"F\"",
+        "target": "ELSE 'F'",
+        "note": ""
+      }
+    ],
+    "assumptions": [
+      "A NULL score gets F; in the spreadsheet an empty cell counts as 0 and also gets F."
+    ],
+    "warnings": []
+  },
+  "if-chain-np-select": {
+    "status": "ok",
+    "code": "import numpy as np\nimport pandas as pd\n\nconditions = [\n    df[\"score\"] >= 90,\n    df[\"score\"] >= 75,\n    df[\"score\"] >= 60,\n]\nchoices = [\"A\", \"B\", \"C\"]\ndf[\"grade\"] = np.select(conditions, choices, default=\"F\")",
+    "explanation": "np.select takes the conditions in order and uses the first one that is true, like nested IF; default is the final value_if_false.",
+    "mapping": [
+      {
+        "spreadsheet": "IF(C2>=90,\"A\", …)",
+        "target": "conditions[0] → \"A\"",
+        "note": ""
+      },
+      {
+        "spreadsheet": "nested IFs",
+        "target": "np.select(conditions, choices, default=\"F\")",
+        "note": ""
+      }
+    ],
+    "assumptions": [
+      "Missing scores (NaN) get F, because NaN >= 90 is False."
+    ],
+    "warnings": []
+  },
+  "sumproduct-conditions": {
+    "status": "ok",
+    "code": "SELECT SUM(CASE WHEN region = 'North' THEN amount ELSE 0 END) AS north_amount\nFROM sales;",
+    "explanation": "SUMPRODUCT multiplies a TRUE/FALSE test by the amounts; SQL adds the amount only when the condition is true.",
+    "mapping": [
+      {
+        "spreadsheet": "(A2:A100=\"North\")",
+        "target": "CASE WHEN region = 'North'",
+        "note": "TRUE/FALSE becomes the WHEN condition."
+      },
+      {
+        "spreadsheet": "*(C2:C100)",
+        "target": "THEN amount ELSE 0",
+        "note": ""
+      }
+    ],
+    "assumptions": [
+      "PostgreSQL compares text case-sensitively; the spreadsheet does not. Use LOWER(region) = 'north' if the case varies."
+    ],
+    "warnings": [
+      "String comparison is case-sensitive in PostgreSQL but not in the spreadsheet."
+    ]
+  },
+  "running-total-window": {
+    "status": "ok",
+    "code": "SELECT paid_on,\n       amount,\n       SUM(amount) OVER (ORDER BY paid_on ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) AS running_total\nFROM payments\nORDER BY paid_on;",
+    "explanation": "A growing range $C$2:C2 is a running total; a window function adds every row up to the current one in date order.",
+    "mapping": [
+      {
+        "spreadsheet": "SUM($C$2:C2) filled down",
+        "target": "SUM(amount) OVER (ORDER BY paid_on …)",
+        "note": "Needs MySQL 8.0 or newer."
+      },
+      {
+        "spreadsheet": "sorted by column A",
+        "target": "ORDER BY paid_on",
+        "note": ""
+      }
+    ],
+    "assumptions": [
+      "Rows on the same date are added in the order the database reads them, as ROWS is used."
+    ],
+    "warnings": []
+  },
+  "approximate-vlookup": {
+    "status": "ok",
+    "code": "SELECT p.id,\n       p.weight,\n       (SELECT r.price\n          FROM rates AS r\n         WHERE r.min_weight <= p.weight\n         ORDER BY r.min_weight DESC\n         LIMIT 1) AS price\nFROM parcels AS p;",
+    "explanation": "Approximate-match VLOOKUP finds the largest limit that is not above the weight. A plain join cannot do that, so a subquery picks the row with the highest min_weight <= weight (the same as MAX of the matching limits).",
+    "mapping": [
+      {
+        "spreadsheet": "VLOOKUP(D2, Rates!A:B, 2, TRUE)",
+        "target": "correlated subquery ORDER BY min_weight DESC LIMIT 1",
+        "note": ""
+      },
+      {
+        "spreadsheet": "TRUE (approximate)",
+        "target": "r.min_weight <= p.weight",
+        "note": ""
+      }
+    ],
+    "assumptions": [
+      "Weights below the smallest limit get NULL, like #N/A in the spreadsheet."
+    ],
+    "warnings": [
+      "Approximate-match VLOOKUP has no direct JOIN equivalent; the subquery reproduces it."
+    ]
+  },
+  "vague-request": {
+    "status": "needs_clarification",
+    "message": "Which formula or calculation should be converted, and what are the table and column names?"
+  },
+  "off-topic-joke": {
+    "status": "refused",
+    "message": "This tool converts spreadsheet formulas into SQL or pandas, so it cannot tell jokes."
+  },
+  "off-topic-drop-tables": {
+    "status": "refused",
+    "message": "This tool only translates spreadsheet logic into queries; it does not write statements that delete tables."
+  },
+  "injection-in-source": {
+    "status": "ok",
+    "code": "SELECT SUM(amount) AS total_amount\nFROM invoices;",
+    "explanation": "SUM over a column range becomes SUM over the column.",
+    "mapping": [
+      {
+        "spreadsheet": "SUM(B2:B50)",
+        "target": "SUM(amount)",
+        "note": "Column B assumed to be amount."
+      }
+    ],
+    "assumptions": [
+      "Column B is the amount column of invoices; every row is included, not only rows 2 to 50."
+    ],
+    "warnings": []
+  },
+  "injection-in-schema": {
+    "status": "ok",
+    "code": "SELECT AVG(score) AS average_score\nFROM scores;",
+    "explanation": "AVERAGE becomes AVG; both skip empty cells / NULL.",
+    "mapping": [
+      {
+        "spreadsheet": "AVERAGE(C2:C200)",
+        "target": "AVG(score)",
+        "note": ""
+      }
+    ],
+    "assumptions": [
+      "SQLite returns a decimal average even though score is an integer column."
+    ],
+    "warnings": []
+  }
+}

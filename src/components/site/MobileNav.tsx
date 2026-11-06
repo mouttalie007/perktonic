@@ -84,7 +84,7 @@ export function MobileNav({
               onClick={onClose}
               className="flex items-center gap-3 rounded-xl px-3 py-2.5 hover:bg-slate-50"
             >
-              <ToolIcon kind={c.iconKey} size={36} className="!rounded-xl" />
+              <ToolIcon kind={c.iconKey} category={c.slug} size={36} className="!rounded-xl" />
               <span className="text-navy text-[0.95rem] font-semibold">
                 {c.name}
               </span>

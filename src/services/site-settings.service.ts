@@ -23,7 +23,7 @@ const DEFAULT_SITE: PublicSiteSettings = {
   id: SINGLETON_ID,
   siteName: "PerkTonic.com",
   siteUrl: "https://perktonic.com",
-  tagline: "Find the good stuff before everyone else does.",
+  tagline: "Free online tools for smarter workflows.",
   logoUrl: null,
   defaultOgImageUrl: null,
   contactEmail: null,
@@ -44,10 +44,10 @@ const DEFAULT_SITE: PublicSiteSettings = {
 
 const DEFAULT_SEO: SeoSettings = {
   id: SINGLETON_ID,
-  defaultTitle: "PerkTonic: Free Stuff, Hidden Web Tricks & Smart Deals",
-  titleTemplate: "%s — PerkTonic",
+  defaultTitle: "PerkTonic: Free Online Tools for Spreadsheets & Data",
+  titleTemplate: "%s | PerkTonic",
   defaultMetaDescription:
-    "Discover free samples, hidden Google features, free AI tools, rewards and money-saving tricks. Honest, tested guides updated regularly.",
+    "Free online tools for Excel and Google Sheets formulas, CSV and JSON files, PDF tables, documents and website checks. No account needed.",
   defaultRobotsIndex: true,
   googleSiteVerification: null,
   bingSiteVerification: null,

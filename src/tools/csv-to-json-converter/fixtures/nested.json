@@ -1,0 +1,4 @@
+[
+  {"user": {"id": 7, "profile": {"first": "Mia", "langs": ["en", "de"]}}, "active": true, "note": null},
+  {"user": {"id": 8, "profile": {"first": "Omar", "langs": []}}, "active": false, "note": "=SUM(A1:A9)"}
+]

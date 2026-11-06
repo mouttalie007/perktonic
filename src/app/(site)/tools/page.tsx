@@ -1,10 +1,7 @@
 import type { Metadata } from "next";
-import Link from "next/link";
-import type { Route } from "next";
 import { CATEGORIES } from "@/config/site";
-import { TOOLS, toolHref } from "@/config/tools";
-import { ToolIcon } from "@/components/site/ToolIcon";
-import { CardArrow } from "@/components/home/SectionHeading";
+import { TOOLS } from "@/config/tools";
+import { ToolsExplorer } from "@/components/tools/ToolsExplorer";
 import { Breadcrumbs } from "@/components/ui/Breadcrumbs";
 
 export const metadata: Metadata = {
@@ -14,79 +11,48 @@ export const metadata: Metadata = {
   alternates: { canonical: "/tools" },
 };
 
-/** Tools hub: every tool grouped by category, with a "Soon" badge on the ones still being built. */
+const FACTS = [
+  { value: `${TOOLS.length}`, label: "free tools" },
+  { value: `${CATEGORIES.length}`, label: "categories" },
+  { value: "0", label: "sign-ups needed" },
+];
+
+/** Tools hub: a hero, a category filter with search, and every tool grouped by category. */
 export default function ToolsHubPage() {
   return (
-    <div className="site-container py-8 sm:py-12">
-      <Breadcrumbs items={[{ name: "Home", href: "/" }, { name: "Tools" }]} />
-      <header className="mt-4 max-w-3xl">
-        <h1 className="font-heading text-navy text-3xl font-extrabold tracking-tight sm:text-4xl">
-          All Tools
-        </h1>
-        <p className="text-slate-ink mt-2 text-lg">
-          Free tools for spreadsheets, data, documents, automation and the web.
-          New tools are added regularly.
-        </p>
-      </header>
-
-      <div className="mt-10 space-y-12">
-        {CATEGORIES.map((c) => {
-          const tools = TOOLS.filter((t) => t.categorySlug === c.slug);
-          return (
-            <section key={c.slug} aria-labelledby={`cat-${c.slug}`}>
-              <div className="mb-4 flex items-center gap-3">
-                <ToolIcon kind={c.iconKey} size={44} />
-                <div>
-                  <h2
-                    id={`cat-${c.slug}`}
-                    className="font-heading text-navy text-xl font-bold"
-                  >
-                    <Link
-                      href={`/category/${c.slug}` as Route}
-                      className="hover:underline"
-                    >
-                      {c.name}
-                    </Link>
-                  </h2>
-                  <p className="text-slate-ink text-sm">{c.shortDescription}</p>
+    <>
+      <section className="tool-wash relative overflow-hidden pt-6 pb-10 sm:pt-8 sm:pb-14">
+        <div aria-hidden className="pointer-events-none absolute inset-0">
+          <span className="absolute -top-24 right-[8%] h-72 w-72 rounded-full bg-[#7C3AED]/10 blur-3xl" />
+          <span className="absolute top-10 right-[28%] h-56 w-56 rounded-full bg-[#E0A800]/15 blur-3xl" />
+          <span className="absolute -bottom-20 left-[6%] h-64 w-64 rounded-full bg-[#2563EB]/10 blur-3xl" />
+        </div>
+        <div className="site-container relative">
+          <Breadcrumbs items={[{ name: "Home", href: "/" }, { name: "Tools" }]} />
+          <header className="mt-5 max-w-3xl">
+            <h1 className="font-heading text-navy text-3xl font-extrabold tracking-tight sm:text-5xl">
+              Every tool, one place
+            </h1>
+            <p className="text-slate-ink mt-3 text-lg leading-relaxed">
+              Free tools for spreadsheets, data, documents, automation and the web.
+              Most run in your browser, so your files stay on your computer.
+            </p>
+            <dl className="mt-6 flex flex-wrap gap-3">
+              {FACTS.map((f) => (
+                <div
+                  key={f.label}
+                  className="flex items-baseline gap-2 rounded-full bg-white/80 px-4 py-2 shadow-[var(--shadow-soft)] ring-1 ring-slate-900/[0.05] backdrop-blur"
+                >
+                  <dd className="font-heading text-navy text-xl font-extrabold">{f.value}</dd>
+                  <dt className="text-sm text-slate-600">{f.label}</dt>
                 </div>
-              </div>
-              {tools.length === 0 ? (
-                <p className="text-slate-ink rounded-2xl border border-dashed border-slate-300 p-5 text-sm">
-                  Tools for this category are on the way.
-                </p>
-              ) : (
-                <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-                  {tools.map((t) => (
-                    <li key={t.slug}>
-                      <Link
-                        href={toolHref(t) as Route}
-                        className="group relative flex h-full items-center gap-4 rounded-2xl border border-slate-200/80 bg-white p-4 pr-5 shadow-[var(--shadow-soft)] transition-shadow hover:shadow-[var(--shadow-soft-hover)]"
-                      >
-                        <ToolIcon kind={t.iconKey} size={48} />
-                        <div className="min-w-0 flex-1">
-                          <h3 className="font-heading text-navy flex flex-wrap items-center gap-2 text-[0.98rem] font-bold">
-                            {t.name}
-                            {t.status === "soon" && (
-                              <span className="rounded-full bg-amber-100 px-2 py-0.5 text-[0.68rem] font-bold tracking-wide text-amber-800 uppercase">
-                                Soon
-                              </span>
-                            )}
-                          </h3>
-                          <p className="text-slate-ink mt-0.5 text-sm leading-snug">
-                            {t.description}
-                          </p>
-                        </div>
-                        <CardArrow />
-                      </Link>
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </section>
-          );
-        })}
-      </div>
-    </div>
+              ))}
+            </dl>
+          </header>
+        </div>
+      </section>
+
+      <ToolsExplorer tools={TOOLS} categories={CATEGORIES} />
+    </>
   );
 }

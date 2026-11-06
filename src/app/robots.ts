@@ -18,6 +18,7 @@ export default function robots(): MetadataRoute.Robots {
           // already carry a noindex meta tag (see admin layout/login), and
           // naming it here would just advertise the hidden URL to anyone
           // who reads robots.txt.
+          "/api/",
           "/api/private",
           "/api/private/*",
           "/internal",

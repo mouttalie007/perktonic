@@ -1,0 +1,17 @@
+{
+  "title": "Cron Job Monitoring Heartbeat: Free Ping URL Alerts",
+  "metaDescription": "Cron job monitoring heartbeat: give each job a ping URL and get one webhook alert when a run is missed or fails, plus one when it recovers.",
+  "h1": "Cron Job Monitoring Heartbeat",
+  "primaryKeyword": "cron job monitoring heartbeat",
+  "secondaryKeywords": [
+    "cron monitoring free",
+    "heartbeat monitoring url",
+    "dead man switch for cron jobs",
+    "cron job failure alerts"
+  ],
+  "relatedSlugs": [
+    "cron-expression-generator",
+    "webhook-test-url-generator",
+    "remote-team-timezone-overlap-planner"
+  ]
+}

@@ -1,0 +1,18 @@
+{
+  "title": "XLOOKUP vs INDEX MATCH Generator: Convert Lookups",
+  "metaDescription": "An xlookup vs index match generator that rewrites VLOOKUP, HLOOKUP, INDEX/MATCH and XLOOKUP formulas into each other and explains what changes.",
+  "h1": "XLOOKUP vs INDEX-MATCH Generator",
+  "primaryKeyword": "xlookup vs index match generator",
+  "secondaryKeywords": [
+    "convert vlookup to xlookup",
+    "vlookup to index match converter",
+    "xlookup converter",
+    "index match vs vlookup",
+    "hlookup to xlookup"
+  ],
+  "relatedSlugs": [
+    "excel-formula-generator",
+    "convert-excel-formula-to-google-sheets",
+    "google-sheets-query-builder"
+  ]
+}

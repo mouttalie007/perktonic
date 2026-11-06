@@ -356,9 +356,9 @@ model SiteSettings {
 
 model SeoSettings {
   id                     String  @id @default("singleton")
-  defaultTitle           String  @default("PerkTonic: Free Stuff, Hidden Web Tricks & Smart Deals")
-  titleTemplate          String  @default("%s — PerkTonic")
-  defaultMetaDescription String  @default("Discover free samples, hidden Google features, free AI tools, rewards and money-saving tricks. Honest, tested guides updated regularly.")
+  defaultTitle           String  @default("PerkTonic: Free Online Tools for Spreadsheets & Data")
+  titleTemplate          String  @default("%s | PerkTonic")
+  defaultMetaDescription String  @default("Free online tools for Excel and Google Sheets formulas, CSV and JSON files, PDF tables, documents and website checks. No account needed.")
   defaultRobotsIndex     Boolean @default(true)
 
   googleSiteVerification String?
@@ -684,4 +684,57 @@ model ArticleBrief {
   @@unique([source, briefNo])
   @@index([status])
   @@map("article_briefs")
+}
+
+// ----------------------------------------------------------------------------
+// Tool 4.10: cron job heartbeat monitor (no accounts: secret links)
+// ----------------------------------------------------------------------------
+
+model HeartbeatMonitor {
+  id              String   @id
+  /// SHA-256 of the ping token and of the dashboard token: the tokens themselves are never stored.
+  pingTokenHash   String   @unique
+  manageTokenHash String   @unique
+  /// Confirmation and stop token hashes of the e-mail channels, for lookup.
+  emailHashes     String[]
+  paused          Boolean  @default(false)
+  createdAt       DateTime @default(now())
+  /// Last ping, or creation: monitors idle for 90 days are deleted.
+  activityAt      DateTime @default(now())
+  /// The whole Monitor object of src/tools/cron-job-monitoring-heartbeat/src/types.ts
+  data            Json
+
+  pings  HeartbeatPing[]
+  events HeartbeatEvent[]
+
+  @@index([paused, activityAt])
+  @@index([emailHashes], type: Gin)
+  @@map("heartbeat_monitors")
+}
+
+model HeartbeatPing {
+  id         Int      @id @default(autoincrement())
+  monitorId  String
+  at         DateTime
+  kind       String
+  durationMs Int?
+  message    String?
+  ip         String?
+  monitor    HeartbeatMonitor @relation(fields: [monitorId], references: [id], onDelete: Cascade)
+
+  @@index([monitorId, id(sort: Desc)])
+  @@map("heartbeat_pings")
+}
+
+model HeartbeatEvent {
+  id        Int      @id @default(autoincrement())
+  monitorId String
+  at        DateTime
+  type      String
+  text      String
+  ok        Boolean
+  monitor   HeartbeatMonitor @relation(fields: [monitorId], references: [id], onDelete: Cascade)
+
+  @@index([monitorId, id(sort: Desc)])
+  @@map("heartbeat_events")
 }

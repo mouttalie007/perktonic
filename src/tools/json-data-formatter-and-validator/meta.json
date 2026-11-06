@@ -1,0 +1,18 @@
+{
+  "title": "JSON Data Formatter and Validator with Schema Check",
+  "metaDescription": "A json data formatter and validator that beautifies or minifies JSON, shows errors by line and column, and checks it against draft-07 or 2020-12 schemas.",
+  "h1": "JSON Data Formatter and Validator",
+  "primaryKeyword": "json data formatter and validator",
+  "secondaryKeywords": [
+    "json formatter",
+    "json validator online",
+    "json schema validator",
+    "json minify",
+    "jsonc to json"
+  ],
+  "relatedSlugs": [
+    "csv-to-json-converter",
+    "webhook-json-payload-formatter",
+    "jsonpath-tester"
+  ]
+}

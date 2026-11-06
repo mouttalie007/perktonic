@@ -90,6 +90,42 @@ export const articleService = {
     };
   },
 
+  /**
+   * Every published article, newest first, for the blog index. The index mixes
+   * categories in the page, so it needs the whole list (a few hundred cards at most).
+   */
+  async listAllCards(): Promise<ArticleCard[]> {
+    return prisma.article.findMany({
+      where: published(),
+      orderBy: { publishedAt: "desc" },
+      select: cardSelect,
+    });
+  },
+
+  /** The newest published article of each given category (categories without one are skipped), in the given order. */
+  async listLatestPerCategory(categorySlugs: string[]): Promise<ArticleCard[]> {
+    const found = await Promise.all(
+      categorySlugs.map((slug) =>
+        prisma.article.findFirst({
+          where: { ...published(), category: { slug } },
+          orderBy: { publishedAt: "desc" },
+          select: cardSelect,
+        }),
+      ),
+    );
+    return found.filter((a): a is ArticleCard => a !== null);
+  },
+
+  /** Most read first, newest as the tie-break (all views are 0 on a new site). */
+  async listMostRead(limit = 5): Promise<ArticleCard[]> {
+    return prisma.article.findMany({
+      where: published(),
+      orderBy: [{ viewCount: "desc" }, { publishedAt: "desc" }],
+      take: limit,
+      select: cardSelect,
+    });
+  },
+
   /** Featured articles for the hero (spec §9, §62). */
   async listFeatured(limit = 3): Promise<ArticleCard[]> {
     return prisma.article.findMany({

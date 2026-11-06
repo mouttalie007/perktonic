@@ -1,0 +1,8 @@
+{
+  "title": "DNS Lookup Tool Online: Records, TTLs and WHOIS (RDAP)",
+  "metaDescription": "A free dns lookup tool online: A, AAAA, CNAME, MX, TXT, NS, SOA and CAA records with TTLs, RDAP registration dates and warnings about DNS mistakes.",
+  "h1": "DNS Lookup Tool Online",
+  "primaryKeyword": "dns lookup tool online",
+  "secondaryKeywords": ["mx record lookup", "whois lookup", "rdap lookup", "dangling cname", "check dns records"],
+  "relatedSlugs": ["spf-dkim-dmarc-checker", "ssl-certificate-checker", "robots-txt-tester-and-sitemap-validator"]
+}

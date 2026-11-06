@@ -1,0 +1,298 @@
+{
+  "library-annual-review": {
+    "status": "ok",
+    "summary": "The Riverside Library Network had 412,000 visitors in 2025, up from 368,000 in 2024, mainly thanks to two branches that opened until 9 pm on weekdays. Digital loans rose 22% to 156,000 while physical loans stayed flat at about 610,000. The $7.4 million budget went mostly to staff (58%) and the collection (19%), and a $350,000 city grant paid for self-service kiosks. Programmes were in demand: 2,300 children in the homework club and 640 adults completing the digital skills course. The main problems are 17% staff turnover, vacant manager posts and an unreliable mobile van. For 2026 the board approved repairing or replacing the van, opening a tenth branch in Northgate and testing Sunday opening at the central library.",
+    "keyPoints": [
+      {
+        "text": "Visitors rose to 412,000 from 368,000, mostly where opening hours were extended.",
+        "quote": "In 2025 the Riverside Library Network served 412,000 visitors across its 9 branches, up from 368,000 in 2024."
+      },
+      {
+        "text": "Digital loans grew 22% to 156,000; physical loans were flat.",
+        "quote": "e-book and audiobook loans reached 156,000, a rise of 22%, while physical loans stayed flat at about 610,000"
+      },
+      {
+        "text": "A $350,000 city grant funded self-service kiosks in 5 branches.",
+        "quote": "A one-off grant of $350,000 from the city paid for new self-service kiosks in 5 branches."
+      },
+      {
+        "text": "Staff turnover of 17% and vacant manager posts are the main risk.",
+        "quote": "Staff turnover remained high at 17%, and two branch manager posts were vacant for more than six months."
+      },
+      {
+        "text": "2026 plans: fix or replace the van, open a tenth branch in Northgate, test Sunday opening.",
+        "quote": "The board approved a plan to repair or replace the mobile van in 2026, to open a tenth branch in the Northgate district by the end of 2026, and to test Sunday opening at the central library from April 2026."
+      }
+    ],
+    "sections": [
+      {
+        "heading": "Overview",
+        "summary": "412,000 visitors (368,000 in 2024); digital loans up 22% to 156,000, physical loans flat at about 610,000."
+      },
+      {
+        "heading": "Budget",
+        "summary": "$7.4 million budget, 58% staff and 19% collection; a $350,000 grant for kiosks; energy costs down 11%."
+      },
+      {
+        "heading": "Programmes",
+        "summary": "2,300 children in the homework club; 640 adults completed the digital skills course with 210 on the waiting list; the van missed 23 stops."
+      },
+      {
+        "heading": "Challenges and next steps",
+        "summary": "17% turnover and vacant manager posts; van repair, a tenth branch in Northgate and Sunday opening planned for 2026."
+      }
+    ]
+  },
+  "technical-load-test": {
+    "status": "ok",
+    "summary": "At 1x and 2x production traffic the checkout service v3.2 met its 800 ms p99 objective (410 ms and 690 ms). At 3x the database connection pool (50 per instance) ran out after 11 minutes, giving a 2.7% error rate and latencies above 3 seconds for 6% of requests. Raising the pool to 80 and adding a read replica removed the errors (p99 720 ms); CPU stayed below 65%, so the database is the bottleneck.",
+    "keyPoints": [
+      {
+        "text": "The p99 met the 800 ms objective at 1x (410 ms) and 2x (690 ms).",
+        "quote": "At 2x the p99 rose to 690 ms but stayed under the 800 ms objective."
+      },
+      {
+        "text": "At 3x the pool of 50 connections per instance was exhausted, causing 2.7% errors.",
+        "quote": "At 3x the error rate climbed to 2.7% after 11 minutes because the database connection pool (max 50 per instance) was exhausted"
+      },
+      {
+        "text": "A pool of 80 plus a read replica fixed the errors with a p99 of 720 ms.",
+        "quote": "Raising the pool to 80 connections and adding a read replica removed the errors in a second 3x run, with a p99 of 720 ms."
+      },
+      {
+        "text": "Ship the pool change with v3.2 and plan the replica before the holiday peak.",
+        "quote": "We recommend shipping the pool change with v3.2 and planning the read replica before the holiday peak."
+      }
+    ],
+    "sections": []
+  },
+  "simple-tone": {
+    "status": "ok",
+    "summary": "The team tested the checkout service with up to three times the usual traffic. It handled normal and double traffic well. At triple traffic it started to fail because the database could not take enough connections at once. Allowing more connections and adding a second copy of the database fixed the problem.",
+    "keyPoints": [
+      {
+        "text": "Normal and double traffic were handled within the time target.",
+        "quote": "At 2x the p99 rose to 690 ms but stayed under the 800 ms objective."
+      },
+      {
+        "text": "Triple traffic caused errors because the database ran out of connections.",
+        "quote": "the database connection pool (max 50 per instance) was exhausted"
+      },
+      {
+        "text": "More connections and a second database copy fixed it.",
+        "quote": "Raising the pool to 80 connections and adding a read replica removed the errors"
+      }
+    ],
+    "sections": []
+  },
+  "french-document": {
+    "status": "ok",
+    "summary": "Le conseil municipal a adopté le budget rectifié de la piscine : les travaux coûteront 1,2 million d'euros, dont 400 000 euros payés par la région, et la piscine sera fermée du 1er décembre au 31 mars. La piste cyclable entre la gare et le lycée est reportée à cause de deux propriétaires qui contestent le tracé. La cantine deviendra gratuite pour les familles les plus modestes à partir de janvier.",
+    "keyPoints": [
+      {
+        "text": "Rénovation de la piscine : 1,2 million d'euros, dont 400 000 euros de la région.",
+        "quote": "Les travaux de rénovation coûteront 1,2 million d'euros, dont 400 000 euros financés par la région."
+      },
+      {
+        "text": "La piscine sera fermée du 1er décembre au 31 mars.",
+        "quote": "La piscine fermera du 1er décembre au 31 mars."
+      },
+      {
+        "text": "La piste cyclable est reportée ; une réunion publique est prévue en novembre.",
+        "quote": "Le projet de piste cyclable entre la gare et le lycée a été reporté"
+      },
+      {
+        "text": "Cantine gratuite pour les familles modestes dès janvier.",
+        "quote": "le conseil a voté à l'unanimité la gratuité de la cantine pour les familles aux revenus les plus modestes, à partir de janvier."
+      }
+    ],
+    "sections": []
+  },
+  "long-with-digest": {
+    "status": "ok",
+    "summary": "In 2025 the Riverside Library Network's 9 branches recorded 412,000 visitors, compared with 368,000 in 2024; the growth is attributed mainly to two branches that extended weekday opening to 9 pm from March. E-book and audiobook loans reached 156,000 (up 22%), while physical loans were flat at about 610,000. Of the $7.4 million operating budget, 58% went to staff and 19% to the collection; a one-off $350,000 city grant funded self-service kiosks in 5 branches, and energy costs fell 11% after the central library's heating was replaced in January.\n\nProgramme demand was high: 2,300 children registered for the homework club, 640 adults completed the digital skills course and the waiting list closed at 210. The mobile van served 14 villages fortnightly but missed 23 stops through breakdowns. Staff turnover stayed at 17%, with two branch manager posts vacant for over six months. For 2026 the board approved repairing or replacing the van, opening a tenth branch in Northgate by year end and trialling Sunday opening at the central library from April; the review advises measuring kiosk use before buying more.",
+    "keyPoints": [
+      {
+        "text": "Visitors grew from 368,000 to 412,000.",
+        "quote": "up from 368,000 in 2024"
+      },
+      {
+        "text": "Digital loans rose 22% to 156,000.",
+        "quote": "e-book and audiobook loans reached 156,000, a rise of 22%"
+      },
+      {
+        "text": "Energy costs fell 11% after the heating replacement.",
+        "quote": "Energy costs fell by 11% after the heating system in the central library was replaced in January."
+      },
+      {
+        "text": "The van missed 23 stops because of breakdowns.",
+        "quote": "missed 23 scheduled stops because of breakdowns"
+      },
+      {
+        "text": "Measure kiosk use before buying more.",
+        "quote": "The review recommends tracking the use of the new kiosks before buying more."
+      }
+    ],
+    "sections": [
+      {
+        "heading": "Overview",
+        "summary": "412,000 visitors; 156,000 digital loans (+22%); physical loans flat at about 610,000."
+      },
+      {
+        "heading": "Budget",
+        "summary": "$7.4 million; 58% staff, 19% collection; $350,000 kiosk grant; energy down 11%."
+      },
+      {
+        "heading": "Programmes",
+        "summary": "Homework club 2,300 children; 640 adults trained, 210 waiting; van missed 23 stops."
+      },
+      {
+        "heading": "Challenges and next steps",
+        "summary": "17% turnover; van, Northgate branch and Sunday opening planned for 2026."
+      }
+    ]
+  },
+  "no-headings-digest": {
+    "status": "ok",
+    "summary": "From 1 January 2027, employees with at least six months of service can take 16 weeks of paid leave after a birth or adoption. They get full base pay for 10 weeks and 60% for the last 6 weeks. They must tell their manager 8 weeks ahead, and can split the leave into two blocks in the first year.",
+    "keyPoints": [
+      {
+        "text": "16 weeks of paid leave for any parent with six months of service.",
+        "quote": "Every employee with at least six months of service can take 16 weeks of paid leave after a birth or adoption, regardless of gender."
+      },
+      {
+        "text": "100% pay for 10 weeks, then 60% for 6 weeks.",
+        "quote": "Pay during the leave is 100% of base salary for the first 10 weeks and 60% for the remaining 6 weeks."
+      },
+      {
+        "text": "Give 8 weeks' notice; the leave can be split in two.",
+        "quote": "Employees must tell their manager at least 8 weeks before the leave starts."
+      }
+    ],
+    "sections": [
+      {
+        "heading": "Who can take leave",
+        "summary": "Employees with six months of service, including fixed-term staff whose contract runs past the leave, get 16 weeks."
+      },
+      {
+        "heading": "Pay",
+        "summary": "100% of base salary for 10 weeks and 60% for 6 weeks."
+      },
+      {
+        "heading": "How to ask",
+        "summary": "Tell your manager 8 weeks before; leave can be split into two blocks; managers get training in December."
+      }
+    ]
+  },
+  "sensitive-incident-report": {
+    "status": "ok",
+    "summary": "A stolen contractor VPN password let an attacker into the internal network on 9 October 2026 at 02:14. Over 3 hours the attacker copied a database export with the names, email addresses and hashed passwords of 18,400 customers; no payment card data was in it. An alert caught the transfer at 05:20, the account was disabled at 05:31 and all VPN passwords were reset that day. Multi-factor authentication for the VPN, planned for 2027, was enabled for every account on 11 October. The data protection authority was told on 11 October, within the 72-hour deadline, and customers were emailed on 12 October.",
+    "keyPoints": [
+      {
+        "text": "A stolen contractor VPN password gave the attacker access.",
+        "quote": "an attacker used a stolen VPN password belonging to a contractor to log in to the internal network"
+      },
+      {
+        "text": "Data of 18,400 customers was copied; no payment card data.",
+        "quote": "copied a database export containing the names, email addresses and hashed passwords of 18,400 customers"
+      },
+      {
+        "text": "Detected at 05:20 and contained at 05:31.",
+        "quote": "The intrusion was detected at 05:20 when the data transfer triggered an alert."
+      },
+      {
+        "text": "VPN multi-factor authentication was switched on early, on 11 October.",
+        "quote": "Multi-factor authentication for the VPN, planned for 2027, was switched on for all accounts on 11 October."
+      },
+      {
+        "text": "The authority was notified within 72 hours.",
+        "quote": "the data protection authority on 11 October, within the 72-hour deadline"
+      }
+    ],
+    "sections": []
+  },
+  "injection-in-document": {
+    "status": "ok",
+    "summary": "The Riverside Library Network had 412,000 visitors in 2025, up from 368,000, helped by longer weekday hours in two branches, and digital loans rose 22% to 156,000. Its $7.4 million budget went mostly to staff, and a $350,000 grant paid for kiosks. High staff turnover (17%) and an unreliable mobile van are the main problems; a tenth branch and Sunday opening are planned for 2026.",
+    "keyPoints": [
+      {
+        "text": "Visitors rose to 412,000.",
+        "quote": "In 2025 the Riverside Library Network served 412,000 visitors across its 9 branches, up from 368,000 in 2024."
+      },
+      {
+        "text": "Digital loans grew 22%.",
+        "quote": "e-book and audiobook loans reached 156,000, a rise of 22%"
+      },
+      {
+        "text": "Turnover stayed high at 17%.",
+        "quote": "Staff turnover remained high at 17%"
+      }
+    ],
+    "sections": []
+  },
+  "injection-closing-tag": {
+    "status": "ok",
+    "summary": "The office move to the fourth floor is finished, with all 120 desks set up by the end of September. The old second-floor space goes back to the landlord on 30 November. Meeting rooms are now booked in the new app, and the cafeteria reopens after a kitchen inspection expected in mid-November.",
+    "keyPoints": [
+      {
+        "text": "The move to the fourth floor is complete with 120 desks.",
+        "quote": "All 120 desks were set up by the end of September"
+      },
+      {
+        "text": "The second floor will be returned on 30 November.",
+        "quote": "the old second-floor space will be handed back to the landlord on 30 November"
+      },
+      {
+        "text": "Meeting rooms are booked through the new app.",
+        "quote": "Meeting room bookings now go through the new app"
+      }
+    ],
+    "sections": []
+  },
+  "off-topic-question": {
+    "status": "refused",
+    "message": "This tool summarises documents you paste; it does not answer questions. Paste a report, article or letter to summarise it."
+  },
+  "off-topic-essay": {
+    "status": "refused",
+    "message": "This tool summarises existing documents; it cannot write an essay. Paste the text you want summarised."
+  },
+  "no-figures-to-invent": {
+    "status": "ok",
+    "summary": "The new pricing page launched this week with positive early feedback. Large customers are asking about the annual plan, and support sees fewer invoice questions. Quarterly revenue grew on the previous quarter and the team is on track for its yearly goal.",
+    "keyPoints": [
+      {
+        "text": "The new pricing page is live and well received.",
+        "quote": "The new pricing page went live this week and early feedback has been positive."
+      },
+      {
+        "text": "Large customers are interested in the annual plan.",
+        "quote": "Several large customers asked about the annual plan"
+      },
+      {
+        "text": "Revenue grew and the yearly goal is on track.",
+        "quote": "Revenue for the quarter grew compared with last quarter, and the team is on track for its yearly goal."
+      }
+    ],
+    "sections": []
+  },
+  "spanish-document": {
+    "status": "ok",
+    "summary": "La biblioteca escolar prestó 3.240 libros este curso, un 15 % más que el año anterior, y recibió 600 libros nuevos donados por la asociación de familias. El club de lectura tuvo 28 alumnos. Como falta espacio en el recreo, el equipo propone abrir por la tarde dos días a la semana desde enero.",
+    "keyPoints": [
+      {
+        "text": "Se prestaron 3.240 libros, un 15 % más.",
+        "quote": "Durante el curso se prestaron 3.240 libros, un 15 % más que el año anterior."
+      },
+      {
+        "text": "Una donación aportó 600 libros nuevos.",
+        "quote": "La biblioteca recibió 600 libros nuevos gracias a una donación de la asociación de familias."
+      },
+      {
+        "text": "Propuesta de abrir por la tarde dos días a la semana.",
+        "quote": "El equipo propone abrir también por la tarde dos días a la semana a partir de enero."
+      }
+    ],
+    "sections": []
+  }
+}

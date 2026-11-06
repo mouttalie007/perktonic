@@ -1,6 +1,8 @@
 "use client";
 
 import { useActionState, useState } from "react";
+import { SITE } from "@/config/site";
+import { SeoChecklist } from "./SeoChecklist";
 import type { Article, Author, Category, Media, Tag } from "@prisma/client";
 import { saveStandardArticle, type SaveState } from "@/app/actions/admin-articles";
 import { TitleSlugFields } from "../TitleSlugFields";
@@ -249,6 +251,7 @@ export function StandardArticleForm({
           {pending ? "Saving…" : article ? "Save changes" : "Publish article"}
         </Button>
         <PublishingCard article={article} defaultPublishedAt={defaultPublishedAt} />
+        <SeoChecklist siteHost={new URL(SITE.url).hostname} />
         <TagsCard key={`tax-${importSeed}`} article={effectiveArticle} tags={tags} />
         <LinkButton href="/adminiyad/articles">Back to articles</LinkButton>
       </div>

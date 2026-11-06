@@ -1,0 +1,18 @@
+{
+  "title": "OpenGraph and Meta Tag Validator with Link Previews",
+  "metaDescription": "An opengraph and meta tag validator that checks title, description, canonical, robots, og:image and Twitter cards and previews links on 4 platforms.",
+  "h1": "OpenGraph and Meta Tag Validator",
+  "primaryKeyword": "opengraph and meta tag validator",
+  "secondaryKeywords": [
+    "og image checker",
+    "open graph preview",
+    "twitter card validator",
+    "meta tags checker",
+    "link preview tester"
+  ],
+  "relatedSlugs": [
+    "redirect-chain-checker",
+    "http-response-header-analyzer",
+    "robots-txt-tester-and-sitemap-validator"
+  ]
+}

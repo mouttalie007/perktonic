@@ -119,6 +119,7 @@ export function HeaderBar() {
                     >
                       <ToolIcon
                         kind={c.iconKey}
+                        category={c.slug}
                         size={36}
                         className="!rounded-xl"
                       />

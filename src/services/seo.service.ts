@@ -24,6 +24,15 @@ export interface PageMetaInput {
   modifiedTime?: string;
 }
 
+/** Brand suffix of the title template (src/app/layout.tsx). */
+const BRAND_SUFFIX = " | PerkTonic";
+const MAX_TITLE = 60;
+
+/** The suffix is added only while the full title still fits in what Google shows; otherwise the keywords win over the brand. */
+function fitTitle(title: string): Metadata["title"] {
+  return title.length + BRAND_SUFFIX.length > MAX_TITLE ? { absolute: title } : title;
+}
+
 export const seoService = {
   absoluteUrl,
 
@@ -37,7 +46,7 @@ export const seoService = {
     const index = input.robotsIndex ?? seo.defaultRobotsIndex;
 
     return {
-      title: input.title,
+      title: fitTitle(input.title),
       description,
       alternates: { canonical },
       robots: {

@@ -1,6 +1,11 @@
 import Link from "next/link";
-import type { Route } from "next";
+import type { Metadata, Route } from "next";
 import { CATEGORIES } from "@/config/site";
+
+export const metadata: Metadata = {
+  title: "Page not found",
+  robots: { index: false, follow: true },
+};
 
 /**
  * 404 within the public site (spec §54, perktonic-seo.md §4.11). Not a dead
@@ -13,11 +18,11 @@ export default function NotFound() {
         404
       </p>
       <h1 className="mt-4 text-2xl font-extrabold tracking-tight sm:text-3xl">
-        This offer isn&apos;t here anymore.
+        This page isn&apos;t here.
       </h1>
       <p className="text-muted mt-3 max-w-md">
         The page you’re looking for may have been moved, renamed, or never
-        existed. Try a search, or browse a category below.
+        existed. Try a search, open the tools, or browse a category below.
       </p>
       <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
         <Link
@@ -25,6 +30,12 @@ export default function NotFound() {
           className="bg-ink hover:bg-ink-deep rounded-sm px-5 py-2.5 text-sm font-bold text-white transition-colors"
         >
           Return Home
+        </Link>
+        <Link
+          href={"/tools" as Route}
+          className="border-line text-ink hover:bg-surface rounded-sm border px-5 py-2.5 text-sm font-bold transition-colors"
+        >
+          All tools
         </Link>
         <Link
           href={"/search" as Route}

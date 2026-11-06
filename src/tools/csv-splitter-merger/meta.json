@@ -1,0 +1,18 @@
+{
+  "title": "Split CSV File by Column, Rows or Size, and Merge CSVs",
+  "metaDescription": "Split a CSV file by column value, row count or size into a ZIP, or merge up to 50 CSV files with columns matched by name. Runs in your browser, no upload.",
+  "h1": "Split CSV File by Column, Rows or Size, or Merge CSV Files",
+  "primaryKeyword": "split csv file by column",
+  "secondaryKeywords": [
+    "split large csv file",
+    "csv splitter",
+    "merge csv files",
+    "combine csv files with different columns",
+    "split csv into multiple files"
+  ],
+  "relatedSlugs": [
+    "compare-two-csv-files",
+    "csv-to-json-converter",
+    "clean-messy-csv-data"
+  ]
+}

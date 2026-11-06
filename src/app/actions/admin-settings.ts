@@ -15,7 +15,7 @@ export async function updateSiteSettings(formData: FormData) {
     where: { id: "singleton" },
     update: {
       siteName: str(formData, "siteName") ?? "PerkTonic.com",
-      tagline: str(formData, "tagline") ?? "Find the good stuff before everyone else does.",
+      tagline: str(formData, "tagline") ?? "Free online tools for smarter workflows.",
       logoUrl: str(formData, "logoUrl"),
       defaultOgImageUrl: str(formData, "defaultOgImageUrl"),
       contactEmail: str(formData, "contactEmail"),
@@ -39,8 +39,8 @@ export async function updateSeoSettings(formData: FormData) {
     update: {
       defaultTitle:
         str(formData, "defaultTitle") ??
-        "PerkTonic: Free Stuff, Hidden Web Tricks & Smart Deals",
-      titleTemplate: str(formData, "titleTemplate") ?? "%s — PerkTonic",
+        "PerkTonic: Free Online Tools for Spreadsheets & Data",
+      titleTemplate: str(formData, "titleTemplate") ?? "%s | PerkTonic",
       defaultMetaDescription: str(formData, "defaultMetaDescription") ?? "",
       defaultRobotsIndex: formData.get("defaultRobotsIndex") === "on",
       googleSiteVerification: str(formData, "googleSiteVerification"),

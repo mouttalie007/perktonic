@@ -42,7 +42,7 @@ export default function OgImage() {
             fontFamily: "system-ui, sans-serif",
           }}
         >
-          Find the good stuff before everyone else does.
+          Free online tools for spreadsheets, data and documents.
         </div>
       </div>
     ),

@@ -1,0 +1,8 @@
+import type { PromptInput } from "../src/llm/prompt";
+
+export const sampleInput: PromptInput = {
+  "text": "Riverside Library Network: Annual Review 2025\n\nOverview\nIn 2025 the Riverside Library Network served 412,000 visitors across its 9 branches, up from 368,000 in 2024. The increase came mostly from the two branches that extended their opening hours to 9 pm on weekdays in March. Digital loans grew faster than physical ones: e-book and audiobook loans reached 156,000, a rise of 22%, while physical loans stayed flat at about 610,000.\n\nBudget\nThe network's operating budget was $7.4 million, of which 58% went to staff and 19% to the collection. A one-off grant of $350,000 from the city paid for new self-service kiosks in 5 branches. Energy costs fell by 11% after the heating system in the central library was replaced in January.\n\nProgrammes\nThe homework club ran in all branches and had 2,300 registered children. The digital skills course for adults was fully booked: 640 people completed it, and the waiting list closed at 210 names. The mobile library van visited 14 villages every two weeks but missed 23 scheduled stops because of breakdowns.\n\nChallenges and next steps\nStaff turnover remained high at 17%, and two branch manager posts were vacant for more than six months. The board approved a plan to repair or replace the mobile van in 2026, to open a tenth branch in the Northgate district by the end of 2026, and to test Sunday opening at the central library from April 2026. The review recommends tracking the use of the new kiosks before buying more.",
+  "length": "medium" as const,
+  "tone": "executive" as const,
+  "sections": true
+};

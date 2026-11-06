@@ -56,7 +56,7 @@ export function ShareButtons({
           key={label}
           href={href}
           target="_blank"
-          rel="noopener noreferrer"
+          rel="nofollow noopener noreferrer"
           aria-label={label}
           className="border-line text-ink hover:bg-ink inline-flex h-9 w-9 items-center justify-center rounded-sm border transition-colors hover:text-white"
         >

@@ -58,7 +58,7 @@ export async function subscribeAction(
 
   return {
     status: "success",
-    message: "You're on the list. Watch your inbox for the good stuff.",
+    message: "You're subscribed. We'll email you when new guides are published.",
   };
 }
 

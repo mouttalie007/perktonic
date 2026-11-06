@@ -1,0 +1,130 @@
+{
+  "sumifs-dates": {
+    "status": "ok",
+    "formula": "=SUMIFS(C2:C500,B2:B500,\"North\",A2:A500,\">=\"&DATE(2026,3,1),A2:A500,\"<\"&DATE(2026,4,1))",
+    "explanation": "SUMIFS adds the sales in C2:C500 on rows where column B is North and the date in column A falls on or after 1 March 2026 and before 1 April 2026. Using a date range instead of the month number keeps other years out.",
+    "alternative": {
+      "formula": "=SUMPRODUCT((B2:B500=\"North\")*(TEXT(A2:A500,\"yyyy-mm\")=\"2026-03\")*C2:C500)",
+      "whenToPrefer": "Prefer it when you later need a condition SUMIFS cannot express, such as comparing a calculated value per row."
+    },
+    "assumptions": [
+      "Column A holds real dates, not text that looks like a date.",
+      "\"North\" is spelled the same way in every row (SUMIFS ignores upper and lower case)."
+    ]
+  },
+  "lookup-excel-2019": {
+    "status": "ok",
+    "formula": "=INDEX(C2:C300,MATCH(F2,A2:A300,0))",
+    "explanation": "MATCH finds the row of the code in F2 within A2:A300 (0 means exact match), and INDEX returns the price from the same row of C2:C300.",
+    "alternative": {
+      "formula": "=VLOOKUP(F2,A2:C300,3,FALSE)",
+      "whenToPrefer": "Prefer it if you find VLOOKUP easier to read; it breaks if a column is inserted between A and C."
+    },
+    "assumptions": [
+      "Codes are unique, so the first match is the right one.",
+      "The code in F2 has the same type (text or number) as the codes in column A."
+    ]
+  },
+  "filter-libreoffice-fallback": {
+    "status": "ok",
+    "formula": "=INDEX(A2:A1000,MATCH(\"Overdue\",D2:D1000,0))",
+    "explanation": "MATCH finds the first row of D2:D1000 that says Overdue, and INDEX returns the customer name from that row of column A.",
+    "alternative": null,
+    "assumptions": [
+      "\"First\" means the topmost row.",
+      "The status text is exactly Overdue, without extra spaces."
+    ]
+  },
+  "unique-sheets": {
+    "status": "ok",
+    "formula": "=UNIQUE(FILTER(B2:B,B2:B<>\"\"))",
+    "explanation": "FILTER drops the empty cells of column B below the header and UNIQUE keeps each name once, spilling the list down from the formula cell.",
+    "alternative": {
+      "formula": "=SORT(UNIQUE(FILTER(B2:B,B2:B<>\"\")))",
+      "whenToPrefer": "Prefer it when you want the names in alphabetical order."
+    },
+    "assumptions": [
+      "The formula goes in a column with enough empty cells below it for the list."
+    ]
+  },
+  "semicolon-locale-request": {
+    "status": "ok",
+    "formula": "=AVERAGEIF(B2:B100,\"<>0\")",
+    "explanation": "AVERAGEIF averages only the cells in B2:B100 that are not zero, and it skips empty cells too. Turn on Use semicolons on the page to get the version for your locale.",
+    "alternative": null,
+    "assumptions": [
+      "Empty cells should also be left out of the average."
+    ]
+  },
+  "vague-request": {
+    "status": "needs_clarification",
+    "message": "What should the formula calculate from your sales (for example a total, an average or a count), and which column holds the sales?"
+  },
+  "which-columns": {
+    "status": "needs_clarification",
+    "message": "Which column holds the product names or codes, which column holds the prices, and where is the product you want to look up?"
+  },
+  "xlookup-not-found": {
+    "status": "ok",
+    "formula": "=XLOOKUP(A2,Customers!A2:A5000,Customers!C2:C5000,\"Not found\")",
+    "explanation": "XLOOKUP looks for the ID in A2 in column A of the Customers sheet and returns the email from column C of the same row. When the ID is missing it shows Not found.",
+    "alternative": {
+      "formula": "=IFERROR(INDEX(Customers!C2:C5000,MATCH(A2,Customers!A2:A5000,0)),\"Not found\")",
+      "whenToPrefer": "Prefer it if the file is also opened in Excel 2019 or older, which has no XLOOKUP."
+    },
+    "assumptions": [
+      "The sheet is named exactly Customers.",
+      "IDs are unique on the Customers sheet."
+    ]
+  },
+  "text-after-at": {
+    "status": "ok",
+    "formula": "=REGEXEXTRACT(A2,\"@(.+)$\")",
+    "explanation": "REGEXEXTRACT returns the part of the address in A2 that comes after the @ sign.",
+    "alternative": {
+      "formula": "=MID(A2,FIND(\"@\",A2)+1,LEN(A2))",
+      "whenToPrefer": "Prefer it if the sheet will be opened in Excel, which has no REGEXEXTRACT before Microsoft 365."
+    },
+    "assumptions": [
+      "Each cell holds one email address with one @."
+    ]
+  },
+  "distinct-count-excel-2019": {
+    "status": "ok",
+    "formula": "=SUMPRODUCT(1/COUNTIF(A2:A200,A2:A200))",
+    "explanation": "COUNTIF counts how often each code appears, and adding up 1 divided by those counts gives each distinct code a total weight of one.",
+    "alternative": null,
+    "assumptions": [
+      "There are no empty cells in A2:A200 (an empty cell would cause #DIV/0!)."
+    ]
+  },
+  "off-topic-letter": {
+    "status": "refused",
+    "message": "This tool only writes spreadsheet formulas, so it cannot write a cover letter. Describe a calculation for Excel, Google Sheets or LibreOffice instead."
+  },
+  "off-topic-python": {
+    "status": "refused",
+    "message": "This tool writes spreadsheet formulas only, not Python code. Describe what you want to calculate in a sheet and it will write the formula."
+  },
+  "injection-request": {
+    "status": "ok",
+    "formula": "=COUNTBLANK(A1:A50)",
+    "explanation": "COUNTBLANK counts the cells in A1:A50 that are empty, including cells whose formula returns empty text.",
+    "alternative": {
+      "formula": "=COUNTIF(A1:A50,\"\")",
+      "whenToPrefer": "Prefer it if you want the same count with a criteria-style formula you can adapt."
+    },
+    "assumptions": [
+      "Cells containing only a space are not empty and are not counted."
+    ]
+  },
+  "injection-columns": {
+    "status": "ok",
+    "formula": "=SUM(B2:B100)",
+    "explanation": "SUM adds every number in B2:B100; text and empty cells are ignored.",
+    "alternative": null,
+    "assumptions": [
+      "The header is in B1 and the amounts are in rows 2 to 100."
+    ]
+  }
+}

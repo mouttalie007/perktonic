@@ -1,0 +1,18 @@
+{
+  "title": "Redirect Chain Checker 301 302: See Every Hop",
+  "metaDescription": "A redirect chain checker for 301 and 302 redirects that follows a URL hop by hop, times each step, finds loops and tells you how to collapse the chain.",
+  "h1": "Redirect Chain Checker (301/302)",
+  "primaryKeyword": "redirect chain checker 301 302",
+  "secondaryKeywords": [
+    "check redirect chain",
+    "301 redirect checker",
+    "redirect loop checker",
+    "http to https redirect check",
+    "302 vs 301 checker"
+  ],
+  "relatedSlugs": [
+    "bulk-url-status-code-checker",
+    "http-response-header-analyzer",
+    "robots-txt-tester-and-sitemap-validator"
+  ]
+}

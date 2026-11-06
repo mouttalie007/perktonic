@@ -19,7 +19,7 @@ export function AuthorBox({ author }: { author: Author }) {
   const name = author?.name ?? DEFAULT_AUTHOR_NAME;
   const bio =
     author?.bio ??
-    "Guides and deals researched, verified and written by the PerkTonic team.";
+    "Guides researched, tested and written by the PerkTonic team.";
 
   return (
     <aside className="border-line bg-surface/60 flex gap-4 rounded-sm border p-5">

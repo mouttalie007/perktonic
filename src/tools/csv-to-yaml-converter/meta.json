@@ -1,0 +1,18 @@
+{
+  "title": "CSV to YAML Converter, plus XML and TOML, Both Ways",
+  "metaDescription": "A free csv to yaml converter that also writes XML and TOML and converts them back to CSV, keeping numbers, booleans, nulls and nested fields intact.",
+  "h1": "CSV to YAML Converter (and XML, TOML)",
+  "primaryKeyword": "csv to yaml converter",
+  "secondaryKeywords": [
+    "yaml to csv",
+    "csv to xml converter",
+    "csv to toml",
+    "xml to csv converter",
+    "toml to csv"
+  ],
+  "relatedSlugs": [
+    "csv-to-json-converter",
+    "json-data-formatter-and-validator",
+    "csv-to-sql-insert-generator"
+  ]
+}

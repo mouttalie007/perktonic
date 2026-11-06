@@ -29,12 +29,13 @@ const CSP_GOOGLE_SCRIPT_ORIGINS = [
 const isDev = process.env.NODE_ENV === "development";
 const CSP = [
   "default-src 'self'",
-  `script-src 'self' 'unsafe-inline' ${isDev ? "'unsafe-eval' " : ""}${CSP_GOOGLE_SCRIPT_ORIGINS.join(" ")}`,
+  `script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval' ${isDev ? "'unsafe-eval' " : ""}${CSP_GOOGLE_SCRIPT_ORIGINS.join(" ")}`,
+  "worker-src 'self' blob:",
   "style-src 'self' 'unsafe-inline'",
-  "img-src 'self' data: https:",
+  "img-src 'self' data: blob: https:",
   "font-src 'self' data:",
   `connect-src 'self' https://www.google-analytics.com https://*.google-analytics.com https://*.analytics.google.com ${CSP_GOOGLE_SCRIPT_ORIGINS.join(" ")}`,
-  "frame-src 'self' https://*.doubleclick.net https://googleads.g.doubleclick.net",
+  "frame-src 'self' https://*.doubleclick.net https://googleads.g.doubleclick.net https://*.googlesyndication.com https://*.adtrafficquality.google https://www.google.com",
   "object-src 'none'",
   "base-uri 'self'",
   "form-action 'self'",
@@ -89,6 +90,14 @@ const nextConfig: NextConfig = {
         source: "/uploads/:path*",
         headers: [
           { key: "Cache-Control", value: "public, max-age=31536000, immutable" },
+        ],
+      },
+      {
+        // Brand images (logo, hero, tool and category icons) keep their file names when they
+        // are replaced, so no "immutable": a day in the cache, a week of stale-while-revalidate.
+        source: "/brand/:path*",
+        headers: [
+          { key: "Cache-Control", value: "public, max-age=86400, stale-while-revalidate=604800" },
         ],
       },
     ];

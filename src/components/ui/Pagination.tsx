@@ -37,7 +37,7 @@ export function Pagination({
               Prev
             </Link>
           ) : (
-            <span className="text-line flex h-9 min-w-9 items-center justify-center px-2 text-sm font-semibold">
+            <span aria-disabled="true" className="flex h-9 min-w-9 items-center justify-center px-2 text-sm font-semibold text-slate-400">
               Prev
             </span>
           )}
@@ -69,7 +69,7 @@ export function Pagination({
               Next
             </Link>
           ) : (
-            <span className="text-line flex h-9 min-w-9 items-center justify-center px-2 text-sm font-semibold">
+            <span aria-disabled="true" className="flex h-9 min-w-9 items-center justify-center px-2 text-sm font-semibold text-slate-400">
               Next
             </span>
           )}

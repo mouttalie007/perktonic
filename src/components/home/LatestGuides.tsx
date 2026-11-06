@@ -3,10 +3,12 @@ import Link from "next/link";
 import type { Route } from "next";
 import type { ArticleCard } from "@/services/article.service";
 import { CATEGORIES } from "@/config/site";
+import { ArrowRightIcon } from "@/components/icons";
+import { CATEGORY_THEME } from "@/config/category-theme";
 import { ToolIcon } from "@/components/site/ToolIcon";
-import { CardArrow, SectionHeading } from "./SectionHeading";
+import { SectionHeading } from "./SectionHeading";
 
-/** "Latest Guides & Resources": the 4 newest published articles (hidden when there are none). */
+/** "Latest Guides & Resources": the newest article of each category, so every colour shows (hidden when there are none). */
 export function LatestGuides({ articles }: { articles: ArticleCard[] }) {
   if (articles.length === 0) return null;
   return (
@@ -22,41 +24,52 @@ export function LatestGuides({ articles }: { articles: ArticleCard[] }) {
         linkLabel="View All"
         linkLabelExtra="Articles"
       />
-      <ul className="grid gap-2.5 sm:grid-cols-2 lg:grid-cols-4 lg:gap-4">
-        {articles.map((a) => {
+      <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
+        {articles.map((a, i) => {
           const cat = CATEGORIES.find((c) => c.slug === a.category?.slug);
           return (
-            <li key={a.id}>
+            <li key={a.id} className={i === articles.length - 1 && articles.length % 2 === 1 ? "sm:col-span-2 lg:col-span-1" : ""}>
               <Link
                 href={`/story/${a.slug}` as Route}
-                className="group relative flex h-full items-center gap-4 rounded-2xl border border-slate-200/80 bg-white p-3 pr-4 shadow-[var(--shadow-soft)] transition-shadow hover:shadow-[var(--shadow-soft-hover)] lg:p-4"
+                className="group relative flex h-full flex-col overflow-hidden rounded-2xl bg-white shadow-[var(--shadow-soft)] ring-1 ring-slate-900/[0.06] transition duration-200 hover:-translate-y-1 hover:shadow-[var(--shadow-soft-hover)]"
               >
-                <span className="relative h-[4.5rem] w-[4.5rem] shrink-0 overflow-hidden rounded-xl bg-slate-100 lg:h-24 lg:w-24">
+                <span className="relative block aspect-[1200/630] w-full overflow-hidden bg-slate-100">
                   {a.featuredImage ? (
                     <Image
                       src={a.featuredImage.url}
                       alt={a.featuredImage.alt ?? ""}
                       fill
-                      sizes="96px"
-                      className="object-cover"
+                      sizes="(min-width: 1024px) 20vw, (min-width: 640px) 50vw, 100vw"
+                      className="object-cover transition-transform duration-300 group-hover:scale-[1.03]"
                     />
                   ) : (
                     <span className="flex h-full w-full items-center justify-center">
-                      <ToolIcon kind={cat?.iconKey ?? "globe"} size={44} />
+                      <ToolIcon kind={cat?.iconKey ?? "globe"} category={cat?.slug} size={64} />
                     </span>
                   )}
                 </span>
-                <div className="min-w-0 flex-1">
-                  <h3 className="font-heading text-navy line-clamp-3 text-[0.95rem] leading-snug font-bold">
-                    {a.title}
-                  </h3>
+                <div className="flex flex-1 flex-col p-4">
                   {a.category && (
-                    <span className="text-primary bg-primary-soft mt-2 inline-block rounded-full px-3 py-1 text-[0.75rem] font-medium">
+                    <span
+                      className="mb-2 inline-flex w-fit items-center gap-1.5 text-[0.75rem] font-semibold"
+                      style={{ color: cat ? CATEGORY_THEME[cat.slug].deep : undefined }}
+                    >
+                      <span
+                        aria-hidden
+                        className="size-2 rounded-full"
+                        style={{ background: cat ? CATEGORY_THEME[cat.slug].base : "currentColor" }}
+                      />
                       {a.category.name}
                     </span>
                   )}
+                  <h3 className="font-heading text-navy line-clamp-3 text-[0.95rem] leading-snug font-bold">
+                    {a.title}
+                  </h3>
+                  <span className="text-primary mt-auto inline-flex items-center gap-1.5 pt-3 text-[0.85rem] font-semibold">
+                    Read the guide
+                    <ArrowRightIcon width={15} height={15} className="transition-transform group-hover:translate-x-0.5" />
+                  </span>
                 </div>
-                <CardArrow className="hidden sm:inline-flex lg:absolute lg:right-4 lg:bottom-4" />
               </Link>
             </li>
           );

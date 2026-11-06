@@ -14,7 +14,13 @@ const initial: NewsletterState = { status: "idle" };
  * NewsletterCTA, just boxed to fit a 300px column alongside the other
  * sidebar widgets (AdSlot, TrendingList) instead of a page-wide banner.
  */
-export function NewsletterSidebarCTA() {
+export function NewsletterSidebarCTA({
+  title = "New guides by email",
+  text = "New guides and tools by email when we publish them. No spam, unsubscribe anytime.",
+}: {
+  title?: string;
+  text?: string;
+} = {}) {
   const [state, formAction, pending] = useActionState(subscribeAction, initial);
   const emailId = useId();
   const msgId = useId();
@@ -22,10 +28,10 @@ export function NewsletterSidebarCTA() {
   return (
     <section className="border-line bg-canvas rounded-sm border p-4">
       <h2 className="text-sm font-extrabold tracking-[0.12em] uppercase">
-        Get the Best Deals
+        {title}
       </h2>
       <p className="text-muted mt-1.5 text-xs">
-        New guides by email when we publish them. No spam, unsubscribe anytime.
+        {text}
       </p>
 
       <form action={formAction} noValidate className="mt-3 space-y-2">

@@ -1,0 +1,8 @@
+{
+  "title": "SSL Certificate Checker: Expiry, Chain and TLS Versions",
+  "metaDescription": "A free ssl certificate checker: days until expiry, name match, chain completeness, key size and the TLS versions your server accepts, in plain words.",
+  "h1": "SSL Certificate Checker",
+  "primaryKeyword": "ssl certificate checker",
+  "secondaryKeywords": ["check ssl certificate expiry", "incomplete certificate chain", "tls version checker", "ssl checker port 993", "certificate name mismatch"],
+  "relatedSlugs": ["http-response-header-analyzer", "dns-lookup-tool", "ttfb-server-response-time-test"]
+}

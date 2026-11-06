@@ -1,0 +1,3 @@
+// A WebVTT export of a short meeting (tests of our parser).
+export const SAMPLE_VTT = "WEBVTT\n\n00:00:01.000 --> 00:00:05.000\n<v Jo>Morning. Two things: the release and the hiring plan.\n\n00:00:05.500 --> 00:00:10.000\n<v Ben>The release candidate passed QA. We ship on Thursday.\n\n00:00:10.500 --> 00:00:15.000\n<v Jo>Agreed, ship Thursday. I'll write the release notes.\n\n00:00:15.500 --> 00:00:20.000\n<v Ben>Hiring: do we open the second backend role now or in January?";
+export const SAMPLE_VTT_TEXT = "Jo: Morning. Two things: the release and the hiring plan.\nBen: The release candidate passed QA. We ship on Thursday.\nJo: Agreed, ship Thursday. I'll write the release notes.\nBen: Hiring: do we open the second backend role now or in January?";

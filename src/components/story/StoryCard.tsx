@@ -13,6 +13,7 @@ import type { ReactionCounts } from "@/services/reaction.service";
  *              when `reactions`/`commentCount` are passed)
  *  - `overlay` full-bleed image with text over a bottom gradient (hero)
  *  - `list`    thumb + text row, optional rank number (Trending)
+ *  - `row`     wide image-left card with excerpt (blog index list view)
  *  - `compact` small thumb + title only, no meta/badge — end-of-article
  *              "You May Also Like" rows
  *
@@ -20,7 +21,7 @@ import type { ReactionCounts } from "@/services/reaction.service";
  * avoid CLS. Only pass `priority` for the single above-the-fold hero image.
  */
 
-type Variant = "grid" | "overlay" | "list" | "compact";
+type Variant = "grid" | "overlay" | "list" | "compact" | "row";
 
 interface Props {
   story: ArticleCard;
@@ -220,6 +221,48 @@ export function StoryCard({
     );
   }
 
+  /* ---------- row (blog index, list view) ---------- */
+  if (variant === "row") {
+    return (
+      <Link
+        href={href}
+        className={`group border-line bg-canvas flex flex-col overflow-hidden rounded-sm border transition-shadow hover:shadow-[var(--shadow-raised)] sm:flex-row ${className}`}
+      >
+        <span className="relative block aspect-[1200/630] shrink-0 overflow-hidden sm:w-[17rem] md:w-[19rem]">
+          <Picture
+            story={story}
+            sizes={sizes ?? "(max-width: 640px) 100vw, 304px"}
+          />
+        </span>
+        <span className="flex min-w-0 flex-1 flex-col p-4">
+          <span className="flex items-center gap-2">
+            <Badge story={story} />
+            {story.category?.accentColor && (
+              <span
+                aria-hidden
+                className="h-1.5 w-1.5 rounded-full"
+                style={{ background: story.category.accentColor }}
+              />
+            )}
+          </span>
+          <h3
+            className={`text-ink group-hover:text-ink/70 mt-2 line-clamp-2 text-lg leading-snug font-bold transition-colors ${headingClassName ?? ""}`}
+          >
+            {story.title}
+          </h3>
+          {story.excerpt && (
+            <p className="text-slate-ink mt-1.5 line-clamp-2 text-sm leading-relaxed">
+              {story.excerpt}
+            </p>
+          )}
+          <span className="mt-auto pt-3">
+            <Meta story={story} />
+          </span>
+        </span>
+      </Link>
+    );
+  }
+
   /* ---------- compact (small, elegant — end-of-article) ---------- */
   if (variant === "compact") {
     return (
@@ -249,7 +292,7 @@ export function StoryCard({
           style={{ background: story.category.accentColor }}
         />
       )}
-      <span className="relative block aspect-[16/10] overflow-hidden">
+      <span className="relative block aspect-[1200/630] overflow-hidden">
         <Picture
           story={story}
           sizes={sizes ?? "(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"}

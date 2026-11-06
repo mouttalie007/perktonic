@@ -1,0 +1,8 @@
+{
+  "title": "SPF DKIM DMARC Checker with Suggested Fixes",
+  "metaDescription": "A free spf dkim dmarc checker: counts SPF lookups through every include, checks DMARC tags and DKIM keys, MTA-STS and BIMI, and suggests corrected records.",
+  "h1": "SPF, DKIM and DMARC Checker",
+  "primaryKeyword": "spf dkim dmarc checker",
+  "secondaryKeywords": ["spf record checker", "dmarc record checker", "dkim lookup", "spf too many dns lookups", "mta-sts checker"],
+  "relatedSlugs": ["dns-lookup-tool", "ssl-certificate-checker", "http-response-header-analyzer"]
+}

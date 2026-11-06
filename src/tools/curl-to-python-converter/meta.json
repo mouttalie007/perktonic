@@ -1,0 +1,18 @@
+{
+  "title": "cURL to Python Converter: requests, fetch, axios, PHP, Go",
+  "metaDescription": "A curl to python converter that also writes fetch, axios, PHP cURL and Go code, keeps headers, auth and bodies, and lists any option it cannot map.",
+  "h1": "cURL to Python Converter",
+  "primaryKeyword": "curl to python converter",
+  "secondaryKeywords": [
+    "curl to fetch",
+    "curl to axios",
+    "curl to php",
+    "curl to go",
+    "python requests to curl"
+  ],
+  "relatedSlugs": [
+    "webhook-test-url-generator",
+    "jsonpath-tester",
+    "http-response-header-analyzer"
+  ]
+}

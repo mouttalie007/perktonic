@@ -1,0 +1,18 @@
+{
+  "title": "Text Data Parser and Normalizer: Extract Emails, Phones",
+  "metaDescription": "A free text data parser and normalizer that pulls emails, phone numbers, URLs, dates and amounts out of any text, removes duplicates and exports CSV or JSON.",
+  "h1": "Text Data Parser and Normalizer",
+  "primaryKeyword": "text data parser and normalizer",
+  "secondaryKeywords": [
+    "extract emails from text",
+    "extract phone numbers from text",
+    "extract urls from text",
+    "entity extractor",
+    "remove duplicate emails"
+  ],
+  "relatedSlugs": [
+    "ai-document-action-item-extractor",
+    "regex-generator-tester",
+    "standardize-phone-numbers-csv"
+  ]
+}

@@ -71,7 +71,7 @@ export function ArticleHeader({ article }: { article: HeaderArticle }) {
 
       {article.featuredImage?.url && (
         <figure className="mt-7">
-          <div className="relative aspect-[16/9] overflow-hidden rounded-md">
+          <div className="relative aspect-[1200/630] overflow-hidden rounded-md">
             <Image
               src={article.featuredImage.url}
               alt={article.featuredImage.alt || article.title}

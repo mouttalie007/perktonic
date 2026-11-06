@@ -12,6 +12,9 @@ import { Pagination } from "@/components/ui/Pagination";
 import { AdSlot } from "@/components/ads/AdSlot";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { JsonLd } from "@/components/seo/JsonLd";
+import { ToolCategoryPage } from "@/components/tools/ToolCategoryPage";
+import { CATEGORIES } from "@/config/site";
+import { TOOLS } from "@/config/tools";
 
 const PAGE_SIZE = 13; // 1 featured + 12 grid on page 1
 
@@ -37,6 +40,16 @@ export async function generateMetadata({
 }: Params): Promise<Metadata> {
   const { slug } = await params;
   const { page: pageParam } = await searchParams;
+  const toolCategory = CATEGORIES.find((c) => c.slug === slug);
+  if (toolCategory) {
+    // Tool categories list tools, not articles: indexable once one tool is live.
+    return seoService.buildMetadata({
+      title: `${toolCategory.name}: Free Online Tools`,
+      description: toolCategory.description,
+      path: categoryHref(slug, 1),
+      robotsIndex: TOOLS.some((t) => t.categorySlug === slug && t.status === "live"),
+    });
+  }
   const category = await categoryService.getBySlug(slug);
   if (!category) return { title: "Category not found" };
 
@@ -57,6 +70,21 @@ export async function generateMetadata({
 export default async function CategoryPage({ params, searchParams }: Params) {
   const { slug } = await params;
   const { page: pageParam } = await searchParams;
+  const toolCategory = CATEGORIES.find((c) => c.slug === slug);
+  if (toolCategory) {
+    return (
+      <>
+        <JsonLd
+          data={seoService.breadcrumbJsonLd([
+            { name: "Home", path: "/" },
+            { name: "Tools", path: "/tools" },
+            { name: toolCategory.name, path: `/category/${slug}` },
+          ])}
+        />
+        <ToolCategoryPage category={toolCategory} />
+      </>
+    );
+  }
   const category = await categoryService.getBySlug(slug);
   if (!category) notFound();
 

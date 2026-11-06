@@ -42,17 +42,19 @@ export async function generateStaticParams() {
   return slugs.map((slug) => ({ slug }));
 }
 
-export async function generateMetadata({ params }: Params): Promise<Metadata> {
+export async function generateMetadata({ params, searchParams }: Params): Promise<Metadata> {
   const { slug } = await params;
+  const { page: pageParam } = await searchParams;
   const author = await authorService.getBySlug(slug);
   if (!author) return { title: "Author not found" };
+  const page = Math.max(1, Number(pageParam) || 1);
 
   return seoService.buildMetadata({
-    title: `${author.name} — Author at PerkTonic`,
+    title: page > 1 ? `Guides by ${author.name}: page ${page}` : `Guides by ${author.name}`,
     description:
       author.bio?.slice(0, 155) ??
-      `Guides and deals written by ${author.name} on PerkTonic.`,
-    path: `/author/${slug}`,
+      `Technical guides written by ${author.name} on PerkTonic.`,
+    path: page > 1 ? `/author/${slug}?page=${page}` : `/author/${slug}`,
   });
 }
 
@@ -146,6 +148,7 @@ export default async function AuthorPage({ params, searchParams }: Params) {
             />
           ) : (
             <>
+              <h2 className="sr-only">Guides</h2>
               <StoryGrid stories={items} columns={3} />
               <Pagination
                 page={page}

@@ -224,6 +224,9 @@ body {
     list-style: decimal;
   }
   .page-prose table {
+    display: block;
+    max-width: 100%;
+    overflow-x: auto;
     width: 100%;
     border-collapse: collapse;
     font-size: 0.92rem;
@@ -476,5 +479,107 @@ body {
   }
   .animate-nav-item-in {
     animation: vt-nav-item-in var(--duration-base) var(--ease-out) both;
+  }
+}
+
+/* ==========================================================================
+   Tool pages (2026-10-30 redesign)
+   `.tool-wash` is the tinted band behind the hero and the tool; `.tool-stage`
+   wraps the interactive part. The shared class strings for the tools live in
+   src/tools/_shared/ui.ts; what Tailwind classes cannot reach (selects, the
+   numbered step badge, focus glow) is styled here. Unlayered on purpose, so
+   it also wins over utility classes copied into delivered tools.
+   ========================================================================== */
+
+.tool-wash {
+  position: relative;
+  isolation: isolate;
+  background:
+    radial-gradient(58rem 26rem at 88% -8%, rgba(11, 92, 255, 0.15), transparent 62%),
+    radial-gradient(38rem 20rem at -4% 6%, rgba(124, 58, 237, 0.09), transparent 62%),
+    linear-gradient(180deg, var(--color-hero-wash) 0%, #f5f8ff 62%, #ffffff 100%);
+}
+.tool-wash::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background-image: radial-gradient(rgba(11, 92, 255, 0.14) 1px, transparent 1px);
+  background-size: 22px 22px;
+  -webkit-mask-image: linear-gradient(180deg, #000 0%, transparent 62%);
+  mask-image: linear-gradient(180deg, #000 0%, transparent 62%);
+  pointer-events: none;
+}
+
+.tool-stage h2 {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  font-family: var(--font-heading);
+  font-size: 1.15rem;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  color: var(--color-navy);
+}
+.tool-stage .tool-step {
+  display: inline-grid;
+  flex: none;
+  place-items: center;
+  width: 1.75rem;
+  height: 1.75rem;
+  border-radius: 9999px;
+  background: linear-gradient(145deg, #3b86ff, var(--color-primary));
+  color: #fff;
+  font-size: 0.8rem;
+  font-weight: 800;
+  box-shadow: 0 5px 12px -4px rgba(11, 92, 255, 0.65);
+}
+.tool-stage select {
+  appearance: none;
+  -webkit-appearance: none;
+  padding-right: 2.25rem;
+  cursor: pointer;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='none' stroke='%2355627a' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m5 7.5 5 5 5-5'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.7rem center;
+  background-size: 1rem;
+}
+.tool-stage textarea,
+.tool-stage input:not([type="checkbox"], [type="radio"], [type="file"], [type="range"]),
+.tool-stage select {
+  border-radius: 0.75rem;
+  transition:
+    border-color var(--duration-fast) ease,
+    box-shadow var(--duration-fast) ease;
+}
+.tool-stage textarea:focus-visible,
+.tool-stage input:focus-visible,
+.tool-stage select:focus-visible {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 4px rgba(11, 92, 255, 0.13);
+}
+.tool-stage input[type="checkbox"],
+.tool-stage input[type="radio"],
+.tool-stage input[type="range"] {
+  accent-color: var(--color-primary);
+}
+.tool-stage button:not(:disabled),
+.tool-stage summary {
+  cursor: pointer;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .tool-stage {
+    animation: tool-rise 0.55s var(--ease-out) both;
+  }
+}
+@keyframes tool-rise {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }
