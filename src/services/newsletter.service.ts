@@ -1,11 +1,11 @@
 import { prisma } from "@/lib/prisma";
 import { serverEnv } from "@/config/env.server";
+import { providerEnabled, providerSubscribe, providerUnsubscribe, type ProviderConfig } from "@/lib/newsletter-provider";
 
 /**
  * Newsletter subscription abstraction (spec §18, §88, §89).
- * Phase 0: persists intent to our own table only. A provider adapter
- * (Mailchimp / Buttondown / ...) is plugged in at Phase 8 behind this same
- * interface. Subscriber emails are never exposed publicly.
+ * The address is always stored in our own table. When NEWSLETTER_PROVIDER=mailerlite and a key are set it is
+ * also sent to the provider, which sends the confirmation (double opt-in) e-mail and the campaigns. Subscriber emails are never exposed publicly.
  */
 
 export type SubscribeResult =
@@ -14,9 +14,20 @@ export type SubscribeResult =
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
+const config = (): ProviderConfig => ({
+  provider: serverEnv.NEWSLETTER_PROVIDER,
+  apiKey: serverEnv.NEWSLETTER_API_KEY,
+  groupId: serverEnv.NEWSLETTER_LIST_ID,
+});
+
 export const newsletterService = {
   get provider(): string {
     return serverEnv.NEWSLETTER_PROVIDER;
+  },
+
+  /** True when subscribers are sent to a provider that confirms them by e-mail. */
+  get confirmsByEmail(): boolean {
+    return providerEnabled(config());
   },
 
   async subscribe(
@@ -32,7 +43,9 @@ export const newsletterService = {
         update: { status: "pending", source },
         create: { email, source, status: "pending" },
       });
-      // TODO(Phase 8): forward to configured provider when this.provider is set.
+      if (providerEnabled(config()) && !(await providerSubscribe(config(), email))) {
+        return { ok: false, reason: "error" };
+      }
       return { ok: true, status: row.status as "pending" | "subscribed" };
     } catch {
       return { ok: false, reason: "error" };
@@ -46,6 +59,7 @@ export const newsletterService = {
         where: { email },
         data: { status: "unsubscribed", unsubscribedAt: new Date() },
       });
+      if (providerEnabled(config())) await providerUnsubscribe(config(), email).catch(() => false);
       return { ok: true };
     } catch {
       return { ok: false };

@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { isGonePath } from "@/config/gone";
 
 /**
  * Admin-managed URL redirects (the Redirect model, spec §38/§58). Proxy
@@ -41,6 +42,13 @@ export async function proxy(request: NextRequest) {
     url.protocol = "https:";
     url.port = "";
     return NextResponse.redirect(url, 301);
+  }
+
+  if (isGonePath(pathname)) {
+    return new NextResponse("Gone: this page was removed.", {
+      status: 410,
+      headers: { "content-type": "text/plain; charset=utf-8", "x-robots-tag": "noindex" },
+    });
   }
 
   try {

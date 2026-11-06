@@ -58,7 +58,9 @@ export async function subscribeAction(
 
   return {
     status: "success",
-    message: "You're subscribed. We'll email you when new guides are published.",
+    message: newsletterService.confirmsByEmail
+      ? "Almost done: we sent you a confirmation email. Click the link in it to finish subscribing."
+      : "You're subscribed. We'll email you when new guides are published.",
   };
 }
 

@@ -10,6 +10,7 @@ import { ToolBadges, ToolHero } from "@/components/tools/ToolHero";
 import { ToolFaq } from "@/components/tools/ToolFaq";
 import { ToolProse } from "@/components/tools/ToolProse";
 import { ToolStage } from "@/components/tools/ToolStage";
+import { ToolPrivacyNote } from "@/components/tools/ToolPrivacyNote";
 import { Breadcrumbs } from "@/components/ui/Breadcrumbs";
 import { getToolContent } from "@/lib/tool-content";
 import { articleService } from "@/services/article.service";
@@ -126,6 +127,7 @@ export default async function ToolPage({ params }: Params) {
           <ToolStage className="tool-stage mt-7 rounded-[1.75rem] bg-white/55 p-2 ring-1 ring-primary/10 backdrop-blur-sm sm:mt-9 sm:rounded-[2rem] sm:p-5 lg:p-6">
             <ToolRunner slug={slug} />
           </ToolStage>
+          <ToolPrivacyNote tool={tool} />
         </div>
       </section>
 
