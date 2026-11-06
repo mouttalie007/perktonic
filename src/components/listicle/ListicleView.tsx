@@ -209,9 +209,9 @@ export async function ListicleView({
 
         <aside className="space-y-6 lg:sticky lg:top-6 lg:self-start">
           <AdSlot placement="sidebar" />
-          {related.length > 0 && <TrendingList stories={related} title="More Good Stuff" />}
+          {related.length > 0 && <TrendingList stories={related} title="Related guides" />}
           {otherCategory.length > 0 && (
-            <TrendingList stories={otherCategory} title="Popular Elsewhere" />
+            <TrendingList stories={otherCategory} title="Guides from other areas" />
           )}
           <NewsletterSidebarCTA />
         </aside>

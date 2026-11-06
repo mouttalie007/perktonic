@@ -68,3 +68,7 @@ next-env.d.ts
 
 # Claude Code runtime state (session locks etc.), not project content
 /.claude/
+
+# deploy markers written on the server
+.deployed-lock
+.deployed-schema

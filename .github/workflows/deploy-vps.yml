@@ -28,8 +28,15 @@ jobs:
             export PATH="$HOME/node/bin:$PATH"
             cd "$HOME/app"
             git pull origin main
-            npm ci --omit=dev --no-audit --no-fund --fetch-retries=6 --fetch-retry-mintimeout=3000 --maxsockets=4
-            npx prisma generate
+            # npm ci deletes node_modules (the running site then loses its Prisma engine for a minute): only when the lockfile changed.
+            if ! cmp -s package-lock.json .deployed-lock; then
+              npm ci --omit=dev --no-audit --no-fund --fetch-retries=6 --fetch-retry-mintimeout=3000 --maxsockets=4
+              cp package-lock.json .deployed-lock
+            fi
+            if ! cmp -s prisma/schema.prisma .deployed-schema; then
+              npx prisma generate
+              cp prisma/schema.prisma .deployed-schema
+            fi
             npx prisma migrate deploy
             npm run db:import-prompts || echo "prompt import failed, continuing deploy"
             npx tsx prisma/seed-tool-categories.ts || echo "tool-category seed failed, continuing deploy"

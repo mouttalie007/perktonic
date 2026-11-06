@@ -10,7 +10,7 @@ import { FlameIcon, ArrowRightIcon } from "@/components/icons";
  */
 export function TrendingList({
   stories,
-  title = "Trending Now",
+  title = "Popular guides",
   seeAllHref,
   className = "",
 }: {
