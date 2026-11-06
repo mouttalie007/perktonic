@@ -498,6 +498,8 @@ enum ReactionEmoji {
   WOW // 😮
   ANGRY // 😡
   SAD // 😢
+  HELPFUL // "Was this guide helpful?": yes
+  NOT_HELPFUL // "Was this guide helpful?": no
 }
 
 /// Aggregate reaction counters per article/emoji. Anonymous — there is no

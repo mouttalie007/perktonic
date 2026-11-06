@@ -4,13 +4,12 @@ import type { ArticleCard } from "@/services/article.service";
 import { Breadcrumbs, type Crumb } from "@/components/ui/Breadcrumbs";
 import { ShareButtons } from "@/components/article/ShareButtons";
 import { AuthorBox } from "@/components/article/AuthorBox";
-import { ReactionBar } from "@/components/article/ReactionBar";
+import { HelpfulVote } from "@/components/article/HelpfulVote";
 import { CommentSection } from "@/components/article/CommentSection";
 import { NewsletterSidebarCTA } from "@/components/article/NewsletterSidebarCTA";
 import { QuizCta } from "@/components/article/QuizCta";
 import { AdSlot } from "@/components/ads/AdSlot";
 import { TrendingList } from "@/components/home/TrendingList";
-import { reactionService } from "@/services/reaction.service";
 import { formatReadingTime } from "@/lib/format";
 import { DEFAULT_AUTHOR_NAME } from "@/config/site";
 import {
@@ -68,7 +67,6 @@ export async function ListicleView({
   const showExtras = isFirst || isLast;
   // Reactions/comments only once the reader has reached the end — showing
   // the same thread on page 1 too would be a confusing duplicate.
-  const reactionCounts = isLast ? await reactionService.getCounts(article.id) : {};
   const authorName = article.author?.name ?? DEFAULT_AUTHOR_NAME;
 
   const adCtx = {
@@ -181,7 +179,7 @@ export async function ListicleView({
           />
 
           <div className="border-line mt-10 flex flex-wrap items-center justify-between gap-4 border-t pt-6">
-            {isLast && <ReactionBar articleId={article.id} initialCounts={reactionCounts} />}
+            {isLast && <HelpfulVote articleId={article.id} />}
             <ShareButtons url={canonical} title={article.title} />
           </div>
 

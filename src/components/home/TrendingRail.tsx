@@ -192,7 +192,6 @@ export function TrendingRail({
                   {story.title}
                 </h3>
                 <EngagementMeta
-                  reactions={eng?.reactions ?? {}}
                   commentCount={eng?.commentCount ?? 0}
                   className="mt-1.5"
                 />

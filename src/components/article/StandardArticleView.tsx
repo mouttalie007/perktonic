@@ -6,13 +6,12 @@ import { ArticleHeader } from "./ArticleHeader";
 import { ArticleBody } from "./ArticleBody";
 import { ShareButtons } from "./ShareButtons";
 import { AuthorBox } from "./AuthorBox";
-import { ReactionBar } from "./ReactionBar";
+import { HelpfulVote } from "./HelpfulVote";
 import { CommentSection } from "./CommentSection";
 import { NewsletterSidebarCTA } from "./NewsletterSidebarCTA";
 import { QuizCta } from "./QuizCta";
 import { AdSlot } from "@/components/ads/AdSlot";
 import { TrendingList } from "@/components/home/TrendingList";
-import { reactionService } from "@/services/reaction.service";
 
 /* Loose shape — the article payload from articleService has all of this. */
 type ViewArticle = Parameters<typeof ArticleHeader>[0]["article"] & {
@@ -42,7 +41,6 @@ export async function StandardArticleView({
   otherCategory: ArticleCard[];
   quiz: { title: string; questionCount: number } | null;
 }) {
-  const reactionCounts = await reactionService.getCounts(article.id);
   const adCtx = {
     adsDisabled: article.adsDisabled,
     adOverrides: (article.adOverrides ?? null) as Record<
@@ -82,7 +80,7 @@ export async function StandardArticleView({
           </div>
 
           <div className="border-line mt-10 flex flex-wrap items-center justify-between gap-4 border-t pt-6">
-            <ReactionBar articleId={article.id} initialCounts={reactionCounts} />
+            <HelpfulVote articleId={article.id} />
             <ShareButtons url={canonical} title={article.title} />
           </div>
 

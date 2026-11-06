@@ -7,7 +7,7 @@ import { getClientIp, hashIp } from "@/lib/client-ip";
 
 const schema = z.object({
   articleId: z.string().min(1),
-  emoji: z.enum(["LAUGH", "LOVE", "WOW", "ANGRY", "SAD"]),
+  emoji: z.enum(["HELPFUL", "NOT_HELPFUL"]),
 });
 
 // Client-side localStorage already stops a casual double-click; this backs

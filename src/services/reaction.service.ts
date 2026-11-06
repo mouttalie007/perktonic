@@ -2,18 +2,10 @@ import { prisma } from "@/lib/prisma";
 import type { ReactionEmoji } from "@prisma/client";
 
 /**
- * Emoji reaction counters (homepage redesign, 2026-09-12). Anonymous
+ * Reaction counters; today only the "Was this guide helpful?" votes (HELPFUL / NOT_HELPFUL) are used. Anonymous
  * aggregate counts, no per-visitor identity — see the schema comment on
  * ArticleReaction for the trade-off.
  */
-
-export const REACTION_EMOJI: Record<ReactionEmoji, string> = {
-  LAUGH: "😂",
-  LOVE: "😍",
-  WOW: "😮",
-  ANGRY: "😡",
-  SAD: "😢",
-};
 
 export type ReactionCounts = Partial<Record<ReactionEmoji, number>>;
 
@@ -57,18 +49,3 @@ export const reactionService = {
   },
 };
 
-/** Sum of all emoji counts. */
-export function totalReactions(counts: ReactionCounts): number {
-  return Object.values(counts).reduce((sum: number, n) => sum + (n ?? 0), 0);
-}
-
-/** Top N emoji by count, highest first. */
-export function topReactions(
-  counts: ReactionCounts,
-  n = 2,
-): { emoji: ReactionEmoji; count: number }[] {
-  return (Object.entries(counts) as [ReactionEmoji, number][])
-    .sort((a, b) => b[1] - a[1])
-    .slice(0, n)
-    .map(([emoji, count]) => ({ emoji, count }));
-}

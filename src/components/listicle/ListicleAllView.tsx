@@ -4,13 +4,12 @@ import type { ArticleCard } from "@/services/article.service";
 import { Breadcrumbs, type Crumb } from "@/components/ui/Breadcrumbs";
 import { ShareButtons } from "@/components/article/ShareButtons";
 import { AuthorBox } from "@/components/article/AuthorBox";
-import { ReactionBar } from "@/components/article/ReactionBar";
+import { HelpfulVote } from "@/components/article/HelpfulVote";
 import { CommentSection } from "@/components/article/CommentSection";
 import { NewsletterSidebarCTA } from "@/components/article/NewsletterSidebarCTA";
 import { QuizCta } from "@/components/article/QuizCta";
 import { AdSlot } from "@/components/ads/AdSlot";
 import { TrendingList } from "@/components/home/TrendingList";
-import { reactionService } from "@/services/reaction.service";
 import { formatReadingTime } from "@/lib/format";
 import { DEFAULT_AUTHOR_NAME } from "@/config/site";
 import { subpagePath, type ListicleItemLike } from "@/lib/listicle";
@@ -54,7 +53,6 @@ export async function ListicleAllView({
   otherCategory: ArticleCard[];
   quiz: { title: string; questionCount: number } | null;
 }) {
-  const reactionCounts = await reactionService.getCounts(article.id);
   const authorName = article.author?.name ?? DEFAULT_AUTHOR_NAME;
   const adCtx = {
     adsDisabled: article.adsDisabled,
@@ -133,7 +131,7 @@ export async function ListicleAllView({
           </div>
 
           <div className="border-line mt-12 flex flex-wrap items-center justify-between gap-4 border-t pt-6">
-            <ReactionBar articleId={article.id} initialCounts={reactionCounts} />
+            <HelpfulVote articleId={article.id} />
             <ShareButtons url={canonical} title={article.title} />
           </div>
           <div className="mt-8">

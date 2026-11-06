@@ -131,7 +131,6 @@ export function StoryCard({
   sizes,
   headingClassName,
   className = "",
-  reactions,
   commentCount,
 }: Props) {
   const href = storyHref(story.slug);
@@ -301,8 +300,8 @@ export function StoryCard({
           {story.title}
         </h3>
         <span className="mt-auto pt-3">
-          {reactions || commentCount ? (
-            <EngagementMeta reactions={reactions ?? {}} commentCount={commentCount ?? 0} />
+          {commentCount ? (
+            <EngagementMeta commentCount={commentCount} />
           ) : (
             <Meta story={story} />
           )}
