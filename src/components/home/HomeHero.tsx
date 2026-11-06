@@ -83,12 +83,12 @@ export function HomeHero() {
             </span>
             <ul className="-mr-4 flex min-w-0 [scrollbar-width:none] gap-2 overflow-x-auto pr-4 sm:mr-0 sm:flex-wrap sm:overflow-visible sm:pr-0 [&::-webkit-scrollbar]:hidden">
               {POPULAR_SEARCHES.map((q) => (
-                <li key={q} className="shrink-0">
+                <li key={q.slug} className="shrink-0">
                   <Link
-                    href={`/search?q=${encodeURIComponent(q)}` as Route}
+                    href={`/tools/${q.slug}` as Route}
                     className="text-primary hover:bg-primary bg-primary-soft inline-block rounded-full px-3.5 py-1.5 text-[0.8rem] font-medium transition-colors hover:text-white"
                   >
-                    {q}
+                    {q.label}
                   </Link>
                 </li>
               ))}

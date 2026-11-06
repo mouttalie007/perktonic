@@ -469,10 +469,11 @@ export const popularTools = () => TOOLS.filter((t) => t.popular);
 export const toolBySlug = (slug: string) => TOOLS.find((t) => t.slug === slug);
 
 /** Searches shown as chips under the hero search box. */
-export const POPULAR_SEARCHES = [
-  "excel formula",
-  "pdf to excel",
-  "csv to json",
-  "regex tester",
-  "meta tag checker",
+/** The quick links under the home search box: each goes straight to its tool (not to a search results page). */
+export const POPULAR_SEARCHES: { label: string; slug: string }[] = [
+  { label: "excel formula", slug: "excel-formula-generator" },
+  { label: "pdf to excel", slug: "pdf-to-excel" },
+  { label: "csv to json", slug: "csv-to-json-converter" },
+  { label: "regex tester", slug: "regex-generator-tester" },
+  { label: "meta tag checker", slug: "opengraph-and-meta-tag-validator" },
 ];

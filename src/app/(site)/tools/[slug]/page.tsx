@@ -12,11 +12,16 @@ import { ToolProse } from "@/components/tools/ToolProse";
 import { ToolStage } from "@/components/tools/ToolStage";
 import { Breadcrumbs } from "@/components/ui/Breadcrumbs";
 import { getToolContent } from "@/lib/tool-content";
+import { articleService } from "@/services/article.service";
+import { StoryCard } from "@/components/story/StoryCard";
 import { seoService } from "@/services/seo.service";
 import { ToolRunner } from "@/tools/ToolRunner";
 import { TOOL_SLUGS } from "@/tools/slugs";
 
 type Params = { params: Promise<{ slug: string }> };
+
+/** Static pages, refreshed hourly so new guides show up in "Guides for this tool". */
+export const revalidate = 3600;
 
 /**
  * One route for every tool. A live tool (status "live" + a component in
@@ -54,6 +59,7 @@ export default async function ToolPage({ params }: Params) {
   if (!isLive(slug)) return <ComingSoon slug={slug} />;
 
   const { meta, hero, sections, faq } = getToolContent(slug);
+  const guides = await articleService.listByTool(slug);
   const related = (meta.relatedSlugs ?? [])
     .map((s) => toolBySlug(s))
     .filter((t): t is NonNullable<typeof t> => !!t && isLive(t.slug));
@@ -146,6 +152,23 @@ export default async function ToolPage({ params }: Params) {
               </section>
             );
           })}
+
+          {guides.length > 0 && (
+            <section aria-labelledby="sec-guides">
+              <h2
+                id="sec-guides"
+                className="font-heading text-navy mb-5 flex items-center gap-3 text-2xl font-extrabold tracking-tight"
+              >
+                <span aria-hidden className="from-primary h-6 w-1.5 rounded-full bg-gradient-to-b to-violet-500" />
+                Guides for this tool
+              </h2>
+              <div className="space-y-4">
+                {guides.map((g) => (
+                  <StoryCard key={g.id} story={g} variant="row" />
+                ))}
+              </div>
+            </section>
+          )}
         </div>
 
         <aside aria-label="More tools" className="mt-14 min-w-0 lg:mt-0">

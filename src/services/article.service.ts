@@ -102,6 +102,16 @@ export const articleService = {
     });
   },
 
+  /** Published guides that link to a tool page (the tool is linked from the guide body), newest first. */
+  async listByTool(toolSlug: string, limit = 4): Promise<ArticleCard[]> {
+    return prisma.article.findMany({
+      where: { ...published(), content: { contains: `href="/tools/${toolSlug}"` } },
+      orderBy: { publishedAt: "desc" },
+      take: limit,
+      select: cardSelect,
+    });
+  },
+
   /** The newest published article of each given category (categories without one are skipped), in the given order. */
   async listLatestPerCategory(categorySlugs: string[]): Promise<ArticleCard[]> {
     const found = await Promise.all(
