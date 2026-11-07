@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef, useState, useCallback } from "react";
+import { createPortal } from "react-dom";
 import { useRouter } from "next/navigation";
 import type { Route } from "next";
 import { SearchIcon, CloseIcon } from "@/components/icons";
@@ -39,7 +40,9 @@ export function SearchOverlay({
 
   if (!open) return null;
 
-  return (
+  // Rendered on <body>: the header has backdrop-filter, which makes it the containing block of any
+  // fixed child and would shrink the overlay to the header's box.
+  return createPortal(
     <div
       className="fixed inset-0 z-[110] flex items-start justify-center bg-black/60 px-4 pt-[12vh] backdrop-blur-sm"
       onMouseDown={(e) => {
@@ -92,6 +95,7 @@ export function SearchOverlay({
           </button>
         </form>
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 }

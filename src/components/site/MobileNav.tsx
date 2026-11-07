@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef } from "react";
+import { createPortal } from "react-dom";
 import Link from "next/link";
 import type { Route } from "next";
 import { CATEGORIES, NAV_LINKS } from "@/config/site";
@@ -31,7 +32,9 @@ export function MobileNav({
   const isActive = (href: string) =>
     href === "/" ? pathname === "/" : pathname.startsWith(href);
 
-  return (
+  // Rendered on <body>: the header has backdrop-filter, which makes it the containing block of any
+  // fixed child and would shrink the overlay to the header's box.
+  return createPortal(
     <div
       className="animate-fade-in fixed inset-0 z-[110] bg-slate-900/50 lg:hidden"
       onMouseDown={(e) => {
@@ -103,6 +106,7 @@ export function MobileNav({
           </Link>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 }
