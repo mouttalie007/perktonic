@@ -5,11 +5,19 @@ import { createPortal } from "react-dom";
 import Link from "next/link";
 import type { Route } from "next";
 import { CATEGORIES, NAV_LINKS } from "@/config/site";
-import { ArrowRightIcon, CloseIcon } from "@/components/icons";
+import { ArrowRightIcon, BookIcon, CloseIcon, HomeIcon, InfoIcon, WrenchIcon } from "@/components/icons";
 import { Logo } from "./Logo";
 import { ToolIcon } from "./ToolIcon";
 import { useFocusTrap } from "@/lib/use-focus-trap";
 import { useBodyScrollLock } from "@/lib/use-body-scroll-lock";
+
+/** A small coloured icon tile for each main link of the menu. */
+const NAV_ICON: Record<string, { Icon: typeof HomeIcon; tile: string }> = {
+  "/": { Icon: HomeIcon, tile: "bg-blue-50 text-blue-600" },
+  "/tools": { Icon: WrenchIcon, tile: "bg-amber-50 text-amber-600" },
+  "/blog": { Icon: BookIcon, tile: "bg-violet-50 text-violet-600" },
+  "/about": { Icon: InfoIcon, tile: "bg-emerald-50 text-emerald-600" },
+};
 
 /**
  * Slide-in mobile menu: accessible dialog (focus trap, Escape, scroll lock).
@@ -67,12 +75,23 @@ export function MobileNav({
               href={item.href as Route}
               onClick={onClose}
               aria-current={isActive(item.href) ? "page" : undefined}
-              className={`rounded-xl px-3 py-3 text-base font-semibold ${
+              className={`flex items-center gap-3 rounded-xl px-3 py-2.5 text-base font-semibold ${
                 isActive(item.href)
                   ? "bg-primary-soft text-primary"
                   : "text-navy hover:bg-slate-50"
               }`}
             >
+              {NAV_ICON[item.href] && (
+                <span
+                  aria-hidden
+                  className={`flex size-9 shrink-0 items-center justify-center rounded-xl ${NAV_ICON[item.href].tile}`}
+                >
+                  {(() => {
+                    const { Icon } = NAV_ICON[item.href];
+                    return <Icon width={19} height={19} />;
+                  })()}
+                </span>
+              )}
               {item.label}
             </Link>
           ))}
